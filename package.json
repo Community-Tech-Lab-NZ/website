@@ -13,14 +13,18 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "check:brand": "node scripts/check-brand-tokens.mjs"
+    "check:brand": "node scripts/check-brand-tokens.mjs",
+    "check:logic": "node scripts/check-application-logic.mjs"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "google-auth-library": "^10.9.1",
     "next": "16.2.12",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "resend": "^6.18.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
@@ -30,6 +34,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.12",
     "tailwindcss": "^4",
+    "tsx": "^4.23.1",
     "typescript": "^5"
   }
 }

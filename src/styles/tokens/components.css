@@ -111,4 +111,10 @@
 
   /* Minimum touch target for interactive elements in the mobile nav. */
   --tap-target: 48px;
+
+  /* Step-nav and slot numbering share the tighter mono tracking. */
+  --tracking-step: 0.12em;
+  /* Matches the global link underline offset from base.css, for elements that
+     look like links but are not anchors. */
+  --link-underline-offset: 3px;
 }

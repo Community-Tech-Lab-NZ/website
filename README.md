@@ -32,14 +32,20 @@ pnpm dev
 
 The site runs at http://localhost:3000.
 
+The site runs fully without any configuration. Forms validate, and the submission
+route reports an honest failure rather than pretending to save. See
+[`.env.example`](.env.example) to connect the real Sheet.
+
 ## Commands
 
-| Command      | What it does               |
-| ------------ | -------------------------- |
-| `pnpm dev`   | Start the dev server       |
-| `pnpm build` | Production build           |
-| `pnpm start` | Serve the production build |
-| `pnpm lint`  | Lint with ESLint           |
+| Command             | What it does                                          |
+| ------------------- | ----------------------------------------------------- |
+| `pnpm dev`          | Start the dev server                                  |
+| `pnpm build`        | Production build                                      |
+| `pnpm start`        | Serve the production build                            |
+| `pnpm lint`         | Lint with ESLint                                      |
+| `pnpm check:brand`  | Fail on values that bypass the design token layer     |
+| `pnpm check:logic`  | Window boundaries, eligibility gates, anti-spam rules |
 
 ## Stack
 
@@ -49,6 +55,38 @@ Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS 4.
 
 The visual mark is **The Caret** — simple and forward-looking. Tone throughout the
 site is warm, grounded and community-focused. No corporate jargon.
+
+The brand system is **locked**: four colours, an 8px spacing base derived from the
+logo's cursor block, and a fixed type scale. `brand-guide.md` is the reference and
+`src/styles/tokens/` is the implementation.
+
+Two rules worth knowing before you write a component:
+
+- **The tokens are the source of truth.** The `@theme` block in
+  `src/app/globals.css` only maps them onto Tailwind. Change a value in
+  `tokens/`, never in the mapping.
+- **Off-brand utilities do not compile.** Every theme namespace is cleared, so
+  `bg-blue-500` and `rounded-lg` genuinely do not exist. Arbitrary values are the
+  remaining gap, and `pnpm check:brand` catches those.
+
+Some rules the tooling cannot enforce, from the brand guide: two colours maximum
+per surface, one gold thing per viewport, gold is never body copy, and cards take
+a hairline border and no shadow.
+
+## How applications are collected
+
+Submissions go to a Google Sheet owned by the programme, with a formatted Google
+Doc generated per application so the panel has something readable to work from.
+
+The ordering in `src/app/api/apply/route.ts` is deliberate: the raw JSON is
+written to the `_raw` tab **before** any formatting, Doc creation, upload or
+email. Once that write succeeds the route never returns an error, because telling
+someone their application failed after 50 minutes of work — when the data is
+actually saved — is the worst outcome this code can produce. Everything after
+that step is best-effort and logged.
+
+The community form autosaves to `localStorage` as it is filled in. The
+eligibility gates and the declaration are deliberately not persisted.
 
 ## Contributing
 

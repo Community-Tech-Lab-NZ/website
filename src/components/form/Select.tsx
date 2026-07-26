@@ -36,6 +36,15 @@ export function Select({
   const isInvalid = invalid ?? field.invalid ?? false;
   const isInverse = inverse ?? field.inverse ?? false;
 
+  // A select must be controlled OR uncontrolled, never both. When the caller
+  // supplies `value` the placeholder is selected by that value being "", so
+  // defaultValue must not also be set — React warns and the behaviour is
+  // ambiguous otherwise.
+  const uncontrolled = props.value === undefined;
+  const defaultValue = uncontrolled
+    ? (props.defaultValue ?? (placeholder ? "" : undefined))
+    : undefined;
+
   return (
     <div className={clsx("relative", className)}>
       <select
@@ -43,7 +52,7 @@ export function Select({
         aria-describedby={props["aria-describedby"] ?? field.describedBy}
         aria-invalid={isInvalid || undefined}
         required={props.required ?? field.required}
-        defaultValue={props.defaultValue ?? (placeholder ? "" : undefined)}
+        defaultValue={defaultValue}
         className={controlClasses({
           inverse: isInverse,
           invalid: isInvalid,

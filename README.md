@@ -108,7 +108,7 @@ check the issues list for work that's ready to pick up.
 ## Related repositories
 
 The three community solutions built during the programme live alongside this one in
-the [`communitytechlab`](https://github.com/communitytechlab) organisation.
+the [`Community-Tech-Lab-NZ`](https://github.com/Community-Tech-Lab-NZ) organisation.
 
 ## Licence
 

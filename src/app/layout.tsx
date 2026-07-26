@@ -3,7 +3,7 @@ import { Archivo, Source_Sans_3, Space_Mono } from "next/font/google";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { RouteFade } from "@/components/RouteFade";
-import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
+import { IS_PRODUCTION, SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 import {
   JsonLd,
   organizationSchema,
@@ -51,13 +51,16 @@ export const metadata: Metadata = {
   },
   description: SITE_DESCRIPTION,
   alternates: { canonical: "/" },
-  // Explicit rather than assumed: the site should be indexed, and this makes
-  // that a decision on the record rather than a default nobody checked.
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: { index: true, follow: true, "max-image-preview": "large" },
-  },
+  // Production is indexed; previews are not. robots.txt already blocks previews,
+  // but a direct link to a preview page bypasses robots.txt entirely — the meta
+  // tag is what actually keeps it out of the index.
+  robots: IS_PRODUCTION
+    ? {
+        index: true,
+        follow: true,
+        googleBot: { index: true, follow: true, "max-image-preview": "large" },
+      }
+    : { index: false, follow: false },
   openGraph: {
     type: "website",
     siteName: SITE_NAME,

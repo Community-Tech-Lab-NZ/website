@@ -1,5 +1,7 @@
 # Community Tech Lab — website
 
+**[communitytechlab.co.nz](https://communitytechlab.co.nz)**
+
 The website for Community Tech Lab, a civic tech initiative in the Queenstown Lakes
 District, Aotearoa New Zealand.
 
@@ -87,6 +89,15 @@ that step is best-effort and logged.
 
 The community form autosaves to `localStorage` as it is filled in. The
 eligibility gates and the declaration are deliberately not persisted.
+
+## Deploying
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for the full sequence: the Google Sheet and
+Drive setup, Vercel, Resend DNS at GoDaddy, and pointing the domain.
+
+Preview deployments are deliberately not indexable — `robots.txt` blocks them and
+every page carries `noindex`, so a preview URL can never compete with the real
+domain in search.
 
 ## Contributing
 

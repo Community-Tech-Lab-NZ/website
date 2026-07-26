@@ -1,26 +1,46 @@
-/* Canonical site URL.
+/* Canonical site URL and environment.
  *
- * Needed for absolute URLs in Open Graph tags, the sitemap and robots.txt.
- * Relative URLs do not work in any of those: a social card with a relative image
- * path simply shows nothing.
+ * Needed for absolute URLs in Open Graph tags, canonicals, the sitemap and
+ * robots.txt. Relative URLs do not work in any of those: a social card with a
+ * relative image path shows nothing, and a canonical pointing at localhost is
+ * worse than no canonical at all.
  *
- * The domain is not registered yet, so this reads from the environment with a
- * placeholder fallback. Set NEXT_PUBLIC_SITE_URL in Vercel once the domain is
- * live, and everything downstream becomes correct without a code change.
- *
- * Vercel supplies VERCEL_PROJECT_PRODUCTION_URL automatically, so preview and
- * production deployments generate correct absolute URLs even before a custom
- * domain is attached.
+ * The production domain is hardcoded as the fallback rather than left to an
+ * environment variable. A missed env var would otherwise publish localhost
+ * canonicals to the live site, which is exactly the kind of silent failure
+ * nobody notices until the site is not ranking.
  */
 
+export const PRODUCTION_URL = "https://communitytechlab.co.nz";
+
+type Environment = "production" | "preview" | "development";
+
+function resolveEnvironment(): Environment {
+  // Vercel sets this on every deployment.
+  const vercelEnv = process.env.VERCEL_ENV;
+  if (vercelEnv === "production" || vercelEnv === "preview") return vercelEnv;
+  if (process.env.NODE_ENV === "development") return "development";
+  return "production";
+}
+
+export const ENVIRONMENT = resolveEnvironment();
+export const IS_PRODUCTION = ENVIRONMENT === "production";
+
 function resolveSiteUrl(): string {
+  // An explicit override always wins, for staging on another domain.
   const explicit = process.env.NEXT_PUBLIC_SITE_URL;
   if (explicit) return explicit.replace(/\/$/, "");
 
-  const vercel = process.env.VERCEL_PROJECT_PRODUCTION_URL;
-  if (vercel) return `https://${vercel}`;
+  if (ENVIRONMENT === "development") return "http://localhost:3000";
 
-  return "http://localhost:3000";
+  // Preview deployments get their own URL so their canonicals are
+  // self-consistent. They are not indexed, so this never competes with
+  // production in search results.
+  if (ENVIRONMENT === "preview" && process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+
+  return PRODUCTION_URL;
 }
 
 export const SITE_URL = resolveSiteUrl();

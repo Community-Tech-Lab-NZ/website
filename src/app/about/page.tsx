@@ -9,13 +9,15 @@ import { Reveal } from "@/components/Reveal";
 import { Section } from "@/components/Section";
 import { SectionRule } from "@/components/SectionRule";
 import { Body, Eyebrow, Heading, Lede } from "@/components/Typography";
+import { breadcrumbSchema, JsonLd, showcaseEventSchema } from "@/lib/structured-data";
 
 /* About. Copy transcribed verbatim from the prototype. */
 
 export const metadata: Metadata = {
-  title: "About",
+  title: "About the programme",
   description:
-    "Two things are true about the Queenstown Lakes district at the same time: developers with capacity to spare, and organisations running on spreadsheets.",
+    "The Queenstown Lakes district has developers with capacity to spare and community organisations running on spreadsheets. Nothing was connecting them.",
+  alternates: { canonical: "/about" },
 };
 
 const PEOPLE = [
@@ -70,6 +72,15 @@ const PARTNER_ROLES = [
 export default function AboutPage() {
   return (
     <>
+      <JsonLd
+        data={[
+          showcaseEventSchema(),
+          breadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "About", path: "/about" },
+          ]),
+        ]}
+      />
       <Section className="pb-7">
         <Eyebrow className="mb-4">About</Eyebrow>
         <Heading level={1} fluid className="max-w-[var(--page-heading-max)]">

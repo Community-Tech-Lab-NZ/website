@@ -4,6 +4,12 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { RouteFade } from "@/components/RouteFade";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
+import {
+  JsonLd,
+  organizationSchema,
+  programmeSchema,
+  websiteSchema,
+} from "@/lib/structured-data";
 import "./globals.css";
 
 /* Three faces, fixed jobs, no fourth. The --ff-* variable names stay clear of
@@ -37,10 +43,21 @@ export const metadata: Metadata = {
   // image path simply renders no card at all.
   metadataBase: new URL(SITE_URL),
   title: {
-    default: SITE_NAME,
+    // Brand first, place second. Almost nobody knows the programme by name yet,
+    // so the place is what makes a brand search resolvable and tells a search
+    // engine this is a Queenstown Lakes thing rather than a software product.
+    default: `${SITE_NAME} · Queenstown Lakes`,
     template: `%s · ${SITE_NAME}`,
   },
   description: SITE_DESCRIPTION,
+  alternates: { canonical: "/" },
+  // Explicit rather than assumed: the site should be indexed, and this makes
+  // that a decision on the record rather than a default nobody checked.
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large" },
+  },
   openGraph: {
     type: "website",
     siteName: SITE_NAME,
@@ -80,6 +97,9 @@ export default function RootLayout({
         <noscript>
           <style>{`.ctl-rise{opacity:1!important;transform:none!important}`}</style>
         </noscript>
+        {/* Site-wide structured data. Page-specific schemas are added by the
+            routes that need them. */}
+        <JsonLd data={[organizationSchema(), websiteSchema(), programmeSchema()]} />
       </head>
       <body className="flex min-h-full flex-col">
         <a

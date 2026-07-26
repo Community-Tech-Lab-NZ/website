@@ -16,6 +16,7 @@ export const metadata: Metadata = {
   title: "Programme terms",
   description:
     "Who can apply, how applications are assessed, what you receive, who owns the data and the code, and what happens after a build finishes.",
+  alternates: { canonical: "/terms" },
 };
 
 export default function TermsPage() {

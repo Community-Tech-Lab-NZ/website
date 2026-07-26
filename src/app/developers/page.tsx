@@ -10,6 +10,7 @@ import { StatFigure } from "@/components/StatFigure";
 import { Timeline } from "@/components/Timeline";
 import { Eyebrow, Heading, Lede } from "@/components/Typography";
 import { TIMELINE } from "@/lib/navigation";
+import { breadcrumbSchema, JsonLd, jobPostingsSchema } from "@/lib/structured-data";
 
 /* For developers. Copy transcribed verbatim from the prototype.
  *
@@ -19,9 +20,11 @@ import { TIMELINE } from "@/lib/navigation";
  */
 
 export const metadata: Metadata = {
-  title: "For developers",
+  // Developers search for work and a place, not for a nav label.
+  title: "Paid developer roles in Queenstown Lakes",
   description:
-    "Six paid seats across three teams building open-source tools for community organisations in the Queenstown Lakes district.",
+    "Six paid contract seats for developers and designers in the Queenstown Lakes district. About 12 hours a week for five weeks, building open-source tools.",
+  alternates: { canonical: "/developers" },
 };
 
 const ROLES = [
@@ -53,6 +56,19 @@ const WHAT_YOU_GET = [
 export default function DevelopersPage() {
   return (
     <>
+      {/* These are genuine paid contract seats with defined hours and a closing
+          date, which is exactly what JobPosting describes. Marking them up means
+          a developer searching for work in the district can find them without
+          ever having heard of the programme. */}
+      <JsonLd
+        data={[
+          ...jobPostingsSchema(),
+          breadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "For developers", path: "/developers" },
+          ]),
+        ]}
+      />
       <section className="bg-ink text-body-inverse">
         <div className="mx-auto max-w-page px-gutter pb-8 pt-9 lg:px-gutter-lg">
           <Eyebrow inverse className="mb-4 text-fern">

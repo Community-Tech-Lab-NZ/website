@@ -25,9 +25,11 @@ import { TIMELINE } from "@/lib/navigation";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Apply",
+  // The deadline is the most useful thing a searcher can see in a result.
+  title: "Apply by 31 August",
   description:
-    "Applications open 15 to 31 August. Six sections, about 45 to 60 minutes. You do not need to be technical.",
+    "Applications are open 15 to 31 August for community organisations and developers in the Queenstown Lakes district. You do not need to be technical.",
+  alternates: { canonical: "/apply" },
 };
 
 export default function ApplyPage() {

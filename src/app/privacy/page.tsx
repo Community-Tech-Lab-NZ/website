@@ -25,7 +25,8 @@ import { Eyebrow, Heading, Lede } from "@/components/Typography";
 export const metadata: Metadata = {
   title: "Privacy",
   description:
-    "What we collect when you apply, why we collect it, who reads it, and how to see or correct it.",
+    "What we collect when you apply, why we collect it, who reads it, where it is stored, and how to see or correct it.",
+  alternates: { canonical: "/privacy" },
 };
 
 const SECTIONS = [

@@ -9,6 +9,7 @@ import { SectionRule } from "@/components/SectionRule";
 import { Timeline } from "@/components/Timeline";
 import { Body, Eyebrow, Heading, Lede } from "@/components/Typography";
 import { TIMELINE } from "@/lib/navigation";
+import { breadcrumbSchema, JsonLd } from "@/lib/structured-data";
 
 /* For organisations. Copy transcribed verbatim from the prototype.
  *
@@ -17,9 +18,13 @@ import { TIMELINE } from "@/lib/navigation";
  */
 
 export const metadata: Metadata = {
-  title: "For organisations",
+  // "For organisations" is a navigation label, not a search. Nobody types it.
+  // A volunteer treasurer searches for the thing they want, so the title leads
+  // with that and names the district for local search.
+  title: "Free digital tools for community organisations",
   description:
-    "Three solutions are built in parallel for community organisations in the Queenstown Lakes district, at no cost to the organisation.",
+    "Free custom software for not-for-profits, charities and community groups in the Queenstown Lakes district. Local developers build it, at no cost to you.",
+  alternates: { canonical: "/organisations" },
 };
 
 const WHAT_IT_INVOLVES = [
@@ -33,6 +38,12 @@ const WHAT_IT_INVOLVES = [
 export default function OrganisationsPage() {
   return (
     <>
+      <JsonLd
+        data={breadcrumbSchema([
+          { name: "Home", path: "/" },
+          { name: "For organisations", path: "/organisations" },
+        ])}
+      />
       <Section className="pb-7">
         <Eyebrow className="mb-4">For community organisations</Eyebrow>
         <Heading level={1} fluid className="max-w-[var(--page-heading-max)]">

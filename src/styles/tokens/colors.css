@@ -1,0 +1,63 @@
+/* Kōwhai colourway. Two colours maximum per surface. */
+:root{
+  /* Base palette (locked, brand sheet 16 Jul 2026) */
+  --ctl-ink:#14211A;
+  --ctl-fern:#2E8E52;
+  --ctl-kowhai:#F0A81E;
+  --ctl-oat:#F3EFE3;
+  --ctl-white:#FFFFFF;
+
+  /* Derived neutrals. Only ever tints of Ink or Oat, never new hues. */
+  --ctl-ink-90:rgba(20,33,26,.90);
+  --ctl-ink-70:rgba(20,33,26,.70);
+  --ctl-ink-55:rgba(20,33,26,.55);
+  --ctl-ink-16:rgba(20,33,26,.16);
+  --ctl-ink-08:rgba(20,33,26,.08);
+  --ctl-oat-90:rgba(243,239,227,.90);
+  --ctl-oat-70:rgba(243,239,227,.70);
+  --ctl-oat-16:rgba(243,239,227,.16);
+  --ctl-oat-sunk:#EAE5D6; /* Oat pressed one step down for inset wells */
+  --ctl-ink-raised:#1D2E24; /* Ink one step up for cards on Ink */
+
+  /* Semantic - light surface (Oat) */
+  --surface-page:var(--ctl-oat);
+  --surface-card:var(--ctl-white);
+  --surface-sunk:var(--ctl-oat-sunk);
+  --text-heading:var(--ctl-ink);
+  --text-body:var(--ctl-ink-90);
+  --text-muted:var(--ctl-ink-55);
+  --text-link:var(--ctl-ink);
+  --rule-hairline:var(--ctl-ink-16);
+  --rule-accent:var(--ctl-kowhai);
+
+  /* Semantic - dark surface (Ink) */
+  --surface-page-inverse:var(--ctl-ink);
+  --surface-card-inverse:var(--ctl-ink-raised);
+  --text-heading-inverse:var(--ctl-oat);
+  --text-body-inverse:var(--ctl-oat-90);
+  --text-muted-inverse:var(--ctl-oat-70);
+  --text-link-inverse:var(--ctl-fern);
+  --rule-hairline-inverse:var(--ctl-oat-16);
+
+  /* Accent roles. Kōwhai is decorative on Oat, safe as text on Ink. */
+  --accent:var(--ctl-kowhai);
+  --accent-on-ink-text:var(--ctl-kowhai);
+  --accent-structural:var(--ctl-fern);
+
+  /* Actions */
+  --action-primary-bg:var(--ctl-kowhai);
+  --action-primary-fg:var(--ctl-ink);
+  --action-primary-bg-hover:#E09A14;
+  --action-secondary-bg:var(--ctl-ink);
+  --action-secondary-fg:var(--ctl-oat);
+  --action-secondary-bg-hover:#0D170F;
+  --action-tertiary-bg:var(--ctl-fern);
+  --action-tertiary-fg:var(--ctl-oat);
+  --action-tertiary-bg-hover:#267844;
+  --action-focus-ring:var(--ctl-fern);
+
+  /* Status. No red/amber semantic set exists in the brand; status is
+     carried by Fern (open / on track) and Ink (closed / neutral). */
+  --status-open-fg:var(--ctl-fern);
+  --status-closed-fg:var(--ctl-ink-55);
+}

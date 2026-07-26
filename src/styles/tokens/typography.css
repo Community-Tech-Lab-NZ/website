@@ -1,0 +1,43 @@
+:root{
+  /* Families come from next/font (see fonts.css). Fallbacks preserved.
+     The --ff-* names are deliberately outside Tailwind's --font-* namespace. */
+  --font-display:var(--ff-archivo),system-ui,sans-serif;      /* headlines, nav, buttons, eyebrows */
+  --font-body:var(--ff-source-sans),system-ui,sans-serif;     /* all paragraphs, long-form */
+  --font-mono:var(--ff-space-mono),ui-monospace,monospace;    /* dates, eyebrows, meta only */
+
+  --weight-display:900;
+  --weight-headline:800;
+  --weight-subhead:700;
+  --weight-label:700;
+  --weight-body:400;
+  --weight-body-strong:600;
+
+  /* Locked scale: 52 / 34 / 22 / 16 */
+  --size-display:52px;
+  --size-headline:34px;
+  --size-subhead:22px;
+  --size-body:16px;
+  --size-body-lg:18px;
+  --size-body-sm:14px;
+  --size-label:11px;
+
+  --leading-display:1.02;
+  --leading-headline:1.08;
+  --leading-subhead:1.25;
+  --leading-body:1.6;
+  --leading-tight:1.35;
+
+  --tracking-display:-0.02em;
+  --tracking-headline:-0.015em;
+  --tracking-subhead:-0.01em;
+  --tracking-body:0;
+  --tracking-label:0.16em; /* Space Mono caps labels */
+  --tracking-button:0.01em;
+
+  /* Reading measure: 65-75 characters */
+  --measure-body:700px;
+  --measure-narrow:560px;
+
+  /* Fluid display for hero use */
+  --size-display-fluid:clamp(34px,6vw,52px);
+}

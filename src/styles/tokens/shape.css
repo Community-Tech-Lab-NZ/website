@@ -1,0 +1,20 @@
+:root{
+  /* Nearly square. The caret is the only angle in the system. */
+  --radius-none:0px;
+  --radius-sm:2px;
+  --radius-md:4px;
+  --radius-pill:999px; /* status markers only */
+
+  --border-hairline:1px;
+  --border-rule:2px;    /* Kōwhai section rule under the hero */
+  --border-emphasis:3px;
+
+  /* Flat by default. Shadow is a last resort, never on the logo. */
+  --shadow-none:none;
+  --shadow-card:0 1px 0 var(--ctl-ink-08);
+  --shadow-raised:0 2px 8px rgba(20,33,26,.10);
+  --shadow-overlay:0 12px 32px rgba(20,33,26,.22);
+
+  --caret-angle:38deg; /* @kind other */ /* roofline angle of the mark */
+  --caret-stroke:2px;
+}

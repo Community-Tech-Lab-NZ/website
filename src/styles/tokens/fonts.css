@@ -1,0 +1,19 @@
+/* Archivo, Source Sans 3 and Space Mono are self-hosted by next/font/google,
+   configured in src/app/layout.tsx. next/font generates hashed family names
+   (e.g. __Archivo_abc123) rather than registering the literal family, so it
+   exposes each one as a CSS variable that typography.css consumes:
+
+     --ff-archivo       ->  --font-display
+     --ff-source-sans   ->  --font-body
+     --ff-space-mono    ->  --font-mono
+
+   The --ff-* prefix keeps these clear of Tailwind's --font-* theme namespace,
+   which is reserved for the font-family utilities generated in globals.css.
+
+   This replaces the Google Fonts @import from the handoff. Self-hosting removes
+   a render-blocking request, prevents layout shift, and means no browser
+   requests go to Google when someone visits the site.
+
+   If licensed webfont files are supplied later, drop them in src/app/fonts/ and
+   switch layout.tsx from next/font/google to next/font/local. Nothing else in
+   the token layer needs to change. */

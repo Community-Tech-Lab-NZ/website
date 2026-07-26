@@ -1,26 +1,246 @@
+/* Community Tech Lab — stylesheet entry point.
+ *
+ * The token layer below is the SOURCE OF TRUTH, ported verbatim from the design
+ * handoff and matching brand-guide.md. The @theme block that follows is a thin
+ * mapping layer that exposes those tokens to Tailwind. It is never a second
+ * definition — if a value needs changing, change it in tokens/, not here.
+ */
+
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@import "../styles/tokens/fonts.css";
+@import "../styles/tokens/colors.css";
+@import "../styles/tokens/typography.css";
+@import "../styles/tokens/spacing.css";
+@import "../styles/tokens/shape.css";
+@import "../styles/tokens/motion.css";
+@import "../styles/tokens/base.css";
+@import "../styles/tokens/utilities.css";
+
+/* ---------------------------------------------------------------------------
+ * Theme mapping
+ *
+ * Every namespace is cleared with `--<namespace>-*: initial` before being
+ * repopulated from the tokens. This is deliberate and load-bearing: the brand
+ * guide says "four brand colours, locked. Nothing else", and clearing the
+ * defaults turns that from a convention into a build-time fact. `bg-blue-500`
+ * does not exist in this codebase, and a spacing value off the brand scale has
+ * nowhere to come from.
+ *
+ * `inline` is required so the generated utilities reference the brand variables
+ * rather than baking in resolved values, keeping the token layer live.
+ *
+ * NAMING RULE — read this before adding a key.
+ * Several handoff token names sit inside Tailwind's theme namespaces but mean
+ * something entirely different. `--text-body` is a COLOUR in the token layer;
+ * to Tailwind, `--text-*` means font-size. Both would land in :root and one
+ * would silently clobber the other. So every key below is deliberately named to
+ * avoid collision with the token layer:
+ *
+ *   token layer (unchanged)        theme key here      utility
+ *   --font-display                 --font-heading      font-heading
+ *   --font-body                    --font-sans         font-sans
+ *   --font-mono                    --font-meta         font-meta
+ *   --size-body                    --text-body-md      text-body-md
+ *   --radius-sm                    --radius-card       rounded-card
+ *   --ease-standard                --ease-brand        ease-brand
+ *   --container-wide               --container-max     max-w-container-max
+ *
+ * Tracking and leading get no standalone keys at all — they ride on the
+ * --text-*--line-height / --letter-spacing modifiers so the locked scale cannot
+ * drift apart in use.
+ * ------------------------------------------------------------------------- */
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* -- Colour ------------------------------------------------------------ */
+  --color-*: initial;
+
+  /* Base palette (locked, brand sheet 16 Jul 2026) */
+  --color-ink: var(--ctl-ink);
+  --color-fern: var(--ctl-fern);
+  --color-kowhai: var(--ctl-kowhai);
+  --color-oat: var(--ctl-oat);
+  --color-white: var(--ctl-white);
+  --color-transparent: transparent;
+  --color-current: currentColor;
+
+  /* Derived neutrals. Tints of Ink or Oat only, never new hues. */
+  --color-ink-90: var(--ctl-ink-90);
+  --color-ink-70: var(--ctl-ink-70);
+  --color-ink-55: var(--ctl-ink-55);
+  --color-ink-16: var(--ctl-ink-16);
+  --color-ink-08: var(--ctl-ink-08);
+  --color-oat-90: var(--ctl-oat-90);
+  --color-oat-70: var(--ctl-oat-70);
+  --color-oat-16: var(--ctl-oat-16);
+  --color-oat-sunk: var(--ctl-oat-sunk);
+  --color-ink-raised: var(--ctl-ink-raised);
+
+  /* Semantic aliases */
+  --color-surface-page: var(--surface-page);
+  --color-surface-card: var(--surface-card);
+  --color-surface-sunk: var(--surface-sunk);
+  --color-surface-inverse: var(--surface-page-inverse);
+  --color-surface-card-inverse: var(--surface-card-inverse);
+  --color-heading: var(--text-heading);
+  --color-body: var(--text-body);
+  --color-muted: var(--text-muted);
+  --color-heading-inverse: var(--text-heading-inverse);
+  --color-body-inverse: var(--text-body-inverse);
+  --color-muted-inverse: var(--text-muted-inverse);
+  --color-hairline: var(--rule-hairline);
+  --color-hairline-inverse: var(--rule-hairline-inverse);
+
+  /* Actions. Hover is a single colour step in the same hue. */
+  --color-action-primary: var(--action-primary-bg);
+  --color-action-primary-hover: var(--action-primary-bg-hover);
+  --color-action-secondary: var(--action-secondary-bg);
+  --color-action-secondary-hover: var(--action-secondary-bg-hover);
+  --color-action-tertiary: var(--action-tertiary-bg);
+  --color-action-tertiary-hover: var(--action-tertiary-bg-hover);
+
+  /* -- Spacing ----------------------------------------------------------- *
+   * Explicit keys override Tailwind's dynamic 4px scale, so brand numbering
+   * survives: p-5 is 24px because --space-5 is 24px. The 8px base is derived
+   * from the cursor block in the logo.
+   */
+  --spacing-*: initial;
+  --spacing-0: 0px;
+  --spacing-px: 1px;
+  --spacing-1: var(--space-1);
+  --spacing-2: var(--space-2);
+  --spacing-3: var(--space-3);
+  --spacing-4: var(--space-4);
+  --spacing-5: var(--space-5);
+  --spacing-6: var(--space-6);
+  --spacing-7: var(--space-7);
+  --spacing-8: var(--space-8);
+  --spacing-9: var(--space-9);
+  --spacing-10: var(--space-10);
+  --spacing-cursor: var(--space-cursor);
+  --spacing-section: var(--section-y);
+  --spacing-section-tight: var(--section-y-tight);
+  --spacing-gutter: var(--gutter);
+  --spacing-gutter-lg: var(--gutter-lg);
+
+  /* -- Type faces -------------------------------------------------------- *
+   * Three faces, fixed jobs, no fourth. Body copy never moves into Archivo,
+   * however short the paragraph.
+   */
+  --font-*: initial;
+  --font-heading: var(--font-display); /* Archivo */
+  --font-sans: var(--font-body); /* Source Sans 3 */
+  --font-meta: var(--font-mono); /* Space Mono, dates and eyebrows only */
+
+  /* -- Type scale -------------------------------------------------------- *
+   * Locked: 52 / 34 / 22 / 18 / 16 / 14 / 11. Each size carries its own
+   * line-height and letter-spacing.
+   */
+  --text-*: initial;
+  --text-display: var(--size-display);
+  --text-display--line-height: var(--leading-display);
+  --text-display--letter-spacing: var(--tracking-display);
+  --text-display-fluid: var(--size-display-fluid);
+  --text-display-fluid--line-height: var(--leading-display);
+  --text-display-fluid--letter-spacing: var(--tracking-display);
+  --text-headline: var(--size-headline);
+  --text-headline--line-height: var(--leading-headline);
+  --text-headline--letter-spacing: var(--tracking-headline);
+  --text-subhead: var(--size-subhead);
+  --text-subhead--line-height: var(--leading-subhead);
+  --text-subhead--letter-spacing: var(--tracking-subhead);
+  --text-body-lg: var(--size-body-lg);
+  --text-body-lg--line-height: var(--leading-body);
+  --text-body-md: var(--size-body);
+  --text-body-md--line-height: var(--leading-body);
+  --text-body-sm: var(--size-body-sm);
+  --text-body-sm--line-height: var(--leading-body);
+  --text-label: var(--size-label);
+  --text-label--line-height: var(--leading-tight);
+  --text-label--letter-spacing: var(--tracking-label);
+
+  /* Conventional names, brand values. Deliberately not --font-weight-body,
+     which would generate `font-body` and collide with the family utilities. */
+  --font-weight-*: initial;
+  --font-weight-normal: var(--weight-body); /* 400 */
+  --font-weight-semibold: var(--weight-body-strong); /* 600 */
+  --font-weight-bold: var(--weight-subhead); /* 700 */
+  --font-weight-extrabold: var(--weight-headline); /* 800 */
+  --font-weight-black: var(--weight-display); /* 900 */
+
+  /* Only the button tracking needs a standalone key. Every other tracking
+     value rides on its --text-*--letter-spacing modifier. */
+  --tracking-*: initial;
+  --tracking-action: var(--tracking-button);
+
+  /* -- Shape ------------------------------------------------------------- *
+   * Nearly square. 2px is the default card and button radius; capsules are
+   * reserved for status markers.
+   */
+  --radius-*: initial;
+  --radius-square: var(--radius-none);
+  --radius-card: var(--radius-sm);
+  --radius-soft: var(--radius-md);
+  --radius-capsule: var(--radius-pill);
+
+  /* Cards in this design carry a hairline border and NO shadow at all.
+     Retained for dialogs, which are the only permitted use. */
+  --shadow-*: initial;
+  --shadow-dialog: var(--shadow-overlay);
+
+  /* -- Motion ------------------------------------------------------------ *
+   * prefers-reduced-motion zeroes the source tokens in motion.css, so anything
+   * built on these inherits that behaviour automatically.
+   */
+  --ease-*: initial;
+  --ease-brand: var(--ease-standard);
+  --ease-entry: var(--ease-out-soft);
+
+  --animate-*: initial;
+
+  /* -- Layout ------------------------------------------------------------ */
+  /* Keys generate max-w-<key>, so these read max-w-page, max-w-measure etc.
+     `max` and `wide` are avoided: max-w-max is a Tailwind static utility. */
+  --container-*: initial;
+  --container-page: var(--container); /* 1120px, the standard container */
+  --container-full: var(--container-wide); /* 1280px */
+  --container-measure: var(--measure-body); /* 700px, 65-75 characters */
+  --container-narrow: var(--measure-narrow); /* 560px */
+
+  /* -- Breakpoints ------------------------------------------------------- *
+   * Not defined in the handoff. Set once here and documented, because the
+   * programme's junior developers will be extending this later.
+   *
+   *   sm   600px  phone landscape; two-up grids become viable
+   *   md   900px  header nav collapses below this; tablet
+   *   lg  1180px  container (1120) plus gutters (2 x 48) fits without clamping
+   */
+  --breakpoint-*: initial;
+  --breakpoint-sm: 600px;
+  --breakpoint-md: 900px;
+  --breakpoint-lg: 1180px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ---------------------------------------------------------------------------
+ * The few things clearer as CSS than as utilities.
+ * ------------------------------------------------------------------------- */
+
+/* The brand's only glyph: a square with two borders, rotated. No icon set
+   exists in this brand and none was invented. */
+@utility caret-mark {
+  display: inline-block;
+  border-style: solid;
+  border-color: currentColor;
+  border-width: var(--caret-stroke) var(--caret-stroke) 0 0;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Hero CTA's detached ring: an outline sitting clear of the button edge. */
+@utility ring-detached {
+  outline: var(--border-rule) solid var(--ctl-kowhai);
+  outline-offset: 6px;
+}
+
+/* The roofline tilt on an angled section rule. */
+@utility rule-angled {
+  transform: rotate(-1.4deg);
 }

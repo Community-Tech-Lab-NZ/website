@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="520" height="140" viewBox="0 0 520 140">
+<rect width="520" height="140" fill="#14211A"></rect>
+<g transform="translate(30,25)">
+<svg width="90" height="90" viewBox="0 0 100 100" fill="none" stroke="#F0A81E" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20,62 50,30 80,62"></polyline><rect x="44" y="76" width="12" height="10" fill="#F0A81E" stroke="none"></rect></svg>
+</g>
+<text x="140" y="68" font-family="Archivo, sans-serif" font-weight="900" font-size="34" letter-spacing="-1" fill="#F3EFE3">Community</text>
+<text x="140" y="106" font-family="Archivo, sans-serif" font-weight="900" font-size="34" letter-spacing="-1" fill="#F3EFE3">Tech Lab</text>
+</svg>

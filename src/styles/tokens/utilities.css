@@ -1,0 +1,16 @@
+/* A handful of brand-critical helpers. Not a utility framework. */
+.ctl-eyebrow{font-family:var(--font-mono);font-size:var(--size-label);font-weight:400;letter-spacing:var(--tracking-label);text-transform:uppercase;color:var(--text-muted);margin:0 0 var(--space-3)}
+.ctl-eyebrow--inverse{color:var(--text-muted-inverse)}
+.ctl-meta{font-family:var(--font-mono);font-size:var(--size-body-sm);letter-spacing:.04em;color:var(--text-muted)}
+.ctl-measure{max-width:var(--measure-body)}
+.ctl-container{max-width:var(--container);margin:0 auto;padding-inline:var(--gutter-lg)}
+.ctl-section{padding-block:var(--section-y)}
+.ctl-on-ink{background:var(--surface-page-inverse);color:var(--text-body-inverse)}
+.ctl-on-ink h1,.ctl-on-ink h2,.ctl-on-ink h3,.ctl-on-ink h4{color:var(--text-heading-inverse)}
+.ctl-on-ink a{color:var(--text-link-inverse);text-decoration-color:var(--ctl-fern)}
+.ctl-on-ink a:hover{color:var(--ctl-kowhai);text-decoration-color:var(--ctl-kowhai)}
+.ctl-highlight{color:var(--ctl-kowhai)} /* only on Ink surfaces */
+.ctl-underline-gold{box-shadow:inset 0 -.28em 0 rgba(240,168,30,.55)} /* gold as decoration on Oat */
+.ctl-rule-gold{border:0;border-top:var(--border-rule) solid var(--ctl-kowhai);margin:0}
+.ctl-rise{opacity:0;transform:translateY(var(--rise-distance));transition:opacity var(--duration-entry) var(--ease-out-soft),transform var(--duration-entry) var(--ease-out-soft)}
+.ctl-rise.is-in{opacity:1;transform:none}

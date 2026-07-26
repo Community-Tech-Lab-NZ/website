@@ -1,0 +1,17 @@
+:root{
+  /* Restrained: a quiet fade, or a short rise on scroll. Nothing else. */
+  --ease-standard:cubic-bezier(.22,.61,.36,1); /* @kind other */
+  --ease-out-soft:cubic-bezier(0,0,.32,1); /* @kind other */
+  --duration-fast:120ms; /* @kind other */
+  --duration-base:220ms; /* @kind other */
+  --duration-entry:420ms; /* @kind other */
+  --rise-distance:12px;
+}
+@media (prefers-reduced-motion:reduce){
+  :root{
+    --duration-fast:0ms; /* @kind other */
+    --duration-base:0ms; /* @kind other */
+    --duration-entry:0ms; /* @kind other */
+    --rise-distance:0px;
+  }
+}

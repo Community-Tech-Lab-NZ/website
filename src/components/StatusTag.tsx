@@ -17,7 +17,15 @@ const tag = cva(
   {
     variants: {
       tone: {
-        open: "text-fern border-fern bg-transparent",
+        // Text is the darker Fern, not --ctl-fern. Fern on Oat is 3.58:1, and
+        // the brand guide itself restricts it to "large headings and UI elements
+        // only, never body copy or small links" — but this tag is 11px Space
+        // Mono, which is exactly the case it rules out. The border stays full
+        // Fern, where 3.58:1 is fine for a non-text boundary.
+        //
+        // The darker value is --action-tertiary-bg-hover, already in the
+        // palette, so no new colour enters the system. 4.74:1.
+        open: "text-action-tertiary-hover border-fern bg-transparent",
         neutral: "text-muted border-hairline bg-transparent",
         gold: "text-ink border-kowhai bg-kowhai",
         inverse: "text-oat border-oat-16 bg-transparent",

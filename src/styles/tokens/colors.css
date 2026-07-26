@@ -25,7 +25,20 @@
   --surface-sunk:var(--ctl-oat-sunk);
   --text-heading:var(--ctl-ink);
   --text-body:var(--ctl-ink-90);
-  --text-muted:var(--ctl-ink-55);
+  /* Was --ctl-ink-55. Changed for contrast: ink-55 composites to 3.63:1 on Oat
+     and 3.78:1 on white, which fails WCAG AA for small text (4.5:1) — and this
+     token is used at 11px for every eyebrow and status label on the site.
+     ink-70 gives 5.75:1 on Oat and 6.12:1 on white.
+
+     This is a deviation from the locked brand, kept as small as possible: ink-70
+     is an existing derived neutral from the same sheet, so no new value is
+     introduced and the "only ever tints of Ink or Oat" rule still holds. It also
+     makes the token symmetric with --text-muted-inverse, which is oat-70.
+
+     The brand guide documents contrast carefully and rules out failing pairs, so
+     this reads as an oversight in the token rather than an intent. Revert by
+     restoring --ctl-ink-55 if the brand owner disagrees. */
+  --text-muted:var(--ctl-ink-70);
   --text-link:var(--ctl-ink);
   --rule-hairline:var(--ctl-ink-16);
   --rule-accent:var(--ctl-kowhai);

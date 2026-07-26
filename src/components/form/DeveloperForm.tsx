@@ -10,7 +10,7 @@ import { FileUpload } from "./FileUpload";
 import { Input } from "./Input";
 import { Select } from "./Select";
 import { Textarea } from "./Textarea";
-import { DEVELOPER_HOURS, DEVELOPER_SEATS } from "@/lib/schemas";
+import { DEVELOPER_HOURS, DEVELOPER_SEATS } from "@/lib/form-options";
 
 /* The developer application. A few minutes, single page.
  *

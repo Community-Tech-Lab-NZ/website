@@ -98,7 +98,12 @@ export default function AboutPage() {
             }}
           />
 
-          <div className="mx-auto mt-9 max-w-measure text-center">
+          {/* Centred only from md up. The prototype centred this block at every
+              width, which works in a wide column but not on a phone: three
+              paragraphs of centred body copy give a ragged left edge and the eye
+              loses its place on every line. Left-aligned below md, unchanged
+              above it. */}
+          <div className="mx-auto mt-9 max-w-measure md:text-center">
             <Body className="mx-auto">
               Queenstown Lakes is a district of about fifty thousand residents carrying
               several million visitors a year, and the community sector holds a lot of

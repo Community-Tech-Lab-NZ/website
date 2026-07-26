@@ -21,7 +21,7 @@ import {
   ORG_SIZES,
   SENSITIVE_ANSWERS,
   SYSTEM_ANSWERS,
-} from "@/lib/schemas";
+} from "@/lib/form-options";
 
 /* The community application. Six sections, roughly 45 to 60 minutes.
  *
@@ -241,7 +241,11 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
       ) : null}
 
       <div className="mt-6 max-w-[var(--form-measure)]">
-        <Heading level={3}>{SECTIONS[step].title}</Heading>
+        {/* h2, not h3: this sits directly under the page h1, and an h3 here
+            skipped a level. Visual size is unchanged. */}
+        <Heading level={3} as="h2">
+          {SECTIONS[step].title}
+        </Heading>
         <Body className="mt-3">{SECTIONS[step].intro}</Body>
       </div>
 

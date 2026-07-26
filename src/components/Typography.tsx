@@ -94,7 +94,13 @@ export function Body({ children, inverse = false, className }: ProseProps) {
 type EyebrowProps = {
   children: React.ReactNode;
   inverse?: boolean;
-  as?: "p" | "span" | "div";
+  /**
+   * Heading tags are allowed and sometimes required. Several eyebrows do the
+   * visual job of a section heading ("Two ways in", "The roles", "Who is behind
+   * it") with only h3s beneath them, which left an H1-to-H3 jump in the outline.
+   * Rendering those as h2 fixes the document structure without changing a pixel.
+   */
+  as?: "p" | "span" | "div" | "h2" | "h3";
   className?: string;
 };
 

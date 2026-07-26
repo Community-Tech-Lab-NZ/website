@@ -21,6 +21,14 @@
 .ctl-rule-draw{transform:scaleX(0);transform-origin:left center;transition:transform var(--duration-entry) var(--ease-out-soft)}
 .ctl-rule-draw.is-in{transform:scaleX(1)}
 
+/* Entry animations start at opacity 0 and are revealed by an IntersectionObserver
+   as the reader scrolls. Printing never scrolls, so anything below the first page
+   would come out blank. That matters here: the terms and privacy pages are
+   exactly the ones people save as a PDF or hand to a board. */
+@media print{
+  .ctl-rise,.ctl-rule-draw{opacity:1 !important;transform:none !important;animation:none !important}
+}
+
 /* Approved addition: a fade between routes, so the six pages read as one
    surface. Runs on --duration-base, so prefers-reduced-motion zeroes it. */
 @keyframes ctl-route-fade{from{opacity:0}to{opacity:1}}

@@ -1,289 +1,204 @@
-import { Button } from "@/components/Button";
+import type { Metadata } from "next";
 import { AudiencePath } from "@/components/AudiencePath";
+import { Button } from "@/components/Button";
 import { CalloutBanner } from "@/components/CalloutBanner";
 import { Card } from "@/components/Card";
 import { CaretList } from "@/components/CaretList";
 import { FunderCredit } from "@/components/FunderCredit";
-import { Pairing } from "@/components/Pairing";
 import { PartnerRow } from "@/components/PartnerRow";
+import { Reveal } from "@/components/Reveal";
+import { Section } from "@/components/Section";
 import { SectionRule } from "@/components/SectionRule";
 import { StatFigure } from "@/components/StatFigure";
-import { StatusTag } from "@/components/StatusTag";
 import { Timeline } from "@/components/Timeline";
-import { Checkbox } from "@/components/form/Checkbox";
-import { Field } from "@/components/form/Field";
-import { FileUpload } from "@/components/form/FileUpload";
-import { Input } from "@/components/form/Input";
-import { Select } from "@/components/form/Select";
-import { Textarea } from "@/components/form/Textarea";
+import { Body, Eyebrow, Heading, Lede } from "@/components/Typography";
 import { TIMELINE } from "@/lib/navigation";
 
-/* TEMPORARY — phase 1 pilot.
+/* Home. Copy is final and iterated with the programme team — transcribed
+ * verbatim from the prototype, not rewritten.
  *
- * This is the theme-mapping proving harness, not the home page. It renders every
- * Button variant and size, the locked type scale, the palette and the spacing
- * scale, so a wrong or missing @theme key is visible immediately rather than
- * after 21 components have been built on top of it.
- *
- * Replaced by the real home page in phase 3.
+ * The page's job: state what the programme is in one line, fork the two
+ * audiences, and prove it is real.
  */
 
-const VARIANTS = [
-  "primary",
-  "secondary",
-  "fern",
-  "oat",
-  "outline",
-  "outline-inverse",
-] as const;
+export const metadata: Metadata = {
+  description:
+    "Local developers build something useful for community organisations across the Queenstown Lakes district, at no cost to the organisation.",
+};
 
-const SIZES = ["sm", "md", "lg"] as const;
-
-const TYPE_SCALE = [
-  { cls: "text-display font-heading font-black", label: "display / 52 / 900" },
-  { cls: "text-headline font-heading font-extrabold", label: "headline / 34 / 800" },
-  { cls: "text-subhead font-heading font-bold", label: "subhead / 22 / 700" },
-  { cls: "text-body-lg font-sans", label: "body-lg / 18 / 400" },
-  { cls: "text-body-md font-sans", label: "body-md / 16 / 400" },
-  { cls: "text-body-sm font-sans", label: "body-sm / 14 / 400" },
-  { cls: "text-label font-meta uppercase", label: "label / 11 / mono caps" },
+const HERO_STATS = [
+  { figure: "3", label: "Solutions to be built" },
+  { figure: "6", label: "Paid developer seats" },
+  { figure: "5 weeks", label: "One build, weekly sprints" },
+  { figure: "Open source", label: "Free to reuse" },
 ];
 
-const PALETTE = [
-  { cls: "bg-ink", name: "ink" },
-  { cls: "bg-fern", name: "fern" },
-  { cls: "bg-kowhai", name: "kowhai" },
-  { cls: "bg-oat border border-hairline", name: "oat" },
-  { cls: "bg-white border border-hairline", name: "white" },
-  { cls: "bg-oat-sunk", name: "oat-sunk" },
-  { cls: "bg-ink-raised", name: "ink-raised" },
+const HOW_IT_RUNS = [
+  "A panel of local tech and community people reads every application",
+  "Discovery happens before the build, so scope is agreed with you",
+  "Five weeks of weekly sprints, then handover with training and documentation",
+  "Bugs fixed free for six weeks after handover, and the code is yours",
 ];
 
-const SPACING = [
-  { n: 1, w: "w-1" },
-  { n: 2, w: "w-2" },
-  { n: 3, w: "w-3" },
-  { n: 4, w: "w-4" },
-  { n: 5, w: "w-5" },
-  { n: 6, w: "w-6" },
-  { n: 7, w: "w-7" },
-  { n: 8, w: "w-8" },
-  { n: 9, w: "w-9" },
-  { n: 10, w: "w-10" },
-];
-
-export default function PilotPage() {
+export default function HomePage() {
   return (
-    <div className="bg-surface-page text-body">
-      <div className="mx-auto max-w-page px-gutter py-section lg:px-gutter-lg">
-        <p className="font-meta text-label uppercase text-muted">Phase 1 pilot</p>
-        <h1 className="mt-4 font-heading text-display-fluid font-black text-heading">
-          Theme mapping check
-        </h1>
-        <p className="mt-5 max-w-measure font-sans text-body-lg">
-          Every value on this page comes from the token layer through the{" "}
-          <code className="font-meta">@theme</code> block. If something here looks
-          wrong, the mapping is wrong.
-        </p>
+    <>
+      {/* Hero — the one Ink moment on the site, and the one gold thing in view */}
+      <section className="bg-ink text-body-inverse">
+        <div className="mx-auto max-w-page px-gutter pb-8 pt-9 lg:px-gutter-lg">
+          <Heading level={1} fluid inverse className="max-w-[var(--hero-heading-max)]">
+            Solutions that get used.
+          </Heading>
 
-        <hr className="ctl-rule-gold my-9" />
+          <Lede inverse className="mt-6">
+            Local developers build something useful for community organisations across
+            the Queenstown Lakes district, at no cost to the organisation.
+          </Lede>
 
-        <h2 className="font-heading text-headline font-extrabold text-heading">
-          Buttons on Oat
-        </h2>
-        <div className="mt-6 flex flex-col gap-6">
-          {VARIANTS.filter((v) => v !== "outline-inverse").map((variant) => (
-            <div key={variant} className="flex flex-wrap items-center gap-4">
-              <span className="w-40 font-meta text-body-sm text-muted">{variant}</span>
-              {SIZES.map((size) => (
-                <Button key={size} variant={variant} size={size}>
-                  Apply now
-                </Button>
-              ))}
-              <Button variant={variant} size="md" disabled>
-                Disabled
-              </Button>
-            </div>
-          ))}
-        </div>
-
-        <hr className="my-9 border-t border-hairline" />
-
-        <h2 className="font-heading text-headline font-extrabold text-heading">
-          Type scale
-        </h2>
-        <div className="mt-6 flex flex-col gap-5">
-          {TYPE_SCALE.map((t) => (
-            <div key={t.label}>
-              <span className="font-meta text-label uppercase text-muted">{t.label}</span>
-              <p className={`${t.cls} text-heading`}>Solutions that get used</p>
-            </div>
-          ))}
-        </div>
-
-        <hr className="my-9 border-t border-hairline" />
-
-        <h2 className="font-heading text-headline font-extrabold text-heading">
-          Palette
-        </h2>
-        <div className="mt-6 flex flex-wrap gap-4">
-          {PALETTE.map((c) => (
-            <div key={c.name} className="flex flex-col gap-2">
-              <div className={`${c.cls} h-8 w-8 rounded-card`} />
-              <span className="font-meta text-body-sm text-muted">{c.name}</span>
-            </div>
-          ))}
-        </div>
-
-        <hr className="my-9 border-t border-hairline" />
-
-        <h2 className="font-heading text-headline font-extrabold text-heading">
-          Spacing scale
-        </h2>
-        <p className="mt-3 max-w-measure font-sans text-body-sm text-muted">
-          8px base, derived from the cursor block in the logo. Brand numbering is
-          preserved, so space-5 is 24px.
-        </p>
-        <div className="mt-6 flex flex-col gap-2">
-          {SPACING.map((s) => (
-            <div key={s.n} className="flex items-center gap-4">
-              <span className="w-16 font-meta text-body-sm text-muted">space-{s.n}</span>
-              <div className={`${s.w} h-3 bg-fern`} />
-            </div>
-          ))}
-        </div>
-
-        <hr className="my-9 border-t border-hairline" />
-
-        <h2 className="font-heading text-headline font-extrabold text-heading">
-          Components
-        </h2>
-
-        <div className="mt-6 flex flex-wrap items-center gap-4">
-          <StatusTag tone="open">Applications open</StatusTag>
-          <StatusTag tone="neutral">Closed</StatusTag>
-          <StatusTag tone="gold">Received</StatusTag>
-        </div>
-
-        <div className="mt-8 flex flex-wrap gap-8">
-          <StatFigure figure="3" label="Solutions to be built" />
-          <StatFigure figure="6" label="Paid developer seats" labelSize="md" />
-          <StatFigure figure="5 weeks" label="One build, weekly sprints" labelSize="lg" />
-          <StatFigure figure="Open source" label="Free to reuse" accent />
-        </div>
-
-        <div className="mt-8"><SectionRule variant="gold" /></div>
-
-        <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2">
-          <Card tone="light" accentRule>
-            <p className="font-meta text-label uppercase text-muted">Key dates</p>
-            <div className="mt-5"><Timeline steps={TIMELINE} /></div>
-          </Card>
-          <div className="grid gap-6">
-            <Card tone="oat">
-              <CaretList items={["Genuine need", "Reusable by other organisations", "Realistic scope"]} />
-            </Card>
-            <Card tone="sunk">Sunk card</Card>
-            <Card tone="ink"><CaretList items={["Gold marker on Ink"]} inverse /></Card>
+          <div className="mt-7">
+            <Button variant="primary" size="hero" href="/apply">
+              Apply now
+            </Button>
           </div>
-        </div>
 
-        <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2">
-          <AudiencePath
-            audience="community"
-            eyebrow="Community organisations"
-            title="Something useful, built for your organisation."
-            blurb="Tell us the problem. You do not need to know how it would be built."
-            points={["No cost to your organisation", "Five-week build"]}
-            actionLabel="See what is involved"
-            actionHref="/organisations"
-          />
-          <AudiencePath
-            audience="developer"
-            eyebrow="Developers"
-            title="Paid work, real users, and code you can point at."
-            blurb="Six paid seats across three build teams."
-            points={["Community rate, paid", "Open source"]}
-            actionLabel="See the roles"
-            actionHref="/developers"
-          />
-        </div>
-
-        <div className="mt-9">
-          <Pairing
-            left={{ eyebrow: "One side", title: "Developers with capacity to spare" }}
-            right={{ eyebrow: "The other", title: "Organisations running on spreadsheets" }}
-            joinLabel="Nothing was connecting them"
-          />
-        </div>
-
-        <div className="mt-9"><PartnerRow /></div>
-        <div className="mt-8"><FunderCredit /></div>
-
-        <hr className="my-9 border-t border-hairline" />
-
-        <h2 className="font-heading text-headline font-extrabold text-heading">
-          Form controls
-        </h2>
-        <div className="mt-6 grid max-w-[var(--form-measure)] gap-5">
-          <Field label="Organisation name" required hint="As it appears on your registration.">
-            <Input placeholder="Wakatipu Community Trust" />
-          </Field>
-          <Field label="Legal structure">
-            <Select placeholder="Select one" options={["Registered charity", "Incorporated society", "Charitable trust"]} />
-          </Field>
-          <Field label="What is the problem" hint="A sentence or two. Plain language is perfect.">
-            <Textarea rows={3} />
-          </Field>
-          <Field label="Email" error="Enter an email address we can reply to.">
-            <Input type="email" defaultValue="not-an-email" />
-          </Field>
-          <Field label="Your CV" hint="Optional. PDF or Word.">
-            <FileUpload />
-          </Field>
-          <Checkbox label="We are based in, or primarily serve, the Queenstown Lakes district." />
-          <Checkbox label="Pre-ticked example" defaultChecked />
-          <Checkbox label="Disabled example" disabled />
-        </div>
-
-        <div className="mt-9">
-          <CalloutBanner
-            eyebrow="Applications open 15 to 31 August"
-            title="Tell us what would make the biggest difference."
-            note="Six sections, about 45 to 60 minutes."
-            actionLabel="Apply now"
-            actionHref="/apply"
-          />
-        </div>
-      </div>
-
-      <div className="bg-surface-inverse">
-        <div className="mx-auto max-w-page px-gutter py-section lg:px-gutter-lg">
-          <h2 className="font-heading text-headline font-extrabold text-heading-inverse">
-            Buttons on Ink
-          </h2>
-          <div className="mt-6 flex flex-wrap items-center gap-4">
-            <span className="w-40 font-meta text-body-sm text-muted-inverse">
-              outline-inverse
-            </span>
-            {SIZES.map((size) => (
-              <Button key={size} variant="outline-inverse" size={size}>
-                See what&rsquo;s involved
-              </Button>
+          <div className="mt-9 grid grid-cols-[repeat(auto-fit,minmax(var(--hero-stat-min),max-content))] gap-8">
+            {HERO_STATS.map((stat) => (
+              <StatFigure
+                key={stat.label}
+                inverse
+                labelSize="md"
+                figure={stat.figure}
+                label={stat.label}
+              />
             ))}
           </div>
-          <div className="mt-8">
-            <p className="font-meta text-label uppercase text-muted-inverse">
-              Hero CTA, detached ring
-            </p>
-            <div className="mt-5">
-              <Button variant="primary" size="lg" className="ring-detached">
-                Apply now
-              </Button>
+        </div>
+        <SectionRule variant="gold" />
+      </section>
+
+      {/* Two ways in — the audience fork */}
+      <Section>
+        <Reveal>
+          <Eyebrow as="h2" className="mb-5">Two ways in</Eyebrow>
+          <div className="grid grid-cols-[repeat(auto-fit,minmax(var(--col-min-wide),1fr))] gap-6">
+            <AudiencePath
+              audience="community"
+              eyebrow="For community organisations"
+              title="Something useful, built for your organisation"
+              blurb="Scoped with you, built for the way you work now, and handed over with training. There is no cost to your organisation."
+              points={[
+                "No cost to your organisation",
+                "One to two hours a week from one named contact",
+                "Training, documentation and six weeks of free bug fixes",
+              ]}
+              actionLabel="See what's involved"
+              actionHref="/organisations"
+            />
+            <AudiencePath
+              audience="developer"
+              eyebrow="For developers"
+              title="Paid work at community rates, with real users on the other end"
+              blurb="Six paid seats across three teams, three senior and three junior, plus intern places. Roughly 12 hours a week for five weeks, after the ski season closes."
+              points={[
+                "Paid contract with Startup Queenstown Lakes, at community rates",
+                "A senior developer mentoring every build",
+                "An open source repository you can point at",
+              ]}
+              actionLabel="See the roles"
+              actionHref="/developers"
+            />
+          </div>
+        </Reveal>
+      </Section>
+
+      {/* Why it exists / Built once, used by many */}
+      <Section flush>
+        <Reveal>
+          <div className="grid grid-cols-[repeat(auto-fit,minmax(var(--col-min),1fr))] gap-8">
+            <div>
+              <Eyebrow className="mb-4">Why it exists</Eyebrow>
+              <Heading level={3} as="h2">
+                A small, dispersed tech community, working together
+              </Heading>
+              <Body className="mt-4">
+                The district has good developers, particularly early in their careers,
+                who rarely get paid local work with real users. They take this on at
+                community rates, well under commercial, because the work is worth doing.
+                This programme is what puts them in a room with experienced local
+                engineers and with the organisations that need the work done.
+              </Body>
+            </div>
+            <div>
+              <Eyebrow className="mb-4">Built once, used by many</Eyebrow>
+              <Heading level={3} as="h2">
+                Everything is open source
+              </Heading>
+              <Body className="mt-4">
+                Only three solutions get built, so each one is chosen partly on how many
+                organisations it could serve. If five need the same thing, the aim is to
+                build it once so all five can use it, rather than once for one of them.
+              </Body>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
+        </Reveal>
+      </Section>
+
+      {/* How it runs */}
+      <Section flush>
+        <Reveal>
+          <div className="grid grid-cols-1 items-start gap-9 lg:grid-cols-[minmax(var(--col-min-wide),1.2fr)_minmax(var(--col-min-narrow),0.8fr)]">
+            <div>
+              <Eyebrow className="mb-4">How it runs</Eyebrow>
+              <Heading level={2}>
+                Properly scoped and mentored, not a rushed side project
+              </Heading>
+              <Body className="mt-5">
+                Three solutions are chosen through an open application process, each one
+                scoped so it can serve more than one organisation. Each is matched with a
+                small team of local developers, led by a senior developer. The programme
+                is run by Startup Queenstown Lakes and funded by the Queenstown Lakes
+                District Council Economic Diversification Fund.
+              </Body>
+              <div className="mt-6">
+                <CaretList items={HOW_IT_RUNS} />
+              </div>
+            </div>
+
+            <Card tone="light" accentRule>
+              <Eyebrow className="mb-5">Key dates</Eyebrow>
+              <Timeline steps={TIMELINE} />
+            </Card>
+          </div>
+        </Reveal>
+      </Section>
+
+      {/* Partners */}
+      <Section flush>
+        <Reveal>
+          <SectionRule variant="hairline" draw={false} className="mb-7" />
+          <PartnerRow eyebrow="Delivered with" />
+          <p className="mt-5 max-w-measure font-sans text-body-sm text-muted">
+            Startup Queenstown Lakes is the lead organisation, fund holder, and the
+            entity developers contract to.
+          </p>
+          <div className="mt-7">
+            <FunderCredit />
+          </div>
+        </Reveal>
+      </Section>
+
+      {/* Closing CTA. Padding and background stripped so the banner sits directly
+          in the Ink section rather than reading as a card inside one. */}
+      <Section tone="ink" tight>
+        <CalloutBanner
+          bare
+          eyebrow="Applications open 15 to 31 August"
+          title="Apply now"
+          note="Three solutions get built this round. Applying commits you to nothing."
+          actionLabel="Apply now"
+          actionHref="/apply"
+        />
+      </Section>
+    </>
   );
 }

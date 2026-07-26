@@ -89,6 +89,26 @@
   /* Footer link columns, auto-fitting from this minimum. */
   --footer-col-min: 140px;
 
+  /* Hero CTA. Larger than the lg button and carrying a detached ring, because
+     it is the single most important control on the site. */
+  --hero-cta-padding: 20px 40px;
+  --hero-cta-size: 19px;
+  --hero-heading-max: 860px;
+  --page-heading-max: 780px;
+  --hero-stat-min: 160px;
+
+  /* Two-column section grids from the prototype. */
+  --col-min-wide: 320px;
+  --col-min: 300px;
+  --col-min-narrow: 280px;
+  --role-col-min: 220px;
+
+  /* Terms and privacy: a narrower column than the standard measure, because
+     these pages are read in long stretches rather than scanned. */
+  --terms-measure: 760px;
+  --terms-number-col: 48px;
+  --footer-brand-min: 220px;
+
   /* Minimum touch target for interactive elements in the mobile nav. */
   --tap-target: 48px;
 }

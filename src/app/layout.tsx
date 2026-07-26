@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import { Archivo, Source_Sans_3, Space_Mono } from "next/font/google";
+import { SiteHeader } from "@/components/SiteHeader";
+import { SiteFooter } from "@/components/SiteFooter";
+import { RouteFade } from "@/components/RouteFade";
 import "./globals.css";
 
 /* Three faces, fixed jobs, no fourth. The --ff-* variable names stay clear of
@@ -54,7 +57,27 @@ export default function RootLayout({
       lang="en-NZ"
       className={`${archivo.variable} ${sourceSans.variable} ${spaceMono.variable} h-full`}
     >
-      <body className="flex min-h-full flex-col">{children}</body>
+      <head>
+        {/* .ctl-rise starts at opacity 0 and is revealed by an
+            IntersectionObserver. Without JS nothing would ever reveal it, so
+            neutralise the class entirely rather than leave a civic site blank. */}
+        <noscript>
+          <style>{`.ctl-rise{opacity:1!important;transform:none!important}`}</style>
+        </noscript>
+      </head>
+      <body className="flex min-h-full flex-col">
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:absolute focus:z-10 focus:m-3 focus:rounded-card focus:bg-ink focus:px-4 focus:py-3 focus:font-heading focus:text-body-sm focus:font-bold focus:text-oat"
+        >
+          Skip to content
+        </a>
+        <SiteHeader />
+        <main id="main" className="flex flex-1 flex-col">
+          <RouteFade>{children}</RouteFade>
+        </main>
+        <SiteFooter />
+      </body>
     </html>
   );
 }

@@ -14,3 +14,31 @@
 .ctl-rule-gold{border:0;border-top:var(--border-rule) solid var(--ctl-kowhai);margin:0}
 .ctl-rise{opacity:0;transform:translateY(var(--rise-distance));transition:opacity var(--duration-entry) var(--ease-out-soft),transform var(--duration-entry) var(--ease-out-soft)}
 .ctl-rise.is-in{opacity:1;transform:none}
+
+/* Approved addition, not in the original handoff: the gold section rule draws
+   in from the left as its section enters. Same 420ms and easing as .ctl-rise,
+   so prefers-reduced-motion zeroes it through the same token. */
+.ctl-rule-draw{transform:scaleX(0);transform-origin:left center;transition:transform var(--duration-entry) var(--ease-out-soft)}
+.ctl-rule-draw.is-in{transform:scaleX(1)}
+
+/* Approved addition: a fade between routes, so the six pages read as one
+   surface. Runs on --duration-base, so prefers-reduced-motion zeroes it. */
+@keyframes ctl-route-fade{from{opacity:0}to{opacity:1}}
+.ctl-route-fade{animation:ctl-route-fade var(--duration-base) var(--ease-standard)}
+
+/* Approved addition: the cursor block in the lockup settles on first load. The
+   mark is literally a text cursor and the 8px spacing base is derived from that
+   block, so this is the most on-brand motion available.
+
+   It blinks three times and STOPS. WCAG 2.2.2 requires a pause mechanism for
+   anything blinking beyond five seconds, and an endlessly winking logo would
+   also be tiresome on a page someone spends 50 minutes filling in. */
+@keyframes ctl-cursor-settle{
+  0%,45%{opacity:1}
+  50%,70%{opacity:.25}
+  75%,100%{opacity:1}
+}
+.ctl-cursor-settle{animation:ctl-cursor-settle 1.1s var(--ease-standard) 3}
+@media (prefers-reduced-motion:reduce){
+  .ctl-cursor-settle{animation:none}
+}

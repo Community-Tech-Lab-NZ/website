@@ -1,0 +1,94 @@
+/* Component-level values the handoff hard-coded outside the main scale.
+ *
+ * These are NOT new brand decisions. Every value here is lifted verbatim from
+ * the prototype, where it was written inline. They live here rather than as
+ * arbitrary Tailwind values so they stay visible, documented and greppable, and
+ * so scripts/check-brand-tokens.mjs has something legitimate to point at.
+ *
+ * If you find yourself adding to this file, check brand-guide.md first — the
+ * main scale usually already has what you need.
+ */
+:root {
+  /* StatFigure label sizes. The brand label token is 11px; the home page and
+     developer page use two larger variants for standalone figures. */
+  --stat-label-md-size: 13px;
+  --stat-label-md-tracking: 0.12em;
+  --stat-label-lg-size: 15px;
+  --stat-label-lg-tracking: 0.1em;
+
+  /* CaretList marker sits 7px down so it optically aligns with the cap height
+     of the first line rather than its box. */
+  --caret-list-marker-offset: 7px;
+  --caret-list-marker-size: 9px;
+
+  /* Angled section rule: a 48px inner rule rotated inside a 24px clipping
+     window, overshooting the width so the tilt reaches both edges. */
+  --rule-angled-window: 24px;
+  --rule-angled-inner: 48px;
+  --rule-angled-overshoot: 104%;
+
+  /* SiteHeader minimum height and the horizontal lockup size within it. */
+  --header-height: 96px;
+  --header-lockup: 56px;
+  --header-logo-bleed: -8px;
+  --footer-lockup: 150px;
+  --footer-logo-bleed: -14px;
+
+  /* Form controls: 12px vertical / 14px horizontal padding. The 14px is off the
+     8px scale and is deliberate, giving the control a slightly wider gutter than
+     its height suggests. */
+  --control-padding-y: 12px;
+  --control-padding-x: 14px;
+  --control-leading: 1.4;
+  /* Native select needs room for the caret indicator on the right. */
+  --select-padding-right: 40px;
+  --select-caret-right: 16px;
+  --checkbox-size: 20px;
+  --checkbox-offset: 2px;
+  --checkbox-tick-w: 9px;
+  --checkbox-tick-h: 5px;
+  --checkbox-leading: 1.45;
+  /* FileUpload's trigger sits between the sm and md button sizes. */
+  --upload-padding: 10px 18px;
+
+  /* StatusTag capsule. Asymmetric vertical padding optically centres Space Mono
+     caps, which sit high in their box. */
+  --tag-padding: 5px 10px 4px;
+
+  /* Timeline: an 18px node column beside a 1px hairline spine. The offsets
+     align the caret and the spine with the date line's cap height. */
+  --timeline-column: 18px;
+  --timeline-node-offset: 8px;
+  --timeline-spine-offset: 6px;
+
+  /* Dashed placeholder slots. No partner logo files were supplied and the QLDC
+     mark needs written approval before use, so both render as empty slots
+     rather than anything pulled from the web. Delete these once real assets
+     land. */
+  --slot-label-size: 9px;
+  --slot-label-tracking: 0.12em;
+  --partner-cell-min: 84px;
+  --partner-slot-w: 132px;
+  --partner-slot-h: 44px;
+  --funder-slot-w: 132px;
+  --funder-slot-h: 64px;
+
+  /* CalloutBanner text column, narrower than the standard reading measure so
+     the band keeps its title and action on one line at desktop widths. */
+  --callout-measure: 520px;
+
+  /* Pairing: two sides facing each other across a centred join column. */
+  --pairing-side-min: 240px;
+  --pairing-join: 96px;
+  --pairing-spine: 40px;
+
+  /* The apply form column. Narrower than the 700px reading measure: form fields
+     are easier to scan when the label, control and hint share a short line. */
+  --form-measure: 620px;
+
+  /* Footer link columns, auto-fitting from this minimum. */
+  --footer-col-min: 140px;
+
+  /* Minimum touch target for interactive elements in the mobile nav. */
+  --tap-target: 48px;
+}

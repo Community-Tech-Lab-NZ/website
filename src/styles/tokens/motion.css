@@ -14,4 +14,14 @@
     --duration-entry:0ms; /* @kind other */
     --rise-distance:0px;
   }
+
+  /* The cross-route View Transition runs in the browser's own pseudo-element
+     tree and never reads the tokens above, so it needs an explicit opt-out.
+     Without this block, zeroing every duration would still leave route changes
+     animating. */
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*){
+    animation:none !important;
+  }
 }

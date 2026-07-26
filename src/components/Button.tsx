@@ -19,7 +19,12 @@ const button = cva(
   [
     "inline-flex items-center justify-center gap-2 text-center no-underline",
     "font-heading font-bold tracking-action",
-    "cursor-pointer border-2 border-transparent rounded-card",
+    // Border WIDTH only. The colour is set per variant: a shared
+    // `border-transparent` here would compete with the variants' border-colour
+    // utilities, and CSS resolves that by stylesheet order rather than by the
+    // order classes appear in className — so the outline variants would lose
+    // their border at random.
+    "cursor-pointer border-2 border-solid rounded-card",
     "transition-[background-color,color,border-color]",
     "duration-[var(--duration-fast)] ease-brand",
     "active:translate-y-px",
@@ -28,14 +33,16 @@ const button = cva(
   {
     variants: {
       variant: {
-        primary: "bg-action-primary text-ink hover:bg-action-primary-hover",
-        secondary: "bg-action-secondary text-oat hover:bg-action-secondary-hover",
+        primary:
+          "border-transparent bg-action-primary text-ink hover:bg-action-primary-hover",
+        secondary:
+          "border-transparent bg-action-secondary text-oat hover:bg-action-secondary-hover",
         // Oat on Fern is 3.6:1, so this variant needs 18px+ at weight 800.
-        fern: "bg-action-tertiary text-oat font-extrabold hover:bg-action-tertiary-hover",
-        oat: "bg-oat text-ink hover:bg-white",
-        outline: "bg-transparent text-ink border-ink hover:bg-ink hover:text-oat",
+        fern: "border-transparent bg-action-tertiary text-oat font-extrabold hover:bg-action-tertiary-hover",
+        oat: "border-transparent bg-oat text-ink hover:bg-white",
+        outline: "border-ink bg-transparent text-ink hover:bg-ink hover:text-oat",
         "outline-inverse":
-          "bg-transparent text-oat border-oat-16 hover:border-kowhai hover:text-kowhai",
+          "border-oat-16 bg-transparent text-oat hover:border-kowhai hover:text-kowhai",
       },
       size: {
         sm: "text-body-sm px-4 py-2",

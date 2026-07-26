@@ -1,4 +1,22 @@
 import { Button } from "@/components/Button";
+import { AudiencePath } from "@/components/AudiencePath";
+import { CalloutBanner } from "@/components/CalloutBanner";
+import { Card } from "@/components/Card";
+import { CaretList } from "@/components/CaretList";
+import { FunderCredit } from "@/components/FunderCredit";
+import { Pairing } from "@/components/Pairing";
+import { PartnerRow } from "@/components/PartnerRow";
+import { SectionRule } from "@/components/SectionRule";
+import { StatFigure } from "@/components/StatFigure";
+import { StatusTag } from "@/components/StatusTag";
+import { Timeline } from "@/components/Timeline";
+import { Checkbox } from "@/components/form/Checkbox";
+import { Field } from "@/components/form/Field";
+import { FileUpload } from "@/components/form/FileUpload";
+import { Input } from "@/components/form/Input";
+import { Select } from "@/components/form/Select";
+import { Textarea } from "@/components/form/Textarea";
+import { TIMELINE } from "@/lib/navigation";
 
 /* TEMPORARY — phase 1 pilot.
  *
@@ -56,7 +74,7 @@ const SPACING = [
 
 export default function PilotPage() {
   return (
-    <main className="bg-surface-page text-body">
+    <div className="bg-surface-page text-body">
       <div className="mx-auto max-w-page px-gutter py-section lg:px-gutter-lg">
         <p className="font-meta text-label uppercase text-muted">Phase 1 pilot</p>
         <h1 className="mt-4 font-heading text-display-fluid font-black text-heading">
@@ -134,6 +152,109 @@ export default function PilotPage() {
             </div>
           ))}
         </div>
+
+        <hr className="my-9 border-t border-hairline" />
+
+        <h2 className="font-heading text-headline font-extrabold text-heading">
+          Components
+        </h2>
+
+        <div className="mt-6 flex flex-wrap items-center gap-4">
+          <StatusTag tone="open">Applications open</StatusTag>
+          <StatusTag tone="neutral">Closed</StatusTag>
+          <StatusTag tone="gold">Received</StatusTag>
+        </div>
+
+        <div className="mt-8 flex flex-wrap gap-8">
+          <StatFigure figure="3" label="Solutions to be built" />
+          <StatFigure figure="6" label="Paid developer seats" labelSize="md" />
+          <StatFigure figure="5 weeks" label="One build, weekly sprints" labelSize="lg" />
+          <StatFigure figure="Open source" label="Free to reuse" accent />
+        </div>
+
+        <div className="mt-8"><SectionRule variant="gold" /></div>
+
+        <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2">
+          <Card tone="light" accentRule>
+            <p className="font-meta text-label uppercase text-muted">Key dates</p>
+            <div className="mt-5"><Timeline steps={TIMELINE} /></div>
+          </Card>
+          <div className="grid gap-6">
+            <Card tone="oat">
+              <CaretList items={["Genuine need", "Reusable by other organisations", "Realistic scope"]} />
+            </Card>
+            <Card tone="sunk">Sunk card</Card>
+            <Card tone="ink"><CaretList items={["Gold marker on Ink"]} inverse /></Card>
+          </div>
+        </div>
+
+        <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2">
+          <AudiencePath
+            audience="community"
+            eyebrow="Community organisations"
+            title="Something useful, built for your organisation."
+            blurb="Tell us the problem. You do not need to know how it would be built."
+            points={["No cost to your organisation", "Five-week build"]}
+            actionLabel="See what is involved"
+            actionHref="/organisations"
+          />
+          <AudiencePath
+            audience="developer"
+            eyebrow="Developers"
+            title="Paid work, real users, and code you can point at."
+            blurb="Six paid seats across three build teams."
+            points={["Community rate, paid", "Open source"]}
+            actionLabel="See the roles"
+            actionHref="/developers"
+          />
+        </div>
+
+        <div className="mt-9">
+          <Pairing
+            left={{ eyebrow: "One side", title: "Developers with capacity to spare" }}
+            right={{ eyebrow: "The other", title: "Organisations running on spreadsheets" }}
+            joinLabel="Nothing was connecting them"
+          />
+        </div>
+
+        <div className="mt-9"><PartnerRow /></div>
+        <div className="mt-8"><FunderCredit /></div>
+
+        <hr className="my-9 border-t border-hairline" />
+
+        <h2 className="font-heading text-headline font-extrabold text-heading">
+          Form controls
+        </h2>
+        <div className="mt-6 grid max-w-[var(--form-measure)] gap-5">
+          <Field label="Organisation name" required hint="As it appears on your registration.">
+            <Input placeholder="Wakatipu Community Trust" />
+          </Field>
+          <Field label="Legal structure">
+            <Select placeholder="Select one" options={["Registered charity", "Incorporated society", "Charitable trust"]} />
+          </Field>
+          <Field label="What is the problem" hint="A sentence or two. Plain language is perfect.">
+            <Textarea rows={3} />
+          </Field>
+          <Field label="Email" error="Enter an email address we can reply to.">
+            <Input type="email" defaultValue="not-an-email" />
+          </Field>
+          <Field label="Your CV" hint="Optional. PDF or Word.">
+            <FileUpload />
+          </Field>
+          <Checkbox label="We are based in, or primarily serve, the Queenstown Lakes district." />
+          <Checkbox label="Pre-ticked example" defaultChecked />
+          <Checkbox label="Disabled example" disabled />
+        </div>
+
+        <div className="mt-9">
+          <CalloutBanner
+            eyebrow="Applications open 15 to 31 August"
+            title="Tell us what would make the biggest difference."
+            note="Six sections, about 45 to 60 minutes."
+            actionLabel="Apply now"
+            actionHref="/apply"
+          />
+        </div>
       </div>
 
       <div className="bg-surface-inverse">
@@ -163,6 +284,6 @@ export default function PilotPage() {
           </div>
         </div>
       </div>
-    </main>
+    </div>
   );
 }

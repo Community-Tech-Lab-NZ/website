@@ -8,14 +8,28 @@
 
 @import "tailwindcss";
 
+/* Custom-property files: unlayered is fine, they only declare variables. */
 @import "../styles/tokens/fonts.css";
 @import "../styles/tokens/colors.css";
 @import "../styles/tokens/typography.css";
 @import "../styles/tokens/spacing.css";
 @import "../styles/tokens/shape.css";
 @import "../styles/tokens/motion.css";
-@import "../styles/tokens/base.css";
-@import "../styles/tokens/utilities.css";
+@import "../styles/tokens/components.css";
+
+/* These two DECLARE STYLES, not just variables, so they must be layered.
+ *
+ * Cascade layers lose to unlayered CSS regardless of specificity, and Tailwind
+ * puts every utility in @layer utilities. Left unlayered, base.css's
+ * `a { color: var(--text-link); text-decoration: underline }` beat `text-oat`
+ * and `no-underline` on every link in the app — which rendered the header's
+ * Apply now button as Ink text on an Ink background.
+ *
+ * layer(base) puts element defaults below utilities; layer(components) does the
+ * same for the .ctl-* helpers, so a utility can still override one when needed.
+ */
+@import "../styles/tokens/base.css" layer(base);
+@import "../styles/tokens/utilities.css" layer(components);
 
 /* ---------------------------------------------------------------------------
  * Theme mapping
@@ -172,6 +186,7 @@
      value rides on its --text-*--letter-spacing modifier. */
   --tracking-*: initial;
   --tracking-action: var(--tracking-button);
+  --tracking-meta: 0.04em; /* Space Mono dates and meta lines */
 
   /* -- Shape ------------------------------------------------------------- *
    * Nearly square. 2px is the default card and button radius; capsules are
@@ -199,11 +214,14 @@
   --animate-*: initial;
 
   /* -- Layout ------------------------------------------------------------ */
-  /* Keys generate max-w-<key>, so these read max-w-page, max-w-measure etc.
-     `max` and `wide` are avoided: max-w-max is a Tailwind static utility. */
+  /* Keys generate BOTH max-w-<key> and w-<key>, so a key must never reuse a
+     Tailwind static width keyword. `full` cost an hour: --container-full made
+     `.w-full` mean `width: 1280px` instead of `width: 100%`, which stretched
+     every form control past the viewport and gave the whole site a horizontal
+     scrollbar. Avoid: full, screen, auto, min, max, fit, px. */
   --container-*: initial;
   --container-page: var(--container); /* 1120px, the standard container */
-  --container-full: var(--container-wide); /* 1280px */
+  --container-page-wide: var(--container-wide); /* 1280px */
   --container-measure: var(--measure-body); /* 700px, 65-75 characters */
   --container-narrow: var(--measure-narrow); /* 560px */
 

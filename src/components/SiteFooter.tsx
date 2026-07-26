@@ -1,0 +1,72 @@
+import Link from "next/link";
+import { Eyebrow } from "./Typography";
+import { FunderCredit } from "./FunderCredit";
+import { Logo } from "./Logo";
+import { FOOTER_COLUMNS, FOOTER_NOTE, OPEN_SOURCE_NOTE } from "@/lib/navigation";
+
+/* Site footer on Ink: primary lockup, link columns, funder credit.
+ *
+ * There is deliberately NO email address here. The programme publishes no inbox,
+ * and the handoff is explicit that any contact route has to be a form rather
+ * than a mailto: link. The prototype's optional `email` prop is not carried
+ * over, so it cannot be switched on by accident.
+ *
+ * The funder credit is mandatory on any page promoting the programme.
+ */
+
+export function SiteFooter() {
+  return (
+    <footer className="bg-ink py-8 text-body-inverse">
+      <div className="mx-auto max-w-page px-gutter lg:px-gutter-lg">
+        <div className="grid grid-cols-1 items-start gap-8 md:grid-cols-[minmax(220px,1fr)_2fr]">
+          <div>
+            <Logo
+              variant="primary-dark"
+              height={150}
+              className="ml-[var(--footer-logo-bleed)]"
+            />
+          </div>
+
+          <div className="grid grid-cols-[repeat(auto-fit,minmax(var(--footer-col-min),1fr))] gap-6">
+            {FOOTER_COLUMNS.map((col) => (
+              <div key={col.title}>
+                <Eyebrow inverse>{col.title}</Eyebrow>
+                <ul className="m-0 mt-4 grid list-none gap-3 p-0">
+                  {col.links.map((link) => (
+                    <li key={link.label}>
+                      {link.href ? (
+                        <Link
+                          href={link.href}
+                          className="font-sans text-body-sm text-body-inverse no-underline hover:text-kowhai"
+                        >
+                          {link.label}
+                        </Link>
+                      ) : (
+                        <span className="font-sans text-body-sm text-body-inverse">
+                          {link.label}
+                        </span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-8">
+          <FunderCredit inverse />
+        </div>
+
+        <hr className="mt-8 border-0 border-t border-solid border-hairline-inverse" />
+
+        <div className="mt-5 flex flex-wrap justify-between gap-4">
+          <p className="font-meta text-label uppercase text-muted-inverse">{FOOTER_NOTE}</p>
+          <p className="font-meta text-label uppercase text-muted-inverse">
+            {OPEN_SOURCE_NOTE}
+          </p>
+        </div>
+      </div>
+    </footer>
+  );
+}

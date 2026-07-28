@@ -148,7 +148,10 @@
 /* Hover lift and grow (override 4). Transform-only so nothing reflows.
    On --duration-hover, not --duration-fast: growth should stretch, not
    twitch. */
-.ctl-lift{transition:transform var(--duration-hover) var(--ease-out-soft)}
+/* Owns border-color too: the audience cards pair the lift with a Fern
+   border highlight, and a Tailwind transition utility alongside would
+   overwrite this shorthand and snap both back to the fast timing. */
+.ctl-lift{transition:transform var(--duration-hover) var(--ease-out-soft),border-color var(--duration-hover) var(--ease-out-soft)}
 .ctl-lift:hover{transform:translateY(-3px)}
 .ctl-grow{transition:transform var(--duration-hover) var(--ease-out-soft)}
 .ctl-grow:hover{transform:scale(1.06)}

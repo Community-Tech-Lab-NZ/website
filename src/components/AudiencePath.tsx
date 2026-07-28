@@ -50,10 +50,11 @@ export function AudiencePath({
   return (
     <div
       className={clsx(
-        // ctl-lift is motion override 4. Both cards carry a border so their
-        // boxes match; the Ink card's is invisible until hover.
-        "ctl-lift flex flex-col gap-4 rounded-card border border-solid p-7",
-        "transition-[border-color,transform] duration-[var(--duration-fast)] ease-brand hover:border-fern",
+        // ctl-lift is motion override 4 and owns the whole transition —
+        // border fade included — so the Fern highlight eases in on the same
+        // slow hover timing as everything else. No Tailwind transition
+        // utilities here; one would overwrite the shorthand.
+        "ctl-lift flex flex-col gap-4 rounded-card border border-solid p-7 hover:border-fern",
         dark
           ? "border-transparent bg-ink text-body-inverse"
           : "border-hairline bg-oat text-body",

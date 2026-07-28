@@ -1,7 +1,7 @@
 "use client";
 
 import { clsx } from "clsx";
-import { winkEnd, winkEnter } from "@/lib/knock";
+import { winkEnter } from "@/lib/knock";
 import { Caret } from "./Caret";
 
 /* List using the caret as the marker in place of a bullet.
@@ -43,7 +43,8 @@ export function CaretList({ items, inverse = false, markerColor, className }: Ca
               size={9}
               thickness={2}
               color={marker}
-              className="mt-[var(--caret-list-marker-offset)] transition-[border-color] duration-[var(--duration-fast)] ease-brand"
+              wink
+              className="mt-[var(--caret-list-marker-offset)] transition-[color] duration-[var(--duration-fast)] ease-brand"
             />
             <span
               className={clsx(
@@ -57,11 +58,11 @@ export function CaretList({ items, inverse = false, markerColor, className }: Ca
         );
 
         return (
-          <li key={i} onMouseEnter={winkEnter} onAnimationEnd={winkEnd} className="flex items-start gap-3">
+          <li key={i} onMouseEnter={winkEnter} className="flex items-start gap-3">
             {linked ? (
               <a
                 href={item.href}
-                className="group flex items-start gap-3 no-underline hover:[&_.caret-mark]:border-kowhai"
+                className="group flex items-start gap-3 no-underline hover:[&_.caret-mark]:text-kowhai"
               >
                 {body}
               </a>

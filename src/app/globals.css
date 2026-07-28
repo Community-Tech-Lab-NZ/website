@@ -245,11 +245,11 @@
 
 /* The brand's only glyph: a square with two borders, rotated. No icon set
    exists in this brand and none was invented. */
+/* The marker hook for hover selectors. The glyph itself is stroked SVG now
+   (see Caret.tsx) — the border construction this once carried would frame
+   the svg box. */
 @utility caret-mark {
   display: inline-block;
-  border-style: solid;
-  border-color: currentColor;
-  border-width: var(--caret-stroke) var(--caret-stroke) 0 0;
 }
 
 /* Hero CTA's detached ring: an outline sitting clear of the button edge. */

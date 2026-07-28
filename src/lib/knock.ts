@@ -25,18 +25,14 @@ export function knockEnd(event: AnimationEvent<HTMLElement>) {
   (event.target as HTMLElement).classList.remove("is-knocked");
 }
 
-/* Same run-to-completion contract for the list-marker wink: hovering a list
- * row blinks its caret marker like the logo's eye, and the blink finishes
- * whether or not the pointer stays. */
+/* The list-marker wink is SMIL point animation (see Caret's wink prop): the
+ * apex descends and rises like the lockup's eye. Hovering the row starts it
+ * with beginElement(); SMIL runs to completion on its own, and
+ * restart="whenNotActive" refuses a re-trigger mid-blink. SMIL cannot hear
+ * prefers-reduced-motion, so the trigger checks it here. */
 
 export function winkEnter(event: MouseEvent<HTMLElement>) {
-  const mark = event.currentTarget.querySelector<HTMLElement>(".caret-mark");
-  if (mark && !mark.classList.contains("is-winking")) {
-    mark.classList.add("is-winking");
-  }
-}
-
-export function winkEnd(event: AnimationEvent<HTMLElement>) {
-  if (event.animationName !== "ctl-mark-wink") return;
-  (event.target as HTMLElement).classList.remove("is-winking");
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const anim = event.currentTarget.querySelector<SVGAnimateElement>("animate[data-wink]");
+  anim?.beginElement();
 }

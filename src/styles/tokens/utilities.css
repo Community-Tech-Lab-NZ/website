@@ -141,7 +141,7 @@
    because splitting it between Tailwind utilities and this layer would let
    the utilities layer overwrite it. Press keeps the 1px drop, composed with
    the grown scale so pressing never un-grows the button. */
-.ctl-btn-motion{transition:background-color var(--duration-fast) var(--ease-standard),color var(--duration-fast) var(--ease-standard),border-color var(--duration-fast) var(--ease-standard),transform var(--duration-hover) var(--ease-out-soft)}
+.ctl-btn-motion{will-change:transform;transition:background-color var(--duration-fast) var(--ease-standard),color var(--duration-fast) var(--ease-standard),border-color var(--duration-fast) var(--ease-standard),transform var(--duration-hover) var(--ease-out-soft)}
 .ctl-btn-motion:hover{transform:scale(1.04)}
 .ctl-btn-motion:active{transform:scale(1.04) translateY(1px)}
 
@@ -224,7 +224,6 @@
 @media (prefers-reduced-motion:reduce){
   .ctl-rise{transition-delay:0s}
   .ctl-cursor-blink,.ctl-lockup-block.is-breathing{animation:none}
-  .caret-mark.is-winking{animation:none}
   .ctl-link-grow:hover{transform:none}
   .ctl-btn-motion:hover{transform:none}
   .ctl-btn-motion:active{transform:translateY(1px)}
@@ -268,23 +267,12 @@
    Tailwind transition utility on the same element would overwrite it and
    flatten the grow onto the fast timing (the same layer collision
    .ctl-btn-motion exists to avoid). */
-.ctl-link-grow{display:inline-block;transition:transform 450ms var(--ease-out-soft),color var(--duration-fast) var(--ease-standard),border-color var(--duration-fast) var(--ease-standard),text-decoration-color var(--duration-fast) var(--ease-standard)}
+/* will-change on both growers: without constant layer promotion the text
+   rasterises soft while scaling and snaps sharp when the transition lands —
+   the "blurry then clear" pop. Promoted permanently, the rendering never
+   switches (the same cure as the knock's end-of-wobble blip). */
+.ctl-link-grow{display:inline-block;will-change:transform;transition:transform 450ms var(--ease-out-soft),color var(--duration-fast) var(--ease-standard),border-color var(--duration-fast) var(--ease-standard),text-decoration-color var(--duration-fast) var(--ease-standard)}
 .ctl-link-grow:hover{transform:scale(1.03)}
-
-/* The list-marker carets blink like the logo's eye when their row is
-   hovered: a quick squash to flat and back. The rotation must ride along in
-   the keyframes because the marker's resting rotate lives in an inline style
-   that an animation would otherwise override. Run-to-completion via
-   is-winking (src/lib/knock.ts), same contract as the knock. */
-@keyframes ctl-mark-wink{
-  0%{transform:scaleY(1) rotate(-45deg)}
-  45%{transform:scaleY(0.12) rotate(-45deg)}
-  100%{transform:scaleY(1) rotate(-45deg)}
-}
-/* Origin stays at the default centre: the resting inline rotate pivots
-   there, and animating about any other origin shifts the glyph for the
-   duration of the blink and jolts it back after. */
-.caret-mark.is-winking{animation:ctl-mark-wink 600ms var(--ease-standard) 1}
 
 /* Focus list (the timelines): hovering one entry lifts it slightly and pales
    the rest, so the row under the pointer reads as the one in focus. */

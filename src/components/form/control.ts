@@ -22,6 +22,11 @@ export function controlClasses({
 }) {
   return clsx(
     "box-border w-full rounded-card border border-solid font-sans text-body-md",
+    // Same muted placeholder everywhere: without this, inputs show the UA's
+    // own grey while a select showing its placeholder option renders solid
+    // ink — the mismatch that made the two controls look unrelated. The
+    // select half of the pairing lives in utilities.css (:has rule).
+    inverse ? "placeholder:text-muted-inverse" : "placeholder:text-muted",
     "px-[var(--control-padding-x)] py-[var(--control-padding-y)] leading-[var(--control-leading)]",
     "transition-[border-color] duration-[var(--duration-fast)] ease-brand",
     "focus:border-fern",

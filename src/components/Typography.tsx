@@ -97,9 +97,17 @@ export function splitWords(children: React.ReactNode): React.ReactNode {
     if (Array.isArray(node)) return node.map(wrap);
     if (isValidElement(node)) {
       // Plain markup (span, strong, em...) is recursed into so its words
-      // knock individually; components (links, buttons) knock as one unit.
+      // knock individually. Anchors and buttons knock as one unit — not just
+      // semantics: text-decoration cannot propagate into inline-block
+      // children, so splitting an underlined link's text would erase the
+      // underline beneath every word. Components knock whole too.
       const el = node as React.ReactElement<{ children?: React.ReactNode }>;
-      if (typeof el.type === "string" && el.props.children !== undefined) {
+      if (
+        typeof el.type === "string" &&
+        el.type !== "a" &&
+        el.type !== "button" &&
+        el.props.children !== undefined
+      ) {
         return cloneElement(el, { key: key++ }, wrap(el.props.children));
       }
       return (

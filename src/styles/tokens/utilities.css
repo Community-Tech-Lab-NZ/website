@@ -313,3 +313,15 @@
 .ctl-tab-indicator{position:absolute;bottom:-1px;left:0;width:0;height:2px;opacity:0;background:var(--ctl-kowhai);pointer-events:none;transition:left var(--duration-base) var(--ease-standard),width var(--duration-base) var(--ease-standard),opacity var(--duration-fast) var(--ease-standard)}
 .ctl-tab-indicator--fern{background:var(--ctl-fern)}
 .ctl-tabs-live .ctl-tab-underline{border-bottom-color:transparent !important}
+
+/* Form select parity. A select displaying its placeholder option shows the
+   same muted colour input placeholders do (the :has matches while the empty
+   option is chosen, and stops the moment a real value is). The option rules
+   give the picker panel the site's own face and size where the platform
+   honours styling — device emulation in particular rendered options tiny in
+   the UA default font. */
+/* !important is layer work again: controlClasses' text-ink lives in the
+   utilities layer, which beats this file regardless of specificity. Inverse
+   selects would need their own rule; none exist today. */
+select:has(option[value=""]:checked){color:var(--text-muted) !important}
+select option{font-family:var(--font-body);font-size:var(--size-body);color:var(--ctl-ink);background:var(--ctl-white)}

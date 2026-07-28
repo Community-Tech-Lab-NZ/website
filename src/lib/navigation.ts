@@ -21,6 +21,27 @@ export type FooterColumn = {
   links: { label: string; href?: string }[];
 };
 
+/* One place for partner websites, used by the footer, the partner logo wall
+ * and the about page's roles list.
+ *
+ * Queenstown Coders Connect has no entry because it has no website. It is real
+ * and active — Queenstown's tourism board lists it alongside FLINT and the
+ * Chamber — but it runs through events and word of mouth rather than a site of
+ * its own. The only codersconnect domain on the web belongs to an unrelated
+ * recruitment agency in the UK, so linking anything would be worse than
+ * linking nothing.
+ *
+ * FLINT is a TUANZ programme and the Queenstown chapter has no separate page,
+ * so the link goes to FLINT itself rather than a chapter URL that does not
+ * exist. */
+export const PARTNER_URLS: Record<string, string> = {
+  "Startup Queenstown Lakes": "https://www.startupqueenstownlakes.com",
+  "FLINT Queenstown": "https://tuanz.org.nz/about-flint/",
+  "Queenstown Resort College": "https://www.qrc.ac.nz",
+  huddl: "https://huddl.nz",
+  "Technology Queenstown": "https://www.technologyqueenstown.com",
+};
+
 export const FOOTER_COLUMNS: FooterColumn[] = [
   {
     title: "Take part",
@@ -40,27 +61,15 @@ export const FOOTER_COLUMNS: FooterColumn[] = [
   },
   {
     /* All six are listed at strictly equal weight, in the order the handoff
-     * gives them. An absolute href opens in a new tab; see SiteFooter.
-     *
-     * Queenstown Coders Connect has no href because it has no website. It is
-     * real and active — Queenstown's tourism board lists it alongside FLINT and
-     * the Chamber — but it runs through events and word of mouth rather than a
-     * site of its own. The only codersconnect domain on the web belongs to an
-     * unrelated recruitment agency in the UK, so linking anything here would be
-     * worse than linking nothing.
-     *
-     * FLINT is a TUANZ programme and the Queenstown chapter has no separate
-     * page, so the link goes to FLINT itself rather than a chapter URL that
-     * does not exist.
-     */
+     * gives them. An absolute href opens in a new tab; see SiteFooter. */
     title: "Partners",
     links: [
-      { label: "Startup Queenstown Lakes", href: "https://www.startupqueenstownlakes.com" },
+      { label: "Startup Queenstown Lakes", href: PARTNER_URLS["Startup Queenstown Lakes"] },
       { label: "Queenstown Coders Connect" },
-      { label: "FLINT Queenstown", href: "https://tuanz.org.nz/about-flint/" },
-      { label: "Queenstown Resort College", href: "https://www.qrc.ac.nz" },
-      { label: "huddl", href: "https://huddl.nz" },
-      { label: "Technology Queenstown", href: "https://www.technologyqueenstown.com" },
+      { label: "FLINT Queenstown", href: PARTNER_URLS["FLINT Queenstown"] },
+      { label: "Queenstown Resort College", href: PARTNER_URLS["Queenstown Resort College"] },
+      { label: "huddl", href: PARTNER_URLS["huddl"] },
+      { label: "Technology Queenstown", href: PARTNER_URLS["Technology Queenstown"] },
     ],
   },
 ];

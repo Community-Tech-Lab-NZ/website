@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import { clsx } from "clsx";
 import { Eyebrow } from "./Typography";
+import { PARTNER_URLS } from "@/lib/navigation";
 
 /* Partner row.
  *
@@ -17,13 +18,15 @@ import { Eyebrow } from "./Typography";
  *   FLINT           light blue disc, self-contained     direct on the cell
  *   QRC             red tile, self-contained            direct on the cell
  *   Technology Q    navy, designed for light            direct on the cell
- *   Startup QL      lime reversed mark (their site      fitted Ink chip
- *                   shows it on dark)
- *   huddl           white one-colour version of a       fitted Ink chip
- *                   teal-on-white brand
+ *   Startup QL      lime reversed mark                  chip in SQL deep blue
+ *   huddl           white mark, lives on their orange   chip in huddl orange
  *
- * The chip hugs its logo rather than being a fixed plate, so it reads as a
- * deliberate dark ground for a reversed mark, not as a mismatched box.
+ * The chip hugs its logo rather than being a fixed plate, and each chip is the
+ * PARTNER'S OWN ground colour, supplied by the programme: #182073 for Startup
+ * Queenstown Lakes, #F77815 for huddl (their site's hero orange). These two
+ * hex values are the only non-palette colours in the codebase, which is why
+ * they are inline styles rather than utilities — they are someone else's brand
+ * constants, not ours, and the theme lock should keep refusing them.
  *
  * Plain <img> rather than next/image: huddl's mark is an SVG, and next/image
  * refuses SVG unless dangerouslyAllowSVG is enabled for the whole project.
@@ -41,8 +44,9 @@ type Partner = {
   /** Intrinsic pixel size, so the browser reserves the box and nothing shifts. */
   w?: number;
   h?: number;
-  /** Which ground the supplied mark needs. Defaults to light (direct on cell). */
-  ground?: "light" | "ink";
+  /** Chip colour for reversed marks: the partner's own ground. Absent means
+   *  the mark sits directly on the light cell. */
+  chip?: string;
 };
 
 export const CTL_PARTNERS: readonly Partner[] = [
@@ -51,13 +55,13 @@ export const CTL_PARTNERS: readonly Partner[] = [
     logo: "/logos/startup_queenstown_lakes_logo.webp",
     w: 760,
     h: 300,
-    ground: "ink",
+    chip: "#182073",
   },
   // No website and no logo file supplied.
   { name: "Queenstown Coders Connect" },
   { name: "FLINT Queenstown", logo: "/logos/flint_logo.png", w: 300, h: 300 },
   { name: "Queenstown Resort College", logo: "/logos/qrc_logo.png", w: 130, h: 130 },
-  { name: "huddl", logo: "/logos/huddl_logo.svg", w: 239, h: 100, ground: "ink" },
+  { name: "huddl", logo: "/logos/huddl_logo.svg", w: 239, h: 100, chip: "#F77815" },
   { name: "Technology Queenstown", logo: "/logos/tq_logo.webp", w: 1500, h: 291 },
 ] as const;
 
@@ -98,8 +102,11 @@ export function PartnerRow({
             )}
           >
             {partner.logo ? (
-              partner.ground === "ink" ? (
-                <span className="flex items-center justify-center rounded-card bg-ink px-4 py-2">
+              partner.chip ? (
+                <span
+                  className="flex items-center justify-center rounded-card px-4 py-2"
+                  style={{ background: partner.chip }}
+                >
                   <img
                     src={partner.logo}
                     alt={partner.name}
@@ -133,7 +140,22 @@ export function PartnerRow({
                 Logo slot
               </span>
             )}
-            <span>{partner.name}</span>
+            {PARTNER_URLS[partner.name] ? (
+              <a
+                href={PARTNER_URLS[partner.name]}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={clsx(
+                  "no-underline hover:underline",
+                  inverse ? "text-heading-inverse" : "text-heading",
+                )}
+              >
+                {partner.name}
+                <span className="sr-only"> (opens in a new tab)</span>
+              </a>
+            ) : (
+              <span>{partner.name}</span>
+            )}
           </div>
         ))}
       </div>

@@ -49,10 +49,10 @@ const VIEWBOX = {
  * linecap on the caret's stroke extends it half a stroke-width further left
  * than its coordinates suggest.
  *
- * `primary` is deliberately null. Its wordmark is `text-anchor="middle"`, so
- * the leftmost ink is the end of a centred line of text and moves with the
- * font's metrics. There is no stable value to hard-code, and a centred lockup
- * has no business being left-aligned to a text column anyway.
+ * `primary` is deliberately null. Its wordmark is centred under the caret, so
+ * its leftmost ink is the edge of a centred line — a stable number now that
+ * the text is outlined, but a centred lockup has no business being optically
+ * left-aligned to a text column, so no value is offered.
  */
 const INK_LEFT = { horizontal: 44.4, primary: null, icon: 16 } as const;
 
@@ -68,12 +68,13 @@ const INK_LEFT = { horizontal: 44.4, primary: null, icon: 16 } as const;
  * than the height of the file, so the box tracks the artwork.
  *
  * Measured the same way as INK_LEFT: rasterise, scan for non-background pixels.
- * The horizontal figures depend on the wordmark's font metrics; the primary
- * ones are stable because the caret sets its vertical extent.
+ * These values are stable now: the lockup files carry the wordmark as outlined
+ * Archivo Black paths rather than <text>, so nothing in them depends on which
+ * fonts a machine has installed. Re-measure only if the lockup files change.
  */
 const INK_BOX = {
-  horizontal: { x: 44, y: 42.5, w: 275, h: 64.5 },
-  primary: { x: 161.5, y: 71.5, w: 199, h: 201.5 },
+  horizontal: { x: 44, y: 43, w: 297.5, h: 63.5 },
+  primary: { x: 148.5, y: 71.5, w: 224.5, h: 201 },
   icon: { x: 16, y: 26, w: 68, h: 60 },
 } as const;
 

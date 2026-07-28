@@ -9,6 +9,7 @@ import { Section } from "@/components/Section";
 import { SectionRule } from "@/components/SectionRule";
 import { Body, Eyebrow, Heading, Lede } from "@/components/Typography";
 import { breadcrumbSchema, JsonLd, showcaseEventSchema } from "@/lib/structured-data";
+import { PARTNER_URLS } from "@/lib/navigation";
 
 /* About. Copy transcribed verbatim from the prototype. */
 
@@ -42,28 +43,47 @@ const PEOPLE = [
   },
 ];
 
+/* Bold partner names in the roles list link out where a site exists.
+   Underlined so they read as links inside body copy; new tab so the reader
+   is not navigated away from the page that is introducing the programme. */
+function PartnerName({ name }: { name: string }) {
+  const href = PARTNER_URLS[name];
+  if (!href) return <strong>{name}</strong>;
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="font-bold text-ink underline"
+    >
+      {name}
+      <span className="sr-only"> (opens in a new tab)</span>
+    </a>
+  );
+}
+
 const PARTNER_ROLES = [
   <span key="sql">
-    <strong>Startup Queenstown Lakes</strong> leads the programme, holds the funding and
+    <PartnerName name="Startup Queenstown Lakes" /> leads the programme, holds the funding and
     contracts the developers.
   </span>,
   <span key="qcc">
-    <strong>Queenstown Coders Connect</strong> provides technical leadership, mentoring
+    <PartnerName name="Queenstown Coders Connect" /> provides technical leadership, mentoring
     and developer recruitment.
   </span>,
   <span key="flint">
-    <strong>FLINT Queenstown</strong> brings mentorship and hosts the closing Showcase Hui
+    <PartnerName name="FLINT Queenstown" /> brings mentorship and hosts the closing Showcase Hui
     as its Q4 event.
   </span>,
   <span key="qrc">
-    <strong>Queenstown Resort College</strong> supports recruitment and learning pathways,
+    <PartnerName name="Queenstown Resort College" /> supports recruitment and learning pathways,
     and reserves a place in the cohort for a current student or recent graduate.
   </span>,
   <span key="huddl">
-    <strong>huddl</strong> connects the programme to the not-for-profit sector.
+    <PartnerName name="huddl" /> connects the programme to the not-for-profit sector.
   </span>,
   <span key="tq">
-    <strong>Technology Queenstown</strong> advises on the wider ecosystem and employer
+    <PartnerName name="Technology Queenstown" /> advises on the wider ecosystem and employer
     connections.
   </span>,
 ];

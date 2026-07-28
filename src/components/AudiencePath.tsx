@@ -2,9 +2,10 @@
 
 import { clsx } from "clsx";
 import { knockEnd, knockEnter } from "@/lib/knock";
+import { useWordKnock } from "@/hooks/useWordKnock";
 import { Button } from "./Button";
 import { CaretList } from "./CaretList";
-import { Eyebrow } from "./Typography";
+import { Eyebrow, splitWords } from "./Typography";
 
 /* One of the two audience paths.
  *
@@ -46,6 +47,8 @@ export function AudiencePath({
   className,
 }: AudiencePathProps) {
   const dark = audience === "community";
+  // The blurb joins the word knock (it renders outside Body, so it missed it).
+  const blurbRef = useWordKnock<HTMLParagraphElement>();
 
   return (
     <div
@@ -82,8 +85,11 @@ export function AudiencePath({
       </h3>
 
       {blurb ? (
-        <p className={clsx("font-sans text-body-md", dark ? "text-body-inverse" : "text-body")}>
-          {blurb}
+        <p
+          ref={blurbRef}
+          className={clsx("font-sans text-body-md", dark ? "text-body-inverse" : "text-body")}
+        >
+          {splitWords(blurb)}
         </p>
       ) : null}
 

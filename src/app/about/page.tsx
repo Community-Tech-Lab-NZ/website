@@ -7,7 +7,7 @@ import { PartnerRow } from "@/components/PartnerRow";
 import { Reveal } from "@/components/Reveal";
 import { Section } from "@/components/Section";
 import { SectionRule } from "@/components/SectionRule";
-import { Body, Eyebrow, Heading, Lede } from "@/components/Typography";
+import { Body, Eyebrow, Heading, Lede, WordKnockText } from "@/components/Typography";
 import { breadcrumbSchema, JsonLd, showcaseEventSchema } from "@/lib/structured-data";
 import { PARTNER_URLS } from "@/lib/navigation";
 
@@ -172,12 +172,12 @@ export default function AboutPage() {
                   {person.role}
                 </div>
                 {person.paragraphs.map((para, i) => (
-                  <p
+                  <WordKnockText
                     key={i}
                     className="mt-4 max-w-measure font-sans text-body-sm text-body"
                   >
                     {para}
-                  </p>
+                  </WordKnockText>
                 ))}
               </Card>
             ))}

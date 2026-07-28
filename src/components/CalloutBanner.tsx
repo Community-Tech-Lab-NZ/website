@@ -3,7 +3,8 @@
 import { clsx } from "clsx";
 import { knockEnd, knockEnter } from "@/lib/knock";
 import { Button } from "./Button";
-import { Eyebrow } from "./Typography";
+import { Eyebrow, splitWords } from "./Typography";
+import { useWordKnock } from "@/hooks/useWordKnock";
 
 /* Closing call-to-action band.
  *
@@ -34,6 +35,7 @@ export function CalloutBanner({
   className,
 }: CalloutBannerProps) {
   const dark = tone === "ink";
+  const noteRef = useWordKnock<HTMLDivElement>();
 
   return (
     <div
@@ -66,12 +68,13 @@ export function CalloutBanner({
 
         {note ? (
           <div
+            ref={noteRef}
             className={clsx(
               "mt-2 font-sans text-body-sm",
               dark ? "text-muted-inverse" : "text-muted",
             )}
           >
-            {note}
+            {splitWords(note)}
           </div>
         ) : null}
       </div>

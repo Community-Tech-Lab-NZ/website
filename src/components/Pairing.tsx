@@ -3,7 +3,8 @@
 import { clsx } from "clsx";
 import { knockEnd, knockEnter } from "@/lib/knock";
 import { Caret } from "./Caret";
-import { Eyebrow } from "./Typography";
+import { Eyebrow, splitWords } from "./Typography";
+import { useWordKnock } from "@/hooks/useWordKnock";
 
 /* The two sides of the programme, facing each other with the caret between
  * them: developers with capacity on one side, organisations running on
@@ -39,6 +40,7 @@ function Side({
   align: "left" | "right";
   inverse: boolean;
 }) {
+  const bodyRef = useWordKnock<HTMLDivElement>();
   return (
     <div className={clsx("text-left", align === "right" ? "md:text-right" : "md:text-left")}>
       {data.eyebrow ? (
@@ -60,12 +62,13 @@ function Side({
 
       {data.body ? (
         <div
+          ref={bodyRef}
           className={clsx(
             "mt-3 font-sans text-body-md",
             inverse ? "text-body-inverse" : "text-body",
           )}
         >
-          {data.body}
+          {splitWords(data.body)}
         </div>
       ) : null}
     </div>

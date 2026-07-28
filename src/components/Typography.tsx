@@ -1,6 +1,7 @@
 "use client";
 
 import { clsx } from "clsx";
+import { isValidElement, cloneElement } from "react";
 import { knockEnd, knockEnter } from "@/lib/knock";
 import { useWordKnock } from "@/hooks/useWordKnock";
 
@@ -79,7 +80,7 @@ type ProseProps = {
    selection behave; element children (links, strong) knock whole. Screen
    readers read inline spans as continuous text, so nothing changes for
    them. */
-function splitWords(children: React.ReactNode): React.ReactNode {
+export function splitWords(children: React.ReactNode): React.ReactNode {
   let key = 0;
   const wrap = (node: React.ReactNode): React.ReactNode => {
     if (typeof node === "string") {
@@ -94,7 +95,13 @@ function splitWords(children: React.ReactNode): React.ReactNode {
       );
     }
     if (Array.isArray(node)) return node.map(wrap);
-    if (node !== null && typeof node === "object") {
+    if (isValidElement(node)) {
+      // Plain markup (span, strong, em...) is recursed into so its words
+      // knock individually; components (links, buttons) knock as one unit.
+      const el = node as React.ReactElement<{ children?: React.ReactNode }>;
+      if (typeof el.type === "string" && el.props.children !== undefined) {
+        return cloneElement(el, { key: key++ }, wrap(el.props.children));
+      }
       return (
         <span key={key++} className="ctl-word">
           {node}
@@ -104,6 +111,26 @@ function splitWords(children: React.ReactNode): React.ReactNode {
     return node;
   };
   return wrap(children);
+}
+
+/** Any prose element, joined to the word knock. For text that renders outside
+ *  Body/Lede — footer notes, card asides — so server components can opt text
+ *  in with one swap. */
+export function WordKnockText({
+  as: Tag = "p",
+  className,
+  children,
+}: {
+  as?: "p" | "div" | "span";
+  className?: string;
+  children: React.ReactNode;
+}) {
+  const ref = useWordKnock<HTMLElement>();
+  return (
+    <Tag ref={ref as React.Ref<never>} className={className}>
+      {splitWords(children)}
+    </Tag>
+  );
 }
 
 export function Lede({ children, inverse = false, className }: ProseProps) {

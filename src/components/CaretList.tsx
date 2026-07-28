@@ -2,6 +2,8 @@
 
 import { clsx } from "clsx";
 import { winkEnter } from "@/lib/knock";
+import { useWordKnock } from "@/hooks/useWordKnock";
+import { splitWords } from "./Typography";
 import { Caret } from "./Caret";
 
 /* List using the caret as the marker in place of a bullet.
@@ -30,9 +32,10 @@ function isLink(item: CaretListItem): item is { content: React.ReactNode; href: 
 
 export function CaretList({ items, inverse = false, markerColor, className }: CaretListProps) {
   const marker = markerColor ?? (inverse ? "var(--ctl-kowhai)" : "var(--ctl-fern)");
+  const listRef = useWordKnock<HTMLUListElement>();
 
   return (
-    <ul className={clsx("m-0 grid max-w-measure list-none gap-3 p-0", className)}>
+    <ul ref={listRef} className={clsx("m-0 grid max-w-measure list-none gap-3 p-0", className)}>
       {items.map((item, i) => {
         const linked = isLink(item);
         const content = linked ? item.content : item;
@@ -52,7 +55,7 @@ export function CaretList({ items, inverse = false, markerColor, className }: Ca
                 inverse ? "text-body-inverse" : "text-body",
               )}
             >
-              {content}
+              {splitWords(content)}
             </span>
           </>
         );

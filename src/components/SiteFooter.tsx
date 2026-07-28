@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Eyebrow } from "./Typography";
+import { Eyebrow, WordKnockText } from "./Typography";
 import { Drift } from "./Drift";
 import { FunderCredit } from "./FunderCredit";
 import { AnimatedLockup } from "./AnimatedLockup";
@@ -106,10 +106,12 @@ export function SiteFooter() {
         <div className="mt-5 flex flex-wrap items-center justify-between gap-6">
           <FunderCredit inverse />
           <div className="max-w-[var(--footer-note-max)] md:text-right">
-            <p className="font-meta text-label uppercase text-muted-inverse">{FOOTER_NOTE}</p>
-            <p className="mt-2 font-meta text-label uppercase text-muted-inverse">
+            <WordKnockText className="font-meta text-label uppercase text-muted-inverse">
+              {FOOTER_NOTE}
+            </WordKnockText>
+            <WordKnockText className="mt-2 font-meta text-label uppercase text-muted-inverse">
               {OPEN_SOURCE_NOTE}
-            </p>
+            </WordKnockText>
           </div>
         </div>
       </div>

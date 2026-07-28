@@ -9,7 +9,7 @@ import { Section } from "@/components/Section";
 import { SectionRule } from "@/components/SectionRule";
 import { StatFigure } from "@/components/StatFigure";
 import { Timeline } from "@/components/Timeline";
-import { Eyebrow, Heading, Lede } from "@/components/Typography";
+import { Eyebrow, Heading, Lede, WordKnockText } from "@/components/Typography";
 import { TIMELINE } from "@/lib/navigation";
 import { breadcrumbSchema, JsonLd, jobPostingsSchema } from "@/lib/structured-data";
 
@@ -125,9 +125,9 @@ export default function DevelopersPage() {
                   </div>
                 </div>
 
-                <p className="max-w-measure font-sans text-body-sm text-body">
+                <WordKnockText className="max-w-measure font-sans text-body-sm text-body">
                   {role.body}
-                </p>
+                </WordKnockText>
 
                 <Button variant="outline" size="sm" href="/apply">
                   Apply
@@ -136,9 +136,9 @@ export default function DevelopersPage() {
             ))}
           </div>
 
-          <p className="mt-5 max-w-measure font-sans text-body-sm text-muted">
+          <WordKnockText className="mt-5 max-w-measure font-sans text-body-sm text-muted">
             Open to developers based in the Queenstown Lakes district.
-          </p>
+          </WordKnockText>
         </Reveal>
       </Section>
 

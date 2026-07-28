@@ -7,7 +7,7 @@ import { ScoringTable, SCORING_ORGANISATIONS } from "@/components/ScoringTable";
 import { Section } from "@/components/Section";
 import { SectionRule } from "@/components/SectionRule";
 import { Timeline } from "@/components/Timeline";
-import { Body, Eyebrow, Heading, Lede } from "@/components/Typography";
+import { Body, Eyebrow, Heading, Lede, WordKnockText } from "@/components/Typography";
 import { TIMELINE } from "@/lib/navigation";
 import { breadcrumbSchema, JsonLd } from "@/lib/structured-data";
 
@@ -82,12 +82,12 @@ export default function OrganisationsPage() {
               <Timeline steps={TIMELINE} />
               <div className="mt-6 border-t border-solid border-hairline pt-5">
                 <Eyebrow>Who can apply</Eyebrow>
-                <p className="mt-3 max-w-measure font-sans text-body-sm text-body">
+                <WordKnockText className="mt-3 max-w-measure font-sans text-body-sm text-body">
                   Not-for-profits, registered charities, marae, sports clubs, community
                   groups and incorporated societies based in the Queenstown Lakes
                   district. Businesses can be eligible where what gets built serves the
                   community rather than commercial gain.
-                </p>
+                </WordKnockText>
               </div>
             </Card>
           </div>

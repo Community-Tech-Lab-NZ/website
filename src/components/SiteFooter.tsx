@@ -36,8 +36,10 @@ export function SiteFooter() {
                 <Eyebrow inverse>{col.title}</Eyebrow>
                 <ul className="m-0 mt-4 grid list-none gap-3 p-0">
                   {col.links.map((link) => {
+                    // ctl-hit: 20px line boxes on a 32px pitch; the utility
+                    // brings each to 32px of clickable height, exactly abutting.
                     const style =
-                      "font-sans text-body-sm text-body-inverse no-underline hover:text-kowhai";
+                      "ctl-hit font-sans text-body-sm text-body-inverse no-underline hover:text-kowhai";
 
                     /* Partner sites are absolute URLs and open in a new tab, so
                        a half-finished application is never navigated away from.

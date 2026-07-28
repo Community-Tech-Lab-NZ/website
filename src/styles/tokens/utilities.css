@@ -15,6 +15,15 @@
 .ctl-rise{opacity:0;transform:translateY(var(--rise-distance));transition:opacity var(--duration-entry) var(--ease-out-soft),transform var(--duration-entry) var(--ease-out-soft)}
 .ctl-rise.is-in{opacity:1;transform:none}
 
+/* Enlarged hit area for text links that render short of the 24px WCAG 2.2
+   target minimum (nav and footer links are 20px line boxes). Extends the
+   clickable box 6px above and below WITHOUT moving anything visually. 6px, not
+   more: footer links sit on a 32px pitch (20px box + 12px gap), so ±6 makes
+   adjacent targets abut exactly; anything larger and they overlap, and a click
+   between two links would land on whichever paints later. */
+.ctl-hit{position:relative}
+.ctl-hit::after{content:"";position:absolute;inset:-6px 0}
+
 /* Approved addition, not in the original handoff: the gold section rule draws
    in from the left as its section enters. Same 420ms and easing as .ctl-rise,
    so prefers-reduced-motion zeroes it through the same token. */

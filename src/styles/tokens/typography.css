@@ -43,9 +43,20 @@
   --tracking-label:0.16em; /* Space Mono caps labels */
   --tracking-button:0.01em;
 
-  /* Reading measure: 65-75 characters */
-  --measure-body:700px;
-  --measure-narrow:560px;
+  /* Reading measure. The stated intent has always been 65-75 characters, but
+     the original 700px value never delivered it: Source Sans 3 is a compact
+     face, and 700px measures 96-106 real characters per line at 16px (checked
+     with the Range API against the rendered pages, not estimated). Long-form
+     pages like the terms and privacy notice were the worst affected, which is
+     exactly where measure matters most.
+
+     560px is ~80 characters at 16px and ~70 at the 18px lede size. Still a
+     shade over the stated 75 at body size, deliberately: it is the WCAG AAA
+     boundary, and going all the way to 75 (516px) reads gauntly narrow inside
+     the 1120px container. A deviation from the handoff's px value in service
+     of the handoff's own stated intent; revert by restoring 700px. */
+  --measure-body:560px;
+  --measure-narrow:460px; /* unused; kept proportionate to the above */
 
   /* Fluid display for hero use */
   --size-display-fluid:clamp(34px,6vw,52px);

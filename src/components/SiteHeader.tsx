@@ -102,7 +102,8 @@ export function SiteHeader({
               href={item.href}
               aria-current={isActive(item.href) ? "page" : undefined}
               className={clsx(
-                "border-b-2 border-solid pb-px font-heading text-body-sm font-bold no-underline",
+                // ctl-hit: the 20px line box is under the 24px target minimum.
+                "ctl-hit border-b-2 border-solid pb-px font-heading text-body-sm font-bold no-underline",
                 "transition-[border-color] duration-[var(--duration-fast)] ease-brand",
                 isActive(item.href) ? "border-b-kowhai" : "border-b-transparent",
                 dark ? "text-oat hover:border-b-kowhai" : "text-ink hover:border-b-kowhai",

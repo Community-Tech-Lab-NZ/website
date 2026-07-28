@@ -32,11 +32,11 @@ const PEOPLE = [
     ],
   },
   {
-    name: "Gio Stephens",
+    name: "Giovanni Stephens",
     role: "Chair",
     accent: false,
     paragraphs: [
-      "Gio founded Queenstown Coders Connect, the district's regular meet-up for local developers, and chairs FLINT Queenstown, the local branch of TUANZ. He works as a software engineer building AI systems.",
+      "Giovanni founded Queenstown Coders Connect, the district's regular meet-up for local developers, and chairs FLINT Queenstown, the local branch of TUANZ. He works as a software engineer building AI systems.",
       "From 2024 to 2026 he was community investment adviser at Queenstown Lakes District Council, managing the community fund and designing The Funding Series, a capability programme helping community groups become more financially sustainable. That work meant sitting across the table from a lot of local organisations and hearing the same thing repeatedly: the problem was not always money, it was that the tools they needed did not exist at a price they could pay.",
       "He also advises Queenstown Resort College on its data and machine learning programmes, which is part of why QRC students have a guaranteed place in this cohort.",
     ],

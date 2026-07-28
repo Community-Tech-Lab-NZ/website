@@ -43,7 +43,10 @@ export default function ApplyPage() {
         <div>
           <div className="mb-4 flex flex-wrap items-center gap-4">
             <StatusTag tone={copy.tone}>{copy.tag}</StatusTag>
-            <Eyebrow>Applications open 15 to 31 August</Eyebrow>
+            {/* mb-0 matters here. Eyebrow renders a <p>, base.css gives every
+                <p> a 16px bottom margin, and flexbox centres the MARGIN box —
+                so items-center was lifting this text 8px above the pill. */}
+            <Eyebrow className="mb-0">Applications open 15 to 31 August</Eyebrow>
           </div>
 
           <Heading level={2} as="h1">

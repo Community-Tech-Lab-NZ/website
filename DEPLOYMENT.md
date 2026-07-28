@@ -119,7 +119,12 @@ cache expires.
 
 Tracked here so they do not get lost:
 
-- **Partner logos.** All six render as dashed placeholder slots
+- **Two partner logos are still missing.** Four are in place on Ink plates.
+  - *Queenstown Coders Connect* — no logo file and no website
+  - *Technology Queenstown* — `tq_logo.webp` is on file but is the
+    navy-on-transparent variant, illegible on Ink. Ask them for a reversed
+    or white version. The alternative is a light plate, which would then hide
+    Startup Queenstown Lakes and huddl, both of which are reversed marks
 - **Queenstown Coders Connect has no website**, so it is the one partner in the
   footer without a link. If they have a page anywhere — even a LinkedIn or
   Meetup — it belongs in `src/lib/navigation.ts`

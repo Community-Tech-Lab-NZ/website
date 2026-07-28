@@ -71,7 +71,11 @@
   --slot-label-tracking: 0.12em;
   --partner-cell-min: 84px;
   --partner-slot-w: 132px;
-  --partner-slot-h: 44px;
+  /* 56, not 44. Every mark is normalised to the plate height, so a square logo
+     (FLINT, QRC) renders at the height and a wide one (huddl) at the height
+     too — 44px left the square marks looking undersized next to the wide ones
+     without actually being smaller. */
+  --partner-slot-h: 56px;
   /* Funder credit. The supplied Economic Futures / QLDC lockup is 885x159, so
      the rendered height drives the width and only the height is a token. */
   --funder-logo-h: 40px;

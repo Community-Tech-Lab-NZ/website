@@ -204,8 +204,12 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
   return (
     <div>
       {/* Step nav. The active tab carries the 2px Kowhai underline; it slides
-          between sections rather than jumping, which is the approved motion. */}
-      <div className="mt-6 flex flex-wrap gap-5 border-b border-solid border-hairline">
+          between sections rather than jumping, which is the approved motion.
+          A three-column grid rather than flex-wrap: six sections wrapped 4 + 2
+          at this width, which reads as an accident. Three and three is even at
+          every breakpoint, and justify-items-start keeps each underline hugging
+          its label instead of stretching to the full column. */}
+      <div className="mt-6 grid grid-cols-2 justify-items-start gap-x-5 border-b border-solid border-hairline sm:grid-cols-3">
         {SECTIONS.map((section, i) => (
           <button
             key={section.id}

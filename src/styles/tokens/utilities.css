@@ -141,7 +141,7 @@
    because splitting it between Tailwind utilities and this layer would let
    the utilities layer overwrite it. Press keeps the 1px drop, composed with
    the grown scale so pressing never un-grows the button. */
-.ctl-btn-motion{will-change:transform;transition:background-color var(--duration-fast) var(--ease-standard),color var(--duration-fast) var(--ease-standard),border-color var(--duration-fast) var(--ease-standard),transform var(--duration-hover) var(--ease-out-soft)}
+.ctl-btn-motion{transition:background-color var(--duration-fast) var(--ease-standard),color var(--duration-fast) var(--ease-standard),border-color var(--duration-fast) var(--ease-standard),transform var(--duration-hover) var(--ease-out-soft)}
 .ctl-btn-motion:hover{transform:scale(1.04)}
 .ctl-btn-motion:active{transform:scale(1.04) translateY(1px)}
 
@@ -267,11 +267,17 @@
    Tailwind transition utility on the same element would overwrite it and
    flatten the grow onto the fast timing (the same layer collision
    .ctl-btn-motion exists to avoid). */
-/* will-change on both growers: without constant layer promotion the text
-   rasterises soft while scaling and snaps sharp when the transition lands —
-   the "blurry then clear" pop. Promoted permanently, the rendering never
-   switches (the same cure as the knock's end-of-wobble blip). */
-.ctl-link-grow{display:inline-block;will-change:transform;transition:transform 450ms var(--ease-out-soft),color var(--duration-fast) var(--ease-standard),border-color var(--duration-fast) var(--ease-standard),text-decoration-color var(--duration-fast) var(--ease-standard)}
+/* NO will-change here, deliberately, after trying it: permanent compositing
+   does stop the end-of-grow sharpen pop, but a composited text layer loses
+   subpixel antialiasing, so every link sat faintly soft AT REST — and rest is
+   the state people read. Scaling rasterised text offers no third option:
+   either it re-rasterises when the motion lands (a mild pop) or it never
+   re-rasterises (permanent softness). Crisp-at-rest wins; the only remaining
+   artifact is slight softness while the growth is actually moving, which the
+   eye tracks poorly. The knock keeps its will-change because rotation does
+   not resize the raster and headings are large enough not to show the AA
+   difference. */
+.ctl-link-grow{display:inline-block;transition:transform 450ms var(--ease-out-soft),color var(--duration-fast) var(--ease-standard),border-color var(--duration-fast) var(--ease-standard),text-decoration-color var(--duration-fast) var(--ease-standard)}
 .ctl-link-grow:hover{transform:scale(1.03)}
 
 /* Focus list (the timelines): hovering one entry lifts it slightly and pales

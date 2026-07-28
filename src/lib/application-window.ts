@@ -58,10 +58,6 @@ export function getWindowState(now: Date = new Date()): WindowState {
   return "open";
 }
 
-export function isOpen(now?: Date): boolean {
-  return getWindowState(now) === "open";
-}
-
 /** Copy for each state. Sentence case, no dashes, NZ English. */
 export const WINDOW_COPY = {
   before: {

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { clsx } from "clsx";
+import { ExternalLink } from "./ExternalLink";
 import { Eyebrow } from "./Typography";
 
 /* Funder credit.
@@ -44,10 +45,8 @@ export function FunderCredit({ inverse = false, note = null, className }: Funder
       {/* Plate and fund name both link to the fund's page on qldc.govt.nz,
           and the plate grows on hover like the partner logos — same promise,
           same behaviour. */}
-      <a
+      <ExternalLink
         href={FUND_URL}
-        target="_blank"
-        rel="noopener noreferrer"
         className="ctl-grow flex shrink-0 items-center justify-center rounded-card bg-white p-3 no-underline"
       >
         <Image
@@ -57,15 +56,13 @@ export function FunderCredit({ inverse = false, note = null, className }: Funder
           height={159}
           className="block h-[var(--funder-logo-h)] w-auto"
         />
-        <span className="sr-only"> QLDC Economic Diversification Fund (opens in a new tab)</span>
-      </a>
+        <span className="sr-only"> QLDC Economic Diversification Fund</span>
+      </ExternalLink>
 
       <div>
         <Eyebrow inverse={inverse}>Funded by</Eyebrow>
-        <a
+        <ExternalLink
           href={FUND_URL}
-          target="_blank"
-          rel="noopener noreferrer"
           className={clsx(
             "ctl-link-grow mt-2 block font-heading text-body-md font-bold no-underline",
             "underline decoration-transparent hover:decoration-current",
@@ -73,8 +70,7 @@ export function FunderCredit({ inverse = false, note = null, className }: Funder
           )}
         >
           QLDC Economic Diversification Fund
-          <span className="sr-only"> (opens in a new tab)</span>
-        </a>
+        </ExternalLink>
         {note ? (
           <div
             className={clsx(

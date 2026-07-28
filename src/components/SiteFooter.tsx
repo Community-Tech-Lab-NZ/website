@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Eyebrow, WordKnockText } from "./Typography";
 import { Drift } from "./Drift";
+import { ExternalLink } from "./ExternalLink";
 import { FunderCredit } from "./FunderCredit";
 import { AnimatedLockup } from "./AnimatedLockup";
 import { FOOTER_COLUMNS, FOOTER_NOTE, OPEN_SOURCE_NOTE } from "@/lib/navigation";
@@ -56,21 +57,14 @@ export function SiteFooter() {
                     const style =
                       "ctl-hit ctl-link-grow font-sans text-body-sm text-body-inverse no-underline hover:text-kowhai";
 
-                    /* Partner sites are absolute URLs and open in a new tab, so
-                       a half-finished application is never navigated away from.
-                       Plain <a>: next/link has nothing to prefetch off-site. */
+                    // Partner sites are absolute URLs; ExternalLink carries
+                    // the new-tab treatment and the screen reader note.
                     if (link.href?.startsWith("http")) {
                       return (
                         <li key={link.label}>
-                          <a
-                            href={link.href}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className={style}
-                          >
+                          <ExternalLink href={link.href} className={style}>
                             {link.label}
-                            <span className="sr-only"> (opens in a new tab)</span>
-                          </a>
+                          </ExternalLink>
                         </li>
                       );
                     }

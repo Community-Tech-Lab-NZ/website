@@ -97,7 +97,7 @@ export function SiteHeader({
 
         {/* Desktop nav */}
         <nav
-          ref={stripRef as React.Ref<HTMLElement>}
+          ref={stripRef}
           aria-label="Main"
           onMouseLeave={rest}
           className="ctl-tab-strip ml-auto hidden items-center gap-6 md:flex"

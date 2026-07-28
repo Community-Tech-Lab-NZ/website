@@ -83,6 +83,11 @@ export const TIMELINE: TimelineStep[] = [
   { date: "26 Nov", label: "Showcase Hui, the three solutions demonstrated" },
 ];
 
+/** The application window as copy: the eyebrow on every closing CTA and the
+ *  status line on /apply. The actual boundaries live in application-window.ts;
+ *  if the dates ever move, both files change together. */
+export const APPLICATION_WINDOW_LABEL = "Applications open 15 to 31 August";
+
 export const FOOTER_NOTE =
   "A Startup Queenstown Lakes programme, funded by the QLDC Economic Diversification Fund";
 

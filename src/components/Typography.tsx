@@ -142,37 +142,55 @@ export function WordKnockText({
 }
 
 export function Lede({ children, inverse = false, className }: ProseProps) {
-  const ref = useWordKnock<HTMLParagraphElement>();
-
   return (
-    <p
-      ref={ref}
+    <WordKnockText
       className={clsx(
         "max-w-measure font-sans text-body-lg",
         inverse ? "text-body-inverse" : "text-body",
         className,
       )}
     >
-      {splitWords(children)}
-    </p>
+      {children}
+    </WordKnockText>
   );
 }
 
 /** 16px body copy. Capped at the 700px reading measure. */
 export function Body({ children, inverse = false, className }: ProseProps) {
-  const ref = useWordKnock<HTMLParagraphElement>();
-
   return (
-    <p
-      ref={ref}
+    <WordKnockText
       className={clsx(
         "max-w-measure font-sans text-body-md",
         inverse ? "text-body-inverse" : "text-body",
         className,
       )}
     >
-      {splitWords(children)}
-    </p>
+      {children}
+    </WordKnockText>
+  );
+}
+
+/** Non-heading text that carries the header vase-knock: card titles rendered
+ *  as divs, the odd h3 with bespoke classes. Adds the class and the
+ *  enter/end contract (see src/lib/knock.ts); callers keep their own type
+ *  styles. */
+export function KnockText({
+  as: Tag = "div",
+  className,
+  children,
+}: {
+  as?: "div" | "h3" | "span";
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <Tag
+      onMouseEnter={knockEnter}
+      onAnimationEnd={knockEnd}
+      className={clsx("ctl-knock", className)}
+    >
+      {children}
+    </Tag>
   );
 }
 

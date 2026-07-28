@@ -243,11 +243,9 @@
  * The few things clearer as CSS than as utilities.
  * ------------------------------------------------------------------------- */
 
-/* The brand's only glyph: a square with two borders, rotated. No icon set
-   exists in this brand and none was invented. */
-/* The marker hook for hover selectors. The glyph itself is stroked SVG now
-   (see Caret.tsx) — the border construction this once carried would frame
-   the svg box. */
+/* The marker hook for hover selectors on the brand's only glyph. The glyph
+   itself is stroked SVG now (see Caret.tsx) — the border construction this
+   once carried would frame the svg box. */
 @utility caret-mark {
   display: inline-block;
 }

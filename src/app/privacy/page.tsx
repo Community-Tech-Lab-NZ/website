@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Card } from "@/components/Card";
-import { Reveal } from "@/components/Reveal";
+import { ExternalLink } from "@/components/ExternalLink";
+import { NumberedSections, type NumberedSection } from "@/components/NumberedSections";
 import { Section } from "@/components/Section";
 import { SectionRule } from "@/components/SectionRule";
 import { Eyebrow, Heading, Lede } from "@/components/Typography";
@@ -39,7 +40,7 @@ export const metadata: Metadata = {
 
 /* Paragraphs are ReactNode rather than string so a couple of them can carry a
    link. Everything else in here is plain text. */
-const SECTIONS: { number: string; title: string; paragraphs: React.ReactNode[] }[] = [
+const SECTIONS: NumberedSection[] = [
   {
     number: "01",
     title: "What we collect",
@@ -63,17 +64,15 @@ const SECTIONS: { number: string; title: string; paragraphs: React.ReactNode[] }
       <>
         Startup Queenstown Lakes holds this information as lead organisation and fund
         holder for Community Tech Lab. Their{" "}
-        <a
+        <ExternalLink
           href="https://www.startupqueenstownlakes.com/privacy-policy"
-          target="_blank"
-          rel="noopener noreferrer"
           className="ctl-link-grow text-ink underline"
         >
           privacy policy
-        </a>
-        <span className="sr-only"> (opens in a new tab)</span> covers how they handle
-        personal information generally. This notice covers what is specific to applying
-        to Community Tech Lab, and where the two differ this one is the more detailed.
+        </ExternalLink>{" "}
+        covers how they handle personal information generally. This notice covers what
+        is specific to applying to Community Tech Lab, and where the two differ this one
+        is the more detailed.
       </>,
       "The selection panel reads every application. The panel is drawn from the six partner organisations and from local technology and community people. Everyone on it is bound by the same confidentiality expectations, and anyone with a conflict of interest steps out of the discussion for that application.",
     ],
@@ -142,34 +141,7 @@ export default function PrivacyPage() {
       <SectionRule variant="gold" />
 
       <Section>
-        <div className="grid max-w-[var(--terms-measure)] gap-7">
-          {SECTIONS.map((section) => (
-            <Reveal
-              as="section"
-              key={section.number}
-              className="grid grid-cols-[var(--terms-number-col)_1fr] gap-5 border-t border-solid border-hairline pt-6"
-            >
-              {/* Darker Fern, not --ctl-fern. Fern on Oat is 3.58:1 and this is 14px
-                  bold, which is not "large text" under WCAG, so it needed 4.5:1.
-                  Same substitution StatusTag already makes; 4.74:1. */}
-              <div className="font-meta text-body-sm font-bold text-action-tertiary-hover">
-                {section.number}
-              </div>
-              <div>
-                <Heading level={3} as="h2" className="text-body-lg">
-                  {section.title}
-                </Heading>
-                <div className="mt-4 grid gap-4">
-                  {section.paragraphs.map((para, i) => (
-                    <p key={i} className="max-w-measure font-sans text-body-md text-body">
-                      {para}
-                    </p>
-                  ))}
-                </div>
-              </div>
-            </Reveal>
-          ))}
-        </div>
+        <NumberedSections sections={SECTIONS} />
 
         <Card tone="sunk" className="mt-8 max-w-[var(--terms-measure)]">
           <Eyebrow>Before this goes live</Eyebrow>

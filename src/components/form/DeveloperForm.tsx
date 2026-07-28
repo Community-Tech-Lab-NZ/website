@@ -7,10 +7,13 @@ import { Body, Eyebrow, Heading } from "../Typography";
 import { Checkbox } from "./Checkbox";
 import { Field } from "./Field";
 import { FileUpload } from "./FileUpload";
+import { FormAlert } from "./FormAlert";
+import { Honeypot } from "./Honeypot";
 import { Input } from "./Input";
 import { Select } from "./Select";
 import { Textarea } from "./Textarea";
-import { DEVELOPER_HOURS, DEVELOPER_SEATS, EMAIL_PATTERN } from "@/lib/form-options";
+import { emailIssues, postApplication, requiredIssue, type Issue } from "./submit";
+import { DEVELOPER_HOURS, DEVELOPER_SEATS, FORM_MESSAGES } from "@/lib/form-options";
 
 /* The developer application. A few minutes, single page.
  *
@@ -21,8 +24,6 @@ import { DEVELOPER_HOURS, DEVELOPER_SEATS, EMAIL_PATTERN } from "@/lib/form-opti
  * The CV goes up as multipart alongside the JSON payload, so the whole thing is
  * one request. A failed upload does not fail the application.
  */
-
-type Issue = { field: string; message: string };
 
 export function DeveloperForm({ canSubmit }: { canSubmit: boolean }) {
   const [seat, setSeat] = useState("");
@@ -46,19 +47,13 @@ export function DeveloperForm({ canSubmit }: { canSubmit: boolean }) {
 
   async function submit() {
     /* Client-side pass before anything is sent. Same messages as the server
-       schema, so a local hint and a server rejection never disagree; the
-       server still validates everything again. */
+       schema (both read FORM_MESSAGES), so a local hint and a server
+       rejection never disagree; the server still validates everything again. */
     const found: Issue[] = [
-      ...(seat ? [] : [{ field: "seat", message: "Tell us which seat fits." }]),
-      ...(shipped.trim()
-        ? []
-        : [{ field: "shipped", message: "Point us at something you have shipped." }]),
-      ...(name.trim() ? [] : [{ field: "name", message: "This one is required." }]),
-      ...(!email.trim()
-        ? [{ field: "email", message: "We need an email address to reply to." }]
-        : !EMAIL_PATTERN.test(email.trim())
-          ? [{ field: "email", message: "That does not look like an email address." }]
-          : []),
+      ...requiredIssue("seat", seat, FORM_MESSAGES.seat),
+      ...requiredIssue("shipped", shipped, FORM_MESSAGES.shipped),
+      ...requiredIssue("name", name),
+      ...emailIssues("email", email),
     ];
     if (found.length) {
       setIssues(found);
@@ -69,8 +64,8 @@ export function DeveloperForm({ canSubmit }: { canSubmit: boolean }) {
     setIssues([]);
     setFormError("");
 
-    try {
-      const payload = {
+    const result = await postApplication(
+      {
         formType: "developer",
         submissionId: crypto.randomUUID(),
         website: honeypot,
@@ -83,26 +78,21 @@ export function DeveloperForm({ canSubmit }: { canSubmit: boolean }) {
         email,
         understood,
         aiUnderstood,
-      };
+      },
+      cv,
+    );
+    setSending(false);
 
-      const body = new FormData();
-      body.set("payload", JSON.stringify(payload));
-      if (cv) body.set("cv", cv);
-
-      const res = await fetch("/api/apply", { method: "POST", body });
-      const json = (await res.json()) as { ok: boolean; error?: string; issues?: Issue[] };
-
-      if (!res.ok || !json.ok) {
-        setIssues(json.issues ?? []);
-        setFormError(json.error ?? "Something went wrong. Please try again.");
-        return;
+    if (!result.ok) {
+      if (result.reason === "network") {
+        setFormError("We could not reach the server. Please try again in a moment.");
+      } else {
+        setIssues(result.issues);
+        setFormError(result.error);
       }
-      setSent(true);
-    } catch {
-      setFormError("We could not reach the server. Please try again in a moment.");
-    } finally {
-      setSending(false);
+      return;
     }
+    setSent(true);
   }
 
   if (sent) {
@@ -125,7 +115,7 @@ export function DeveloperForm({ canSubmit }: { canSubmit: boolean }) {
       <Field label="Which seat fits" required error={issueFor("seat")}>
         <Select
           placeholder="Select one"
-          options={[...DEVELOPER_SEATS]}
+          options={DEVELOPER_SEATS}
           value={seat}
           onChange={(e) => setSeat(e.target.value)}
         />
@@ -163,7 +153,7 @@ export function DeveloperForm({ canSubmit }: { canSubmit: boolean }) {
       >
         <Select
           placeholder="Select one"
-          options={[...DEVELOPER_HOURS]}
+          options={DEVELOPER_HOURS}
           value={hours}
           onChange={(e) => setHours(e.target.value)}
         />
@@ -204,24 +194,9 @@ export function DeveloperForm({ canSubmit }: { canSubmit: boolean }) {
         .
       </p>
 
-      {/* Honeypot */}
-      <div aria-hidden="true" className="absolute h-px w-px overflow-hidden opacity-0">
-        <label htmlFor="ctl-dev-website">Website</label>
-        <input
-          id="ctl-dev-website"
-          name="website"
-          tabIndex={-1}
-          autoComplete="off"
-          value={honeypot}
-          onChange={(e) => setHoneypot(e.target.value)}
-        />
-      </div>
+      <Honeypot id="ctl-dev-website" value={honeypot} onChange={setHoneypot} />
 
-      {formError ? (
-        <p role="alert" className="max-w-measure font-sans text-body-sm font-semibold text-ink">
-          {formError}
-        </p>
-      ) : null}
+      {formError ? <FormAlert>{formError}</FormAlert> : null}
 
       <div>
         <Button

@@ -1,10 +1,6 @@
-"use client";
-
 import { clsx } from "clsx";
-import { knockEnd, knockEnter } from "@/lib/knock";
 import { Button } from "./Button";
-import { Eyebrow, splitWords } from "./Typography";
-import { useWordKnock } from "@/hooks/useWordKnock";
+import { Eyebrow, KnockText, WordKnockText } from "./Typography";
 
 /* Closing call-to-action band.
  *
@@ -35,7 +31,6 @@ export function CalloutBanner({
   className,
 }: CalloutBannerProps) {
   const dark = tone === "ink";
-  const noteRef = useWordKnock<HTMLDivElement>();
 
   return (
     <div
@@ -55,27 +50,25 @@ export function CalloutBanner({
           </Eyebrow>
         ) : null}
 
-        <div
-          onMouseEnter={knockEnter}
-          onAnimationEnd={knockEnd}
+        <KnockText
           className={clsx(
-            "ctl-knock font-heading text-subhead font-bold",
+            "font-heading text-subhead font-bold",
             dark ? "text-heading-inverse" : "text-heading",
           )}
         >
           {title}
-        </div>
+        </KnockText>
 
         {note ? (
-          <div
-            ref={noteRef}
+          <WordKnockText
+            as="div"
             className={clsx(
               "mt-2 font-sans text-body-sm",
               dark ? "text-muted-inverse" : "text-muted",
             )}
           >
-            {splitWords(note)}
-          </div>
+            {note}
+          </WordKnockText>
         ) : null}
       </div>
 

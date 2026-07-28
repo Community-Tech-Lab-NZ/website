@@ -65,7 +65,23 @@ export const DECLARATION_STATEMENTS = [
   "I understand that AI tools, including large language models run by other companies, may be used to help summarise, extract from and organise what we submit, and that people make every decision.",
 ] as const;
 
-/* Client-side mirror of the email rule in schemas.ts, which is server-only so
- * Zod stays out of the browser bundle. Deliberately permissive there and
- * identically permissive here: anything with an @ and a dot after it. */
+/* The email rule, shared by the server schema and the client-side mirrors.
+ * Deliberately permissive: anything with an @ and a dot after it. Bouncing a
+ * real applicant over an unusual but valid address costs far more than
+ * accepting the occasional typo, and we reply to everyone anyway. */
 export const EMAIL_PATTERN = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+
+/* Validation messages that appear in BOTH the server schema (schemas.ts) and
+ * the client-side mirrors in the form components. One constant per message
+ * makes "a client hint and a server rejection never disagree" a structural
+ * fact rather than a discipline. Messages only the server sends (length caps,
+ * checkbox confirms) stay inline in schemas.ts. */
+export const FORM_MESSAGES = {
+  required: "This one is required.",
+  emailMissing: "We need an email address to reply to.",
+  emailInvalid: "That does not look like an email address.",
+  gates: "All six eligibility statements need to be confirmed.",
+  declared: "Please confirm the statements before sending.",
+  seat: "Tell us which seat fits.",
+  shipped: "Point us at something you have shipped.",
+} as const;

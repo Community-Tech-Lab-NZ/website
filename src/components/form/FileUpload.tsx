@@ -3,6 +3,7 @@
 import { useId, useRef, useState } from "react";
 import { clsx } from "clsx";
 import { useField } from "./Field";
+import { FormAlert } from "./FormAlert";
 
 /* File attachment control. Outline trigger plus the chosen file name.
  *
@@ -114,15 +115,9 @@ export function FileUpload({
       </div>
 
       {error ? (
-        <p
-          role="alert"
-          className={clsx(
-            "mt-2 font-sans text-body-sm font-semibold",
-            isInverse ? "text-kowhai" : "text-ink",
-          )}
-        >
+        <FormAlert inverse={isInverse} className="mt-2">
           {error}
-        </p>
+        </FormAlert>
       ) : null}
     </div>
   );

@@ -1,14 +1,12 @@
 import type { Metadata } from "next";
-import { CalloutBanner } from "@/components/CalloutBanner";
-import { Card } from "@/components/Card";
 import { CaretList } from "@/components/CaretList";
+import { ClosingCta } from "@/components/ClosingCta";
+import { KeyDatesCard } from "@/components/KeyDatesCard";
 import { Reveal } from "@/components/Reveal";
 import { ScoringTable, SCORING_ORGANISATIONS } from "@/components/ScoringTable";
 import { Section } from "@/components/Section";
 import { SectionRule } from "@/components/SectionRule";
-import { Timeline } from "@/components/Timeline";
 import { Body, Eyebrow, Heading, Lede, WordKnockText } from "@/components/Typography";
-import { TIMELINE } from "@/lib/navigation";
 import { breadcrumbSchema, JsonLd } from "@/lib/structured-data";
 
 /* For organisations. Copy transcribed verbatim from the prototype.
@@ -77,9 +75,7 @@ export default function OrganisationsPage() {
               </div>
             </div>
 
-            <Card tone="light" accentRule>
-              <Eyebrow className="mb-5">Key dates</Eyebrow>
-              <Timeline steps={TIMELINE} />
+            <KeyDatesCard>
               <div className="mt-6 border-t border-solid border-hairline pt-5">
                 <Eyebrow>Who can apply</Eyebrow>
                 <WordKnockText className="mt-3 max-w-measure font-sans text-body-sm text-body">
@@ -89,7 +85,7 @@ export default function OrganisationsPage() {
                   community rather than commercial gain.
                 </WordKnockText>
               </div>
-            </Card>
+            </KeyDatesCard>
           </div>
         </Reveal>
       </Section>
@@ -114,16 +110,10 @@ export default function OrganisationsPage() {
         </Reveal>
       </Section>
 
-      <Section tone="ink" tight>
-        <CalloutBanner
-          bare
-          eyebrow="Applications open 15 to 31 August"
-          title="Bring us a real problem"
-          note="Applying commits you to nothing, and we reply to everyone."
-          actionLabel="Apply now"
-          actionHref="/apply"
-        />
-      </Section>
+      <ClosingCta
+        title="Bring us a real problem"
+        note="Applying commits you to nothing, and we reply to everyone."
+      />
     </>
   );
 }

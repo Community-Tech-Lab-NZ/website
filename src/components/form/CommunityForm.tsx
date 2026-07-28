@@ -10,16 +10,19 @@ import { Body, Eyebrow, Heading } from "../Typography";
 import { Checkbox } from "./Checkbox";
 import { EligibilityQuestion } from "./EligibilityQuestion";
 import { Field } from "./Field";
+import { FormAlert } from "./FormAlert";
+import { Honeypot } from "./Honeypot";
 import { Input } from "./Input";
 import { Select } from "./Select";
 import { Textarea } from "./Textarea";
+import { emailIssues, postApplication, requiredIssue, type Issue } from "./submit";
 import { useFormDraft } from "@/hooks/useFormDraft";
 import { useTabIndicator } from "@/hooks/useTabIndicator";
 import { Caret } from "../Caret";
 import {
   CTL_GATES,
   DECLARATION_STATEMENTS,
-  EMAIL_PATTERN,
+  FORM_MESSAGES,
   LEGAL_STRUCTURES,
   ORG_SIZES,
   SENSITIVE_ANSWERS,
@@ -112,13 +115,12 @@ const EMPTY = {
 
 type Values = typeof EMPTY;
 
-type Issue = { field: string; message: string };
-
 /* Client-side mirror of the REQUIRED rules in the server schema, per section.
- * Messages match schemas.ts word for word, so a client hint and a server
- * rejection never disagree. The server stays the source of truth; this exists
- * so someone finds out about a missing answer while they are looking at it,
- * not from a round-trip after fifty minutes of work.
+ * The mirror helpers in ./submit read FORM_MESSAGES — the same constants the
+ * schema uses — so a client hint and a server rejection cannot disagree. The
+ * server stays the source of truth; this exists so someone finds out about a
+ * missing answer while they are looking at it, not from a round-trip after
+ * fifty minutes of work.
  *
  * The mirror is deliberately presence-only plus the email shape. Everything
  * subtler (length caps, enum membership) still belongs to the server, where
@@ -130,36 +132,25 @@ function sectionIssues(
   gates: boolean[],
   declared: boolean,
 ): Issue[] {
-  const missing = (field: keyof Values, message: string): Issue[] =>
-    values[field].trim() ? [] : [{ field, message }];
-
   switch (section) {
     case 0:
       return [
-        ...missing("orgName", "This one is required."),
-        ...missing("contactName", "This one is required."),
-        ...(!values.contactEmail.trim()
-          ? [{ field: "contactEmail", message: "We need an email address to reply to." }]
-          : !EMAIL_PATTERN.test(values.contactEmail.trim())
-            ? [{ field: "contactEmail", message: "That does not look like an email address." }]
-            : []),
+        ...requiredIssue("orgName", values.orgName),
+        ...requiredIssue("contactName", values.contactName),
+        ...emailIssues("contactEmail", values.contactEmail),
       ];
     case 1:
-      return gates.every(Boolean)
-        ? []
-        : [{ field: "gates", message: "All six eligibility statements need to be confirmed." }];
+      return gates.every(Boolean) ? [] : [{ field: "gates", message: FORM_MESSAGES.gates }];
     case 2:
-      return missing("problem", "This one is required.");
+      return requiredIssue("problem", values.problem);
     case 3:
       return []; // everything in Scope and fit is optional, by design
     case 4:
-      return missing("readinessContact", "This one is required.");
+      return requiredIssue("readinessContact", values.readinessContact);
     case 5:
       return [
-        ...missing("declarationName", "This one is required."),
-        ...(declared
-          ? []
-          : [{ field: "declared", message: "Please confirm the statements before sending." }]),
+        ...requiredIssue("declarationName", values.declarationName),
+        ...(declared ? [] : [{ field: "declared", message: FORM_MESSAGES.declared }]),
       ];
     default:
       return [];
@@ -181,7 +172,7 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
 
   const draft = useFormDraft<Values>("ctl-application-draft-v1", EMPTY);
   const values = draft.value;
-  const { stripRef: tabStripRef, barRef: tabBarRef } = useTabIndicator(step);
+  const { stripRef: tabStripRef, barRef: tabBarRef } = useTabIndicator<HTMLDivElement>(step);
 
   /* Moving between sections replaces the DOM (the keyed fade wrapper), so
      focus is managed: it lands on the new section's heading, which also tells
@@ -254,45 +245,37 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
     setIssues([]);
     setFormError("");
 
-    try {
-      const res = await fetch("/api/apply", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          formType: "community",
-          submissionId: crypto.randomUUID(),
-          website: honeypot,
-          elapsedMs: elapsed(),
-          ...values,
-          gates,
-          declared,
-        }),
-      });
+    const result = await postApplication({
+      formType: "community",
+      submissionId: crypto.randomUUID(),
+      website: honeypot,
+      elapsedMs: elapsed(),
+      ...values,
+      gates,
+      declared,
+    });
+    setSending(false);
 
-      const json = (await res.json()) as { ok: boolean; error?: string; issues?: Issue[] };
-
-      if (!res.ok || !json.ok) {
-        setIssues(json.issues ?? []);
-        setFormError(json.error ?? "Something went wrong. Please try again.");
+    if (!result.ok) {
+      if (result.reason === "network") {
+        setFormError(
+          "We could not reach the server. Your answers are saved on this device, so you can try again.",
+        );
+      } else {
+        setIssues(result.issues);
+        setFormError(result.error);
         // Send them to the first section carrying an error rather than leaving
         // them staring at a message about a field they cannot see.
-        if (json.issues?.length) {
-          const first = json.issues[0].field;
-          const index = SECTION_FOR_FIELD[first];
+        if (result.issues.length) {
+          const index = SECTION_FOR_FIELD[result.issues[0].field];
           if (index !== undefined) setStep(index);
         }
-        return;
       }
-
-      draft.clear();
-      setSent(true);
-    } catch {
-      setFormError(
-        "We could not reach the server. Your answers are saved on this device, so you can try again.",
-      );
-    } finally {
-      setSending(false);
+      return;
     }
+
+    draft.clear();
+    setSent(true);
   }
 
   if (sent) {
@@ -321,7 +304,7 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
           every breakpoint, and justify-items-start keeps each underline hugging
           its label instead of stretching to the full column. */}
       <div
-        ref={tabStripRef as React.Ref<HTMLDivElement>}
+        ref={tabStripRef}
         className="ctl-tab-strip mt-6 grid grid-cols-2 justify-items-start gap-x-5 border-b border-solid border-hairline sm:grid-cols-3"
       >
         {SECTIONS.map((section, i) => (
@@ -424,7 +407,7 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
             >
               <Select
                 placeholder="Select one"
-                options={[...LEGAL_STRUCTURES]}
+                options={LEGAL_STRUCTURES}
                 value={values.legalStructure}
                 onChange={set("legalStructure")}
               />
@@ -465,7 +448,7 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
             >
               <Select
                 placeholder="Select one"
-                options={[...ORG_SIZES]}
+                options={ORG_SIZES}
                 value={values.orgSize}
                 onChange={set("orgSize")}
               />
@@ -490,11 +473,7 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
                 label={gate}
               />
             ))}
-            {issueFor("gates") ? (
-              <p role="alert" className="font-sans text-body-sm font-semibold text-ink">
-                {issueFor("gates")}
-              </p>
-            ) : null}
+            {issueFor("gates") ? <FormAlert>{issueFor("gates")}</FormAlert> : null}
             {!allGates ? (
               <p className="font-sans text-body-sm text-muted">
                 All six need to be confirmed before you can submit.
@@ -503,7 +482,7 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
 
             {/* Makes the section's own instruction true. The copy says "get in
                 touch before submitting" and, until now, pointed nowhere. */}
-            <EligibilityQuestion gates={[...CTL_GATES]} unticked={gates} />
+            <EligibilityQuestion gates={CTL_GATES} unticked={gates} />
           </>
         ) : null}
 
@@ -555,7 +534,7 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
             <Field label="Does it need to connect to, or replace, systems you already use">
               <Select
                 placeholder="Select one"
-                options={[...SYSTEM_ANSWERS]}
+                options={SYSTEM_ANSWERS}
                 value={values.scopeSystems}
                 onChange={set("scopeSystems")}
               />
@@ -572,7 +551,7 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
             >
               <Select
                 placeholder="Select one"
-                options={[...SENSITIVE_ANSWERS]}
+                options={SENSITIVE_ANSWERS}
                 value={values.scopeSensitive}
                 onChange={set("scopeSensitive")}
               />
@@ -618,7 +597,7 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
         {step === 5 ? (
           <>
             <Body className="text-body-sm">By submitting this application, I confirm that:</Body>
-            <CaretList items={[...DECLARATION_STATEMENTS]} />
+            <CaretList items={DECLARATION_STATEMENTS} />
             <div className="grid gap-5 sm:grid-cols-2">
               <Field label="Name" required error={issueFor("declarationName")}>
                 <Input value={values.declarationName} onChange={set("declarationName")} />
@@ -637,11 +616,7 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
               }}
               label="I confirm the statements above on behalf of my organisation"
             />
-            {issueFor("declared") ? (
-              <p role="alert" className="font-sans text-body-sm font-semibold text-ink">
-                {issueFor("declared")}
-              </p>
-            ) : null}
+            {issueFor("declared") ? <FormAlert>{issueFor("declared")}</FormAlert> : null}
 
             <p className="max-w-measure font-sans text-body-sm text-muted">
               Startup Queenstown Lakes holds this information on behalf of the programme,
@@ -656,24 +631,9 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
           </>
         ) : null}
 
-        {/* Honeypot. Hidden from people, tempting to bots. */}
-        <div aria-hidden="true" className="absolute h-px w-px overflow-hidden opacity-0">
-          <label htmlFor="ctl-website">Website</label>
-          <input
-            id="ctl-website"
-            name="website"
-            tabIndex={-1}
-            autoComplete="off"
-            value={honeypot}
-            onChange={(e) => setHoneypot(e.target.value)}
-          />
-        </div>
+        <Honeypot id="ctl-website" value={honeypot} onChange={setHoneypot} />
 
-        {formError ? (
-          <p role="alert" className="max-w-measure font-sans text-body-sm font-semibold text-ink">
-            {formError}
-          </p>
-        ) : null}
+        {formError ? <FormAlert>{formError}</FormAlert> : null}
 
         <div className="mt-3 flex flex-wrap items-center gap-3">
           {step > 0 ? (

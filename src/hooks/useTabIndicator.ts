@@ -20,8 +20,10 @@ import { useCallback, useEffect, useRef } from "react";
  * --duration-base, which the token layer zeroes.
  */
 
-export function useTabIndicator(activeKey: string | number) {
-  const stripRef = useRef<HTMLElement | null>(null);
+export function useTabIndicator<T extends HTMLElement = HTMLElement>(
+  activeKey: string | number,
+) {
+  const stripRef = useRef<T | null>(null);
   const barRef = useRef<HTMLSpanElement | null>(null);
 
   const moveTo = useCallback((el: HTMLElement | null) => {

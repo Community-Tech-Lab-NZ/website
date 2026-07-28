@@ -115,5 +115,3 @@ export function Button({
     </button>
   );
 }
-
-export { button as buttonVariants };

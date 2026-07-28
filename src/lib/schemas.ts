@@ -3,6 +3,8 @@ import {
   CTL_GATES,
   DEVELOPER_HOURS,
   DEVELOPER_SEATS,
+  EMAIL_PATTERN,
+  FORM_MESSAGES,
   LEGAL_STRUCTURES,
   ORG_SIZES,
   SENSITIVE_ANSWERS,
@@ -24,16 +26,16 @@ import {
 const shortText = z.string().trim().max(300, "Please keep this under 300 characters.");
 const longText = z.string().trim().max(5000, "Please keep this under 5000 characters.");
 
-const requiredShort = shortText.min(1, "This one is required.");
+const requiredShort = shortText.min(1, FORM_MESSAGES.required);
 
-// Deliberately permissive. Anything with an @ and a dot after it gets through:
-// bouncing a real applicant over an unusual but valid address costs far more
-// than accepting the occasional typo, and we reply to everyone anyway.
+// Pattern and messages come from form-options so the client mirrors are
+// word-for-word identical by construction; see the notes there on why the
+// pattern is deliberately permissive.
 const email = z
   .string()
   .trim()
-  .min(1, "We need an email address to reply to.")
-  .regex(/^[^@\s]+@[^@\s]+\.[^@\s]+$/, "That does not look like an email address.");
+  .min(1, FORM_MESSAGES.emailMissing)
+  .regex(EMAIL_PATTERN, FORM_MESSAGES.emailInvalid);
 
 /** Anti-spam. Both fields are invisible to humans. */
 const antiSpam = {
@@ -85,11 +87,11 @@ export const communitySchema = z.object({
     .array(z.boolean())
     .length(CTL_GATES.length)
     .refine((g) => g.every(Boolean), {
-      message: "All six eligibility statements need to be confirmed.",
+      message: FORM_MESSAGES.gates,
     }),
 
   // 3. The problem
-  problem: longText.min(1, "This one is required."),
+  problem: longText.min(1, FORM_MESSAGES.required),
   problemToday: longText.optional(),
   problemWho: longText.optional(),
   problemSuccess: longText.optional(),
@@ -103,7 +105,7 @@ export const communitySchema = z.object({
   scopeSensitiveWhat: longText.optional(),
 
   // 5. Readiness
-  readinessContact: longText.min(1, "This one is required."),
+  readinessContact: longText.min(1, FORM_MESSAGES.required),
   readinessOwner: longText.optional(),
   readinessTiming: longText.optional(),
   readinessAnythingElse: longText.optional(),
@@ -112,7 +114,7 @@ export const communitySchema = z.object({
   declarationName: requiredShort,
   declarationRole: shortText.optional(),
   declared: z.literal(true, {
-    message: "Please confirm the statements before sending.",
+    message: FORM_MESSAGES.declared,
   }),
 });
 
@@ -121,8 +123,8 @@ export const developerSchema = z.object({
   submissionId: z.string().uuid(),
   ...antiSpam,
 
-  seat: z.enum(DEVELOPER_SEATS, { message: "Tell us which seat fits." }),
-  shipped: longText.min(1, "Point us at something you have shipped."),
+  seat: z.enum(DEVELOPER_SEATS, { message: FORM_MESSAGES.seat }),
+  shipped: longText.min(1, FORM_MESSAGES.shipped),
   basedIn: shortText.optional(),
   hours: z.enum(DEVELOPER_HOURS).or(z.literal("")).optional(),
   name: requiredShort,

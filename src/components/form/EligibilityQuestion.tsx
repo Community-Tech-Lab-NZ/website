@@ -6,9 +6,11 @@ import { Button } from "../Button";
 import { Card } from "../Card";
 import { Eyebrow } from "../Typography";
 import { Field } from "./Field";
+import { FormAlert } from "./FormAlert";
 import { Input } from "./Input";
 import { Select } from "./Select";
 import { Textarea } from "./Textarea";
+import { postApplication } from "./submit";
 
 /* Closes the dead end in the eligibility section.
  *
@@ -30,7 +32,7 @@ export function EligibilityQuestion({
   gates,
   unticked,
 }: {
-  gates: string[];
+  gates: readonly string[];
   unticked: boolean[];
 }) {
   const [open, setOpen] = useState(false);
@@ -54,31 +56,27 @@ export function EligibilityQuestion({
   async function submit() {
     setSending(true);
     setError("");
-    try {
-      const res = await fetch("/api/apply", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          formType: "question",
-          submissionId: crypto.randomUUID(),
-          elapsedMs: elapsed(),
-          gate,
-          name,
-          email,
-          question,
-        }),
-      });
-      const json = (await res.json()) as { ok: boolean; error?: string };
-      if (!res.ok || !json.ok) {
-        setError(json.error ?? "Something went wrong. Please try again.");
-        return;
-      }
-      setSent(true);
-    } catch {
-      setError("We could not reach the server. Please try again in a moment.");
-    } finally {
-      setSending(false);
+
+    const result = await postApplication({
+      formType: "question",
+      submissionId: crypto.randomUUID(),
+      elapsedMs: elapsed(),
+      gate,
+      name,
+      email,
+      question,
+    });
+    setSending(false);
+
+    if (!result.ok) {
+      setError(
+        result.reason === "network"
+          ? "We could not reach the server. Please try again in a moment."
+          : result.error,
+      );
+      return;
     }
+    setSent(true);
   }
 
   if (sent) {
@@ -137,11 +135,7 @@ export function EligibilityQuestion({
           <Textarea rows={3} value={question} onChange={(e) => setQuestion(e.target.value)} />
         </Field>
 
-        {error ? (
-          <p role="alert" className="font-sans text-body-sm font-semibold text-ink">
-            {error}
-          </p>
-        ) : null}
+        {error ? <FormAlert>{error}</FormAlert> : null}
 
         <div className="flex flex-wrap gap-3">
           <Button variant="secondary" size="sm" onClick={submit} disabled={sending}>

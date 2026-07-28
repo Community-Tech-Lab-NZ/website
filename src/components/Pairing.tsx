@@ -1,10 +1,6 @@
-"use client";
-
 import { clsx } from "clsx";
-import { knockEnd, knockEnter } from "@/lib/knock";
 import { Caret } from "./Caret";
-import { Eyebrow, splitWords } from "./Typography";
-import { useWordKnock } from "@/hooks/useWordKnock";
+import { Eyebrow, KnockText, WordKnockText } from "./Typography";
 
 /* The two sides of the programme, facing each other with the caret between
  * them: developers with capacity on one side, organisations running on
@@ -40,7 +36,6 @@ function Side({
   align: "left" | "right";
   inverse: boolean;
 }) {
-  const bodyRef = useWordKnock<HTMLDivElement>();
   return (
     <div className={clsx("text-left", align === "right" ? "md:text-right" : "md:text-left")}>
       {data.eyebrow ? (
@@ -49,27 +44,25 @@ function Side({
         </Eyebrow>
       ) : null}
 
-      <div
-        onMouseEnter={knockEnter}
-        onAnimationEnd={knockEnd}
+      <KnockText
         className={clsx(
-          "ctl-knock font-heading text-subhead font-extrabold",
+          "font-heading text-subhead font-extrabold",
           inverse ? "text-heading-inverse" : "text-heading",
         )}
       >
         {data.title}
-      </div>
+      </KnockText>
 
       {data.body ? (
-        <div
-          ref={bodyRef}
+        <WordKnockText
+          as="div"
           className={clsx(
             "mt-3 font-sans text-body-md",
             inverse ? "text-body-inverse" : "text-body",
           )}
         >
-          {splitWords(data.body)}
-        </div>
+          {data.body}
+        </WordKnockText>
       ) : null}
     </div>
   );

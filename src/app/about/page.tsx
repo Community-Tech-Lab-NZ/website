@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import { CalloutBanner } from "@/components/CalloutBanner";
 import { Card } from "@/components/Card";
 import { CaretList } from "@/components/CaretList";
+import { ClosingCta } from "@/components/ClosingCta";
+import { ExternalLink } from "@/components/ExternalLink";
 import { Pairing } from "@/components/Pairing";
 import { PartnerRow } from "@/components/PartnerRow";
 import { Reveal } from "@/components/Reveal";
@@ -50,15 +51,9 @@ function PartnerName({ name }: { name: string }) {
   const href = PARTNER_URLS[name];
   if (!href) return <strong>{name}</strong>;
   return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="ctl-link-grow font-bold text-ink underline"
-    >
+    <ExternalLink href={href} className="ctl-link-grow font-bold text-ink underline">
       {name}
-      <span className="sr-only"> (opens in a new tab)</span>
-    </a>
+    </ExternalLink>
   );
 }
 
@@ -204,16 +199,10 @@ export default function AboutPage() {
         </Reveal>
       </Section>
 
-      <Section tone="ink" tight>
-        <CalloutBanner
-          bare
-          eyebrow="Applications open 15 to 31 August"
-          title="Get involved"
-          note="Open to community organisations and to developers based in the district."
-          actionLabel="Apply now"
-          actionHref="/apply"
-        />
-      </Section>
+      <ClosingCta
+        title="Get involved"
+        note="Open to community organisations and to developers based in the district."
+      />
     </>
   );
 }

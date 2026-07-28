@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import { Card } from "@/components/Card";
+import { KeyDatesCard } from "@/components/KeyDatesCard";
 import { ScoringTable, SCORING_APPLY } from "@/components/ScoringTable";
 import { Section } from "@/components/Section";
 import { Reveal } from "@/components/Reveal";
 import { StatusTag } from "@/components/StatusTag";
-import { Timeline } from "@/components/Timeline";
 import { Body, Eyebrow, Heading } from "@/components/Typography";
 import { ApplyTabs } from "@/components/form/ApplyTabs";
 import { getWindowState, WINDOW_COPY } from "@/lib/application-window";
-import { TIMELINE } from "@/lib/navigation";
+import { APPLICATION_WINDOW_LABEL } from "@/lib/navigation";
 
 /* Apply.
  *
@@ -47,7 +47,7 @@ export default function ApplyPage() {
             {/* mb-0 matters here. Eyebrow renders a <p>, base.css gives every
                 <p> a 16px bottom margin, and flexbox centres the MARGIN box —
                 so items-center was lifting this text 8px above the pill. */}
-            <Eyebrow className="mb-0">Applications open 15 to 31 August</Eyebrow>
+            <Eyebrow className="mb-0">{APPLICATION_WINDOW_LABEL}</Eyebrow>
           </div>
 
           <Heading level={2} as="h1">
@@ -71,10 +71,7 @@ export default function ApplyPage() {
         </div>
 
         <div className="grid gap-6">
-          <Card tone="light" accentRule>
-            <Eyebrow className="mb-5">Key dates</Eyebrow>
-            <Timeline steps={TIMELINE} />
-          </Card>
+          <KeyDatesCard />
 
           {state !== "closed" ? (
             <ScoringTable rows={SCORING_APPLY}>

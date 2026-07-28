@@ -1,19 +1,16 @@
 import type { Metadata } from "next";
 import { AudiencePath } from "@/components/AudiencePath";
 import { Button } from "@/components/Button";
-import { CalloutBanner } from "@/components/CalloutBanner";
-import { Drift } from "@/components/Drift";
+import { ClosingCta } from "@/components/ClosingCta";
 import { TypeOn } from "@/components/TypeOn";
-import { Card } from "@/components/Card";
 import { CaretList } from "@/components/CaretList";
+import { KeyDatesCard } from "@/components/KeyDatesCard";
 import { PartnerRow } from "@/components/PartnerRow";
 import { Reveal } from "@/components/Reveal";
 import { Section } from "@/components/Section";
 import { SectionRule } from "@/components/SectionRule";
 import { StatFigure } from "@/components/StatFigure";
-import { Timeline } from "@/components/Timeline";
 import { Body, Eyebrow, Heading, Lede } from "@/components/Typography";
-import { TIMELINE } from "@/lib/navigation";
 
 /* Home. Copy is final and iterated with the programme team — transcribed
  * verbatim from the prototype, not rewritten.
@@ -49,49 +46,46 @@ export default function HomePage() {
           the headline types on, faint carets drift and settle, and the lede,
           CTA and stats rise in sequence while the typing finishes. Each block
           is offset as a whole; nothing inside a block cascades. */}
-      <section className="relative bg-ink text-body-inverse">
-        <Drift preset="hero" />
-        <div className="relative mx-auto max-w-page px-gutter pb-8 pt-9 lg:px-gutter-lg">
-          <Heading level={1} fluid inverse className="max-w-[var(--hero-heading-max)]">
-            <TypeOn text="Solutions that get used." loop />
-          </Heading>
+      <Section tone="ink" drift="hero" hero>
+        <Heading level={1} fluid inverse className="max-w-[var(--hero-heading-max)]">
+          <TypeOn text="Solutions that get used." loop />
+        </Heading>
 
-          <Reveal delay={400}>
-            <Lede inverse className="mt-6">
-              Local developers build something useful for community organisations across
-              the Queenstown Lakes district, at no cost to the organisation.
-            </Lede>
-          </Reveal>
+        <Reveal delay={400}>
+          <Lede inverse className="mt-6">
+            Local developers build something useful for community organisations across
+            the Queenstown Lakes district, at no cost to the organisation.
+          </Lede>
+        </Reveal>
 
-          <Reveal delay={550} className="mt-7">
-            <Button variant="primary" size="hero" href="/apply" className="ctl-cta-ping">
-              Apply now
-            </Button>
-          </Reveal>
+        <Reveal delay={550} className="mt-7">
+          <Button variant="primary" size="hero" href="/apply" className="ctl-cta-ping">
+            Apply now
+          </Button>
+        </Reveal>
 
-          {/* gap-y-3 is the figure-to-label spacing, not a gap between stats:
-              each StatFigure spans both rows via subgrid, so every label starts
-              on the same line however many lines its figure took. */}
-          <Reveal
-            delay={700}
-            className="mt-9 grid grid-cols-[repeat(auto-fit,minmax(var(--hero-stat-min),max-content))] gap-x-8 gap-y-3"
-          >
-            {HERO_STATS.map((stat) => (
-              <StatFigure
-                key={stat.label}
-                inverse
-                align="row"
-                labelSize="md"
-                wipe
-                knock
-                figure={stat.figure}
-                label={stat.label}
-              />
-            ))}
-          </Reveal>
-        </div>
-        <SectionRule variant="gold" />
-      </section>
+        {/* gap-y-3 is the figure-to-label spacing, not a gap between stats:
+            each StatFigure spans both rows via subgrid, so every label starts
+            on the same line however many lines its figure took. */}
+        <Reveal
+          delay={700}
+          className="mt-9 grid grid-cols-[repeat(auto-fit,minmax(var(--hero-stat-min),max-content))] gap-x-8 gap-y-3"
+        >
+          {HERO_STATS.map((stat) => (
+            <StatFigure
+              key={stat.label}
+              inverse
+              align="row"
+              labelSize="md"
+              wipe
+              knock
+              figure={stat.figure}
+              label={stat.label}
+            />
+          ))}
+        </Reveal>
+      </Section>
+      <SectionRule variant="gold" />
 
       {/* Two ways in — the audience fork */}
       <Section>
@@ -183,10 +177,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            <Card tone="light" accentRule>
-              <Eyebrow className="mb-5">Key dates</Eyebrow>
-              <Timeline steps={TIMELINE} />
-            </Card>
+            <KeyDatesCard />
           </div>
         </Reveal>
       </Section>
@@ -206,18 +197,10 @@ export default function HomePage() {
         </Reveal>
       </Section>
 
-      {/* Closing CTA. Padding and background stripped so the banner sits directly
-          in the Ink section rather than reading as a card inside one. */}
-      <Section tone="ink" tight>
-        <CalloutBanner
-          bare
-          eyebrow="Applications open 15 to 31 August"
-          title="Ready when you are"
-          note="Three solutions get built this round. Applying commits you to nothing."
-          actionLabel="Apply now"
-          actionHref="/apply"
-        />
-      </Section>
+      <ClosingCta
+        title="Ready when you are"
+        note="Three solutions get built this round. Applying commits you to nothing."
+      />
     </>
   );
 }

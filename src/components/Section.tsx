@@ -19,6 +19,9 @@ type SectionProps = {
   /** Drop the top padding where a section follows another on the same surface. */
   flush?: boolean;
   tight?: boolean;
+  /** The Ink hero band at the top of a page: shorter, asymmetric padding.
+   *  Follow it with a gold SectionRule, as the Oat heroes already do. */
+  hero?: boolean;
   className?: string;
   id?: string;
 };
@@ -29,6 +32,7 @@ export function Section({
   drift = "auto",
   flush = false,
   tight = false,
+  hero = false,
   className,
   id,
 }: SectionProps) {
@@ -40,8 +44,12 @@ export function Section({
       className={clsx(
         "relative",
         dark ? "bg-ink text-body-inverse" : "bg-oat text-body",
-        tight ? "pb-section-tight" : "pb-section",
-        !flush && (tight ? "pt-section-tight" : "pt-section"),
+        hero
+          ? "pb-8 pt-9"
+          : [
+              tight ? "pb-section-tight" : "pb-section",
+              !flush && (tight ? "pt-section-tight" : "pt-section"),
+            ],
         className,
       )}
     >

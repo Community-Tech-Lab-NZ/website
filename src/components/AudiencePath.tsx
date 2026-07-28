@@ -1,11 +1,7 @@
-"use client";
-
 import { clsx } from "clsx";
-import { knockEnd, knockEnter } from "@/lib/knock";
-import { useWordKnock } from "@/hooks/useWordKnock";
 import { Button } from "./Button";
 import { CaretList } from "./CaretList";
-import { Eyebrow, splitWords } from "./Typography";
+import { Eyebrow, KnockText, WordKnockText } from "./Typography";
 
 /* One of the two audience paths.
  *
@@ -47,8 +43,6 @@ export function AudiencePath({
   className,
 }: AudiencePathProps) {
   const dark = audience === "community";
-  // The blurb joins the word knock (it renders outside Body, so it missed it).
-  const blurbRef = useWordKnock<HTMLParagraphElement>();
 
   return (
     <div
@@ -73,24 +67,24 @@ export function AudiencePath({
         <Eyebrow inverse={dark}>{eyebrow}</Eyebrow>
       ) : null}
 
-      <h3
-        onMouseEnter={knockEnter}
-        onAnimationEnd={knockEnd}
+      <KnockText
+        as="h3"
         className={clsx(
-          "ctl-knock font-heading text-subhead font-extrabold",
+          "font-heading text-subhead font-extrabold",
           dark ? "text-heading-inverse" : "text-heading",
         )}
       >
         {title}
-      </h3>
+      </KnockText>
 
       {blurb ? (
-        <p
-          ref={blurbRef}
+        // The blurb joins the word knock (it renders outside Body, so it
+        // would otherwise miss it).
+        <WordKnockText
           className={clsx("font-sans text-body-md", dark ? "text-body-inverse" : "text-body")}
         >
-          {splitWords(blurb)}
-        </p>
+          {blurb}
+        </WordKnockText>
       ) : null}
 
       {points.length ? <CaretList items={points} inverse={dark} /> : null}

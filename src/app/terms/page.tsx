@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { CalloutBanner } from "@/components/CalloutBanner";
 import { Card } from "@/components/Card";
-import { Reveal } from "@/components/Reveal";
+import { ClosingCta } from "@/components/ClosingCta";
+import { NumberedSections } from "@/components/NumberedSections";
 import { Section } from "@/components/Section";
 import { SectionRule } from "@/components/SectionRule";
 import { Eyebrow, Heading, Lede } from "@/components/Typography";
@@ -41,34 +41,7 @@ export default function TermsPage() {
       <SectionRule variant="gold" />
 
       <Section>
-        <div className="grid max-w-[var(--terms-measure)] gap-7">
-          {TERMS_SECTIONS.map((section) => (
-            <Reveal
-              as="section"
-              key={section.number}
-              className="grid grid-cols-[var(--terms-number-col)_1fr] gap-5 border-t border-solid border-hairline pt-6"
-            >
-              {/* Darker Fern, not --ctl-fern. Fern on Oat is 3.58:1 and this is 14px
-                  bold, which is not "large text" under WCAG, so it needed 4.5:1.
-                  Same substitution StatusTag already makes; 4.74:1. */}
-              <div className="font-meta text-body-sm font-bold text-action-tertiary-hover">
-                {section.number}
-              </div>
-              <div>
-                <Heading level={3} as="h2" className="text-body-lg">
-                  {section.title}
-                </Heading>
-                <div className="mt-4 grid gap-4">
-                  {section.paragraphs.map((para, i) => (
-                    <p key={i} className="max-w-measure font-sans text-body-md text-body">
-                      {para}
-                    </p>
-                  ))}
-                </div>
-              </div>
-            </Reveal>
-          ))}
-        </div>
+        <NumberedSections sections={TERMS_SECTIONS} />
 
         {/* Carried over from the prototype. This is a real caveat, not a
             placeholder: the underlying agreements are still drafts. */}
@@ -87,16 +60,10 @@ export default function TermsPage() {
         </Card>
       </Section>
 
-      <Section tone="ink" tight>
-        <CalloutBanner
-          bare
-          eyebrow="Applications open 15 to 31 August"
-          title="Get involved"
-          note="Open to community organisations and to developers based in the district."
-          actionLabel="Apply now"
-          actionHref="/apply"
-        />
-      </Section>
+      <ClosingCta
+        title="Get involved"
+        note="Open to community organisations and to developers based in the district."
+      />
     </>
   );
 }

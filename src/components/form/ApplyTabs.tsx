@@ -24,7 +24,7 @@ type TabId = (typeof TABS)[number]["id"];
 export function ApplyTabs({ canSubmit }: { canSubmit: boolean }) {
   const [path, setPath] = useState<TabId>("community");
   // Sliding Fern underline; the per-tab borders stay as the no-JS fallback.
-  const { stripRef, barRef } = useTabIndicator(path);
+  const { stripRef, barRef } = useTabIndicator<HTMLDivElement>(path);
 
   return (
     <div>
@@ -37,7 +37,7 @@ export function ApplyTabs({ canSubmit }: { canSubmit: boolean }) {
       <div
         role="tablist"
         aria-label="Which kind of application"
-        ref={stripRef as React.Ref<HTMLDivElement>}
+        ref={stripRef}
         className="ctl-tab-strip mt-6 flex gap-5 border-b border-solid border-hairline"
       >
         {TABS.map((tab) => (

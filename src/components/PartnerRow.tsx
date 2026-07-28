@@ -1,5 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import { clsx } from "clsx";
+import { ExternalLink } from "./ExternalLink";
 import { Eyebrow } from "./Typography";
 import { PARTNER_URLS } from "@/lib/navigation";
 
@@ -147,18 +148,15 @@ export function PartnerRow({
               </span>
             )}
             {PARTNER_URLS[partner.name] ? (
-              <a
+              <ExternalLink
                 href={PARTNER_URLS[partner.name]}
-                target="_blank"
-                rel="noopener noreferrer"
                 className={clsx(
                   "ctl-link-grow underline decoration-transparent hover:decoration-current",
                   inverse ? "text-heading-inverse" : "text-heading",
                 )}
               >
                 {partner.name}
-                <span className="sr-only"> (opens in a new tab)</span>
-              </a>
+              </ExternalLink>
             ) : (
               <span>{partner.name}</span>
             )}
@@ -171,14 +169,14 @@ export function PartnerRow({
 
 /* Wraps a partner logo in its site link where one exists; renders the logo
    bare where it does not (no partner currently has a logo without a site,
-   but the data allows it). */
+   but the data allows it). The img alt names the link and ExternalLink adds
+   the new-tab note. */
 function LinkedLogo({ name, children }: { name: string; children: React.ReactNode }) {
   const href = PARTNER_URLS[name];
   if (!href) return <>{children}</>;
   return (
-    <a href={href} target="_blank" rel="noopener noreferrer" className="no-underline">
+    <ExternalLink href={href} className="no-underline">
       {children}
-      <span className="sr-only">{name} (opens in a new tab)</span>
-    </a>
+    </ExternalLink>
   );
 }

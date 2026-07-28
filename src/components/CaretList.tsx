@@ -20,7 +20,7 @@ import { Caret } from "./Caret";
 export type CaretListItem = React.ReactNode | { content: React.ReactNode; href: string };
 
 type CaretListProps = {
-  items: CaretListItem[];
+  items: readonly CaretListItem[];
   inverse?: boolean;
   markerColor?: string;
   className?: string;

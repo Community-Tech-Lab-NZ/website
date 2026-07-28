@@ -39,7 +39,7 @@ export default function ApplyPage() {
   const canSubmit = state === "open";
 
   return (
-    <Section>
+    <Section drift="hero">
       <Reveal className="grid grid-cols-1 items-start gap-9 lg:grid-cols-[minmax(var(--col-min-wide),1fr)_minmax(var(--col-min-narrow),0.6fr)]">
         <div>
           <div className="mb-4 flex flex-wrap items-center gap-4">

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Button } from "@/components/Button";
 import { CalloutBanner } from "@/components/CalloutBanner";
+import { Drift } from "@/components/Drift";
 import { Card } from "@/components/Card";
 import { CaretList } from "@/components/CaretList";
 import { Reveal } from "@/components/Reveal";
@@ -69,8 +70,9 @@ export default function DevelopersPage() {
           ]),
         ]}
       />
-      <section className="bg-ink text-body-inverse">
-        <div className="mx-auto max-w-page px-gutter pb-8 pt-9 lg:px-gutter-lg">
+      <section className="relative bg-ink text-body-inverse">
+        <Drift preset="hero" />
+        <div className="relative mx-auto max-w-page px-gutter pb-8 pt-9 lg:px-gutter-lg">
           <Eyebrow inverse className="mb-4">
             For developers
           </Eyebrow>

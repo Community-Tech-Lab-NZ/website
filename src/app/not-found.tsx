@@ -24,7 +24,7 @@ export const metadata: Metadata = {
 
 export default function NotFound() {
   return (
-    <Section>
+    <Section drift="hero">
       <Reveal className="max-w-measure">
         <Eyebrow className="mb-4">404</Eyebrow>
         <Heading level={1} fluid>

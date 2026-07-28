@@ -1,31 +1,37 @@
-"use client";
-
-import { useRef } from "react";
 import { clsx } from "clsx";
 import { INK_LEFT } from "./Logo";
 
-/* The header lockup, live.
+/* The header lockup, alive.
  *
- * MOTION OVERRIDE 1 (see the register in tokens/utilities.css): the brand
- * guide lists blinking cursor animations under things to avoid, and the brand
- * owner chose to override it in this bounded form — the cursor block blinks
- * three times on first load and rests, and blinks once more when the lockup is
- * hovered. The mark is literally a text cursor, so of all the overrides this
- * one argues for itself.
+ * MOTION OVERRIDE 1 (see the register in tokens/utilities.css), in its second
+ * form after the owner slowed it down twice: the caret blinks like an eye on
+ * a slow loop — the APEX DESCENDS until the angle flattens to a line and
+ * rises again, legs pivoting at their feet exactly as an eyelid closes. Not a
+ * squash: a scale transform thins the stroke and reads as the glyph receding,
+ * which is what the owner rejected. The closure takes ~720ms, holds shut a
+ * beat, reopens over ~720ms, once every eight seconds.
  *
- * Construction: the static lockup files are single flat SVGs, so their cursor
- * block cannot be animated. This inline SVG rebuilds the same 520x140 geometry
- * from three layers — the wordmark-only file (same canvas, so registration is
+ * The point animation is SMIL (<animate attributeName="points">), the one
+ * mechanism that can move polyline geometry with no JS in every browser.
+ * SMIL cannot hear prefers-reduced-motion, so the markup carries an animated
+ * and a static caret and the ctl-motion-only / ctl-still-only classes swap
+ * them under the media query.
+ *
+ * Hovering the lockup makes the cursor block breathe, a gentle fade out and
+ * back that runs only while the pointer stays.
+ *
+ * Construction: the static lockup files are single flat SVGs, so their parts
+ * cannot be animated. This inline SVG rebuilds the same 520x140 geometry from
+ * three layers — the wordmark-only file (same canvas, so registration is
  * exact), the caret polyline, and a separate <rect> for the block. Everything
  * except the motion matches Logo with align="optical" pixel for pixel: same
  * clear-space padding, same optical margin from INK_LEFT.
  *
- * Hover, at the owner's direction: the block pulses continuously while the
- * pointer stays, and the caret winks once like an eye — a quick squash to its
- * baseline and back. Both stop dead on leave and under reduced motion.
+ * Entirely CSS-driven — no client JS, no event handlers, and reduced motion
+ * stills both pieces through the usual media block.
  *
- * Header only. The footer keeps the static Logo; two blinking cursors on one
- * page would be a tic, not a mark.
+ * Header only. The footer keeps the static Logo; two blinking marks on one
+ * page would be a tic, not a brand.
  */
 
 type AnimatedLockupProps = {
@@ -35,9 +41,6 @@ type AnimatedLockupProps = {
 };
 
 export function AnimatedLockup({ dark = false, height = 68, className }: AnimatedLockupProps) {
-  const blockRef = useRef<SVGRectElement>(null);
-  const caretRef = useRef<SVGPolylineElement>(null);
-
   const width = Math.round(height * (520 / 140));
   // Identical to Logo: clear space scaled with the mark, optical pull-left.
   const pad = Math.max(8, Math.round(height * 0.14));
@@ -45,31 +48,9 @@ export function AnimatedLockup({ dark = false, height = 68, className }: Animate
 
   const ink = dark ? "var(--ctl-kowhai)" : "var(--ctl-ink)";
 
-  function enter() {
-    const block = blockRef.current;
-    if (block) {
-      // The load-time settle hands over to a continuous pulse for the hover.
-      block.classList.remove("ctl-cursor-settle");
-      block.classList.add("ctl-cursor-blink");
-    }
-    const caret = caretRef.current;
-    if (caret) {
-      // One wink per entry; the reflow read restarts the animation.
-      caret.classList.remove("ctl-caret-wink");
-      void caret.getBoundingClientRect();
-      caret.classList.add("ctl-caret-wink");
-    }
-  }
-
-  function leave() {
-    blockRef.current?.classList.remove("ctl-cursor-blink");
-  }
-
   return (
     <span
-      onMouseEnter={enter}
-      onMouseLeave={leave}
-      className={clsx("block", className)}
+      className={clsx("ctl-lockup block", className)}
       style={{ padding: pad, marginLeft: opticalShift }}
     >
       <svg
@@ -89,7 +70,26 @@ export function AnimatedLockup({ dark = false, height = 68, className }: Animate
         {/* Same geometry as the lockup files: nested 90px caret at (30,25). */}
         <g transform="translate(30,25) scale(0.9)">
           <polyline
-            ref={caretRef}
+            className="ctl-motion-only"
+            points="20,62 50,30 80,62"
+            fill="none"
+            stroke={ink}
+            strokeWidth={8}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <animate
+              attributeName="points"
+              dur="8s"
+              repeatCount="indefinite"
+              values="20,62 50,30 80,62; 20,62 50,30 80,62; 20,62 50,60 80,62; 20,62 50,60 80,62; 20,62 50,30 80,62; 20,62 50,30 80,62"
+              keyTimes="0;0.7;0.79;0.83;0.92;1"
+              calcMode="spline"
+              keySplines="0 0 1 1;0.22 0.61 0.36 1;0 0 1 1;0.22 0.61 0.36 1;0 0 1 1"
+            />
+          </polyline>
+          <polyline
+            className="ctl-still-only"
             points="20,62 50,30 80,62"
             fill="none"
             stroke={ink}
@@ -97,7 +97,7 @@ export function AnimatedLockup({ dark = false, height = 68, className }: Animate
             strokeLinecap="round"
             strokeLinejoin="round"
           />
-          <rect ref={blockRef} className="ctl-cursor-settle" x={44} y={76} width={12} height={10} fill={ink} />
+          <rect className="ctl-lockup-block" x={44} y={76} width={12} height={10} fill={ink} />
         </g>
       </svg>
     </span>

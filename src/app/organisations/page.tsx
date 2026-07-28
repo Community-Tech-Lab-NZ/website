@@ -44,7 +44,7 @@ export default function OrganisationsPage() {
           { name: "For organisations", path: "/organisations" },
         ])}
       />
-      <Section className="pb-7">
+      <Section drift="hero" className="pb-7">
         <Eyebrow className="mb-4">For community organisations</Eyebrow>
         <Heading level={1} fluid className="max-w-[var(--page-heading-max)]">
           Something useful, built for your organisation.

@@ -70,7 +70,10 @@
    brand, decided the site should be visually striking and explicitly chose
    these four deviations in their bounded forms:
 
-     1. Cursor blink on the header logo    3 blinks on load, once on hover
+     1. The living lockup                  the caret slow-blinks like an
+                                           eye every ~6.5s on a loop; the
+                                           cursor block breathes only while
+                                           the logo is hovered
      2. Typing hero headline               types, rests ~6.5s, retypes (loop)
      3. Ambient drift                      carets rise in the hero and drift
                                            diagonally in the Ink CTA bands;
@@ -87,21 +90,23 @@
    flashes a second (2.3.1). Zero layout shift throughout.
    ========================================================================= */
 
-/* One blink, for re-triggering on hover. Same envelope as ctl-cursor-settle. */
-.ctl-cursor-blink-once{animation:ctl-cursor-settle 1.1s var(--ease-standard) 1}
-/* Continuous blink: the typing headline's rest phase, and the lockup's
-   cursor block while the logo is hovered. */
+/* Continuous blink: the typing headline's rest phase between cycles. */
 .ctl-cursor-blink{animation:ctl-cursor-settle 1.1s var(--ease-standard) infinite}
 
-/* The caret winking like an eye: a quick squash toward its own baseline and
-   back, thinning the stroke as it closes the way an eyelid would. Hover-only,
-   one wink per entry. */
-@keyframes ctl-caret-wink{
-  0%{transform:scaleY(1)}
-  45%{transform:scaleY(0.12)}
-  100%{transform:scaleY(1)}
+/* The lockup's caret blinks by SMIL point animation (see AnimatedLockup):
+   the apex descends until the angle is flat and rises again, legs pivoting at
+   their feet like an eyelid. SMIL cannot hear prefers-reduced-motion, so the
+   markup carries an animated and a static copy and these two classes swap
+   them under the media query. */
+.ctl-still-only{display:none}
+
+/* Hovering the lockup makes the cursor block breathe — a slow fade out and
+   back, gentler than a blink, running only while the pointer stays. */
+@keyframes ctl-cursor-breathe{
+  0%,100%{opacity:1}
+  50%{opacity:.2}
 }
-.ctl-caret-wink{animation:ctl-caret-wink 380ms var(--ease-standard) 1;transform-box:fill-box;transform-origin:50% 100%}
+.ctl-lockup:hover .ctl-lockup-block{animation:ctl-cursor-breathe 2.2s var(--ease-standard) infinite}
 
 /* Hover lift and grow (override 4). Transform-only so nothing reflows. */
 .ctl-lift{transition:transform var(--duration-fast) var(--ease-standard)}
@@ -151,6 +156,8 @@
 .ctl-drift{position:absolute;display:block;border-style:solid;border-color:var(--ctl-oat-16);border-width:2px 2px 0 0;opacity:0;animation-name:ctl-drift;animation-timing-function:var(--ease-standard);animation-fill-mode:forwards}
 .ctl-drift--diag{animation-name:ctl-drift-diag}
 .ctl-drift--block{border:0;background:var(--ctl-oat-16);animation-name:ctl-drift-block}
+/* On Oat heroes the carets are Ink instead of Oat; same 16% presence. */
+.ctl-drift--ink{border-color:var(--ctl-ink-16)}
 
 /* Timeline: the spine draws down as the section enters, then the nodes fade
    in as one group. Two phases, not a per-item cascade. */
@@ -161,7 +168,9 @@
 
 @media (prefers-reduced-motion:reduce){
   .ctl-rise{transition-delay:0s}
-  .ctl-cursor-blink-once,.ctl-cursor-blink,.ctl-caret-wink{animation:none}
+  .ctl-cursor-blink,.ctl-lockup:hover .ctl-lockup-block{animation:none}
+  .ctl-motion-only{display:none}
+  .ctl-still-only{display:inline}
   .ctl-lift:hover,.ctl-grow:hover{transform:none}
   .ctl-wipe::after{display:none}
   .ctl-sweep-gold{transition:none;background-size:100% .28em}

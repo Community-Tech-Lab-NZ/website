@@ -12,9 +12,10 @@ import { Drift } from "./Drift";
 type SectionProps = {
   children: React.ReactNode;
   tone?: "oat" | "ink";
-  /** Ink sections carry the ambient diagonal drift by default; pass false to
-   *  still one. Oat sections never drift — reading surfaces stay quiet. */
-  drift?: boolean;
+  /** "auto": Ink sections carry the diagonal drift, Oat sections stay still.
+   *  "hero": rising carets like the home hero, Ink-tinted on Oat.
+   *  "none": no ambient layer at all. */
+  drift?: "auto" | "hero" | "none";
   /** Drop the top padding where a section follows another on the same surface. */
   flush?: boolean;
   tight?: boolean;
@@ -25,7 +26,7 @@ type SectionProps = {
 export function Section({
   children,
   tone = "oat",
-  drift = true,
+  drift = "auto",
   flush = false,
   tight = false,
   className,
@@ -37,13 +38,18 @@ export function Section({
     <section
       id={id}
       className={clsx(
-        dark ? "relative bg-ink text-body-inverse" : "bg-oat text-body",
+        "relative",
+        dark ? "bg-ink text-body-inverse" : "bg-oat text-body",
         tight ? "pb-section-tight" : "pb-section",
         !flush && (tight ? "pt-section-tight" : "pt-section"),
         className,
       )}
     >
-      {dark && drift ? <Drift preset="section" /> : null}
+      {drift === "hero" ? (
+        <Drift preset="hero" onLight={!dark} />
+      ) : drift === "auto" && dark ? (
+        <Drift preset="section" />
+      ) : null}
       <div className="relative mx-auto max-w-page px-gutter lg:px-gutter-lg">{children}</div>
     </section>
   );

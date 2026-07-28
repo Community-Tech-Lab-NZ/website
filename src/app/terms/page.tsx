@@ -23,7 +23,7 @@ export const metadata: Metadata = {
 export default function TermsPage() {
   return (
     <>
-      <Section className="pb-6">
+      <Section drift="hero" className="pb-6">
         <Eyebrow className="mb-4">Programme terms</Eyebrow>
         <Heading level={1} fluid className="max-w-[var(--terms-measure)]">
           How this programme works, in full.

@@ -71,7 +71,14 @@ const PRESETS = {
   footer: { items: FOOTER, variant: "ctl-drift--block" },
 } as const;
 
-export function Drift({ preset = "hero" }: { preset?: keyof typeof PRESETS }) {
+export function Drift({
+  preset = "hero",
+  onLight = false,
+}: {
+  preset?: keyof typeof PRESETS;
+  /** Ink-tinted glyphs for Oat surfaces (the sub-page heroes). */
+  onLight?: boolean;
+}) {
   const { items, variant } = PRESETS[preset];
 
   return (
@@ -79,7 +86,7 @@ export function Drift({ preset = "hero" }: { preset?: keyof typeof PRESETS }) {
       {items.map((d, i) => (
         <span
           key={i}
-          className={`ctl-drift ${variant}`}
+          className={`ctl-drift ${variant}${onLight ? " ctl-drift--ink" : ""}`}
           style={{
             left: d.left,
             top: d.top,

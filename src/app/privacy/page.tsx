@@ -125,7 +125,7 @@ const SECTIONS: { number: string; title: string; paragraphs: React.ReactNode[] }
 export default function PrivacyPage() {
   return (
     <>
-      <Section className="pb-6">
+      <Section drift="hero" className="pb-6">
         <Eyebrow className="mb-4">Privacy</Eyebrow>
         <Heading level={1} fluid className="max-w-[var(--terms-measure)]">
           What we do with what you tell us.

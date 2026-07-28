@@ -100,7 +100,7 @@ export default function AboutPage() {
           ]),
         ]}
       />
-      <Section className="pb-7">
+      <Section drift="hero" className="pb-7">
         <Eyebrow className="mb-4">About</Eyebrow>
         <Heading level={1} fluid className="max-w-[var(--page-heading-max)]">
           Why this exists

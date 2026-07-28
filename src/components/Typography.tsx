@@ -2,7 +2,7 @@
 
 import { clsx } from "clsx";
 import { knockEnd, knockEnter } from "@/lib/knock";
-import { useRipple } from "@/hooks/useRipple";
+import { useWordKnock } from "@/hooks/useWordKnock";
 
 /* Text primitives, ported from the design handoff prototype.
  *
@@ -74,11 +74,12 @@ type ProseProps = {
 };
 
 /** 18px opening paragraph. Capped at the 700px reading measure. */
-/* Words wrapped for the pond (useRipple). Strings split on whitespace with
-   the whitespace kept as bare text nodes, so wrapping and selection behave;
-   element children (links, strong) ripple whole. Screen readers read inline
-   spans as continuous text, so nothing changes for them. */
-function splitRipple(children: React.ReactNode): React.ReactNode {
+/* Words wrapped for the word knock (useWordKnock). Strings split on
+   whitespace with the whitespace kept as bare text nodes, so wrapping and
+   selection behave; element children (links, strong) knock whole. Screen
+   readers read inline spans as continuous text, so nothing changes for
+   them. */
+function splitWords(children: React.ReactNode): React.ReactNode {
   let key = 0;
   const wrap = (node: React.ReactNode): React.ReactNode => {
     if (typeof node === "string") {
@@ -86,7 +87,7 @@ function splitRipple(children: React.ReactNode): React.ReactNode {
         part === "" || /^\s+$/.test(part) ? (
           part
         ) : (
-          <span key={key++} className="ctl-ripple-word">
+          <span key={key++} className="ctl-word">
             {part}
           </span>
         ),
@@ -95,7 +96,7 @@ function splitRipple(children: React.ReactNode): React.ReactNode {
     if (Array.isArray(node)) return node.map(wrap);
     if (node !== null && typeof node === "object") {
       return (
-        <span key={key++} className="ctl-ripple-word">
+        <span key={key++} className="ctl-word">
           {node}
         </span>
       );
@@ -106,7 +107,7 @@ function splitRipple(children: React.ReactNode): React.ReactNode {
 }
 
 export function Lede({ children, inverse = false, className }: ProseProps) {
-  const ref = useRipple<HTMLParagraphElement>();
+  const ref = useWordKnock<HTMLParagraphElement>();
 
   return (
     <p
@@ -117,14 +118,14 @@ export function Lede({ children, inverse = false, className }: ProseProps) {
         className,
       )}
     >
-      {splitRipple(children)}
+      {splitWords(children)}
     </p>
   );
 }
 
 /** 16px body copy. Capped at the 700px reading measure. */
 export function Body({ children, inverse = false, className }: ProseProps) {
-  const ref = useRipple<HTMLParagraphElement>();
+  const ref = useWordKnock<HTMLParagraphElement>();
 
   return (
     <p
@@ -135,7 +136,7 @@ export function Body({ children, inverse = false, className }: ProseProps) {
         className,
       )}
     >
-      {splitRipple(children)}
+      {splitWords(children)}
     </p>
   );
 }

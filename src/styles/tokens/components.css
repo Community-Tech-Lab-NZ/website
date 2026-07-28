@@ -127,6 +127,14 @@
   /* Minimum touch target for interactive elements in the mobile nav. */
   --tap-target: 48px;
 
+  /* The typing headline's block cursor, sized relative to the text so it
+     works at the fluid display size. Width and height echo the lockup's
+     cursor block proportions. */
+  --type-cursor-w: 0.44em;
+  --type-cursor-h: 0.78em;
+  --type-cursor-gap: 0.06em;
+  --type-cursor-drop: 0.08em;
+
   /* Step-nav and slot numbering share the tighter mono tracking. */
   --tracking-step: 0.12em;
   /* Matches the global link underline offset from base.css, for elements that

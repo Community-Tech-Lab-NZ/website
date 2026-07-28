@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Eyebrow } from "./Typography";
+import { Drift } from "./Drift";
 import { FunderCredit } from "./FunderCredit";
 import { Logo } from "./Logo";
 import { FOOTER_COLUMNS, FOOTER_NOTE, OPEN_SOURCE_NOTE } from "@/lib/navigation";
@@ -18,8 +19,11 @@ export function SiteFooter() {
   return (
     /* py-6, not py-8. The 8 step is 64px, so the old padding alone was 128px of
        the footer's 700. Same reasoning for the mt-6 gaps below. */
-    <footer className="bg-ink py-6 text-body-inverse">
-      <div className="mx-auto max-w-page px-gutter lg:px-gutter-lg">
+    <footer className="relative bg-ink py-6 text-body-inverse">
+      {/* The footer's ambient layer is the OTHER half of the mark: cursor
+          blocks floating, where the hero has carets rising. */}
+      <Drift preset="footer" />
+      <div className="relative mx-auto max-w-page px-gutter lg:px-gutter-lg">
         {/* auto column: the logo takes its own width and the links take the
             rest. The old minmax(220px,1fr) column was nearly twice the logo's
             width, which read as a hole in the middle of the footer. On md+ the

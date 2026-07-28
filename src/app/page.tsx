@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { AudiencePath } from "@/components/AudiencePath";
 import { Button } from "@/components/Button";
 import { CalloutBanner } from "@/components/CalloutBanner";
-import { HeroDrift } from "@/components/HeroDrift";
+import { Drift } from "@/components/Drift";
 import { TypeOn } from "@/components/TypeOn";
 import { Card } from "@/components/Card";
 import { CaretList } from "@/components/CaretList";
@@ -51,10 +51,10 @@ export default function HomePage() {
           CTA and stats rise in sequence while the typing finishes. Each block
           is offset as a whole; nothing inside a block cascades. */}
       <section className="relative bg-ink text-body-inverse">
-        <HeroDrift />
+        <Drift preset="hero" />
         <div className="relative mx-auto max-w-page px-gutter pb-8 pt-9 lg:px-gutter-lg">
           <Heading level={1} fluid inverse className="max-w-[var(--hero-heading-max)]">
-            <TypeOn text="Solutions that get used." />
+            <TypeOn text="Solutions that get used." loop />
           </Heading>
 
           <Reveal delay={400}>

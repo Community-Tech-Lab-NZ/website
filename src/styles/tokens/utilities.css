@@ -71,18 +71,37 @@
    these four deviations in their bounded forms:
 
      1. Cursor blink on the header logo    3 blinks on load, once on hover
-     2. Typing hero headline               types once, cursor rests
-     3. Hero caret drift                   sparse, faint, settles within 5s
+     2. Typing hero headline               types, rests ~6.5s, retypes (loop)
+     3. Ambient drift                      carets rise in the hero and drift
+                                           diagonally in the Ink CTA bands;
+                                           cursor blocks float in the footer;
+                                           all continuous loops
      4. Hover lift/grow                    <=2px translate / 1.03 scale
 
-   Hard limits shared by all of them: everything zeroes under
-   prefers-reduced-motion, no autonomous movement past five seconds of load
-   (WCAG 2.2.2), nothing approaching three flashes a second (2.3.1), and zero
-   layout shift.
+   The loops are a second, explicit owner decision (28 July 2026): the
+   original build settled all autonomous motion within five seconds to sit
+   inside WCAG 2.2.2, and looping steps outside that. What keeps it
+   defensible: prefers-reduced-motion switches every piece off entirely (the
+   one media query is the pause mechanism), the typing pauses when the tab is
+   hidden, the drift never exceeds 16% opacity, and nothing approaches three
+   flashes a second (2.3.1). Zero layout shift throughout.
    ========================================================================= */
 
 /* One blink, for re-triggering on hover. Same envelope as ctl-cursor-settle. */
 .ctl-cursor-blink-once{animation:ctl-cursor-settle 1.1s var(--ease-standard) 1}
+/* Continuous blink: the typing headline's rest phase, and the lockup's
+   cursor block while the logo is hovered. */
+.ctl-cursor-blink{animation:ctl-cursor-settle 1.1s var(--ease-standard) infinite}
+
+/* The caret winking like an eye: a quick squash toward its own baseline and
+   back, thinning the stroke as it closes the way an eyelid would. Hover-only,
+   one wink per entry. */
+@keyframes ctl-caret-wink{
+  0%{transform:scaleY(1)}
+  45%{transform:scaleY(0.12)}
+  100%{transform:scaleY(1)}
+}
+.ctl-caret-wink{animation:ctl-caret-wink 380ms var(--ease-standard) 1;transform-box:fill-box;transform-origin:50% 100%}
 
 /* Hover lift and grow (override 4). Transform-only so nothing reflows. */
 .ctl-lift{transition:transform var(--duration-fast) var(--ease-standard)}
@@ -116,8 +135,22 @@
   85%{opacity:1}
   100%{opacity:0;transform:translateY(-48px) rotate(-45deg)}
 }
+@keyframes ctl-drift-diag{
+  0%{opacity:0;transform:translate(0,0) rotate(-45deg)}
+  15%{opacity:1}
+  85%{opacity:1}
+  100%{opacity:0;transform:translate(26px,-42px) rotate(-45deg)}
+}
+@keyframes ctl-drift-block{
+  0%{opacity:0;transform:translateY(0)}
+  15%{opacity:1}
+  85%{opacity:1}
+  100%{opacity:0;transform:translateY(-40px)}
+}
 .ctl-drift-layer{position:absolute;inset:0;overflow:hidden;pointer-events:none}
 .ctl-drift{position:absolute;display:block;border-style:solid;border-color:var(--ctl-oat-16);border-width:2px 2px 0 0;opacity:0;animation-name:ctl-drift;animation-timing-function:var(--ease-standard);animation-fill-mode:forwards}
+.ctl-drift--diag{animation-name:ctl-drift-diag}
+.ctl-drift--block{border:0;background:var(--ctl-oat-16);animation-name:ctl-drift-block}
 
 /* Timeline: the spine draws down as the section enters, then the nodes fade
    in as one group. Two phases, not a per-item cascade. */
@@ -128,7 +161,7 @@
 
 @media (prefers-reduced-motion:reduce){
   .ctl-rise{transition-delay:0s}
-  .ctl-cursor-blink-once{animation:none}
+  .ctl-cursor-blink-once,.ctl-cursor-blink,.ctl-caret-wink{animation:none}
   .ctl-lift:hover,.ctl-grow:hover{transform:none}
   .ctl-wipe::after{display:none}
   .ctl-sweep-gold{transition:none;background-size:100% .28em}

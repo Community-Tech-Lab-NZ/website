@@ -17,8 +17,12 @@ import { INK_LEFT } from "./Logo";
  * block cannot be animated. This inline SVG rebuilds the same 520x140 geometry
  * from three layers — the wordmark-only file (same canvas, so registration is
  * exact), the caret polyline, and a separate <rect> for the block. Everything
- * except the blink matches Logo with align="optical" pixel for pixel: same
+ * except the motion matches Logo with align="optical" pixel for pixel: same
  * clear-space padding, same optical margin from INK_LEFT.
+ *
+ * Hover, at the owner's direction: the block pulses continuously while the
+ * pointer stays, and the caret winks once like an eye — a quick squash to its
+ * baseline and back. Both stop dead on leave and under reduced motion.
  *
  * Header only. The footer keeps the static Logo; two blinking cursors on one
  * page would be a tic, not a mark.
@@ -32,6 +36,7 @@ type AnimatedLockupProps = {
 
 export function AnimatedLockup({ dark = false, height = 68, className }: AnimatedLockupProps) {
   const blockRef = useRef<SVGRectElement>(null);
+  const caretRef = useRef<SVGPolylineElement>(null);
 
   const width = Math.round(height * (520 / 140));
   // Identical to Logo: clear space scaled with the mark, optical pull-left.
@@ -40,19 +45,30 @@ export function AnimatedLockup({ dark = false, height = 68, className }: Animate
 
   const ink = dark ? "var(--ctl-kowhai)" : "var(--ctl-ink)";
 
-  function blink() {
-    const el = blockRef.current;
-    if (!el) return;
-    // Swap the three-blink settle for a single blink and restart it. The
-    // reflow read is what lets the same animation run again.
-    el.classList.remove("ctl-cursor-settle", "ctl-cursor-blink-once");
-    void el.getBoundingClientRect();
-    el.classList.add("ctl-cursor-blink-once");
+  function enter() {
+    const block = blockRef.current;
+    if (block) {
+      // The load-time settle hands over to a continuous pulse for the hover.
+      block.classList.remove("ctl-cursor-settle");
+      block.classList.add("ctl-cursor-blink");
+    }
+    const caret = caretRef.current;
+    if (caret) {
+      // One wink per entry; the reflow read restarts the animation.
+      caret.classList.remove("ctl-caret-wink");
+      void caret.getBoundingClientRect();
+      caret.classList.add("ctl-caret-wink");
+    }
+  }
+
+  function leave() {
+    blockRef.current?.classList.remove("ctl-cursor-blink");
   }
 
   return (
     <span
-      onMouseEnter={blink}
+      onMouseEnter={enter}
+      onMouseLeave={leave}
       className={clsx("block", className)}
       style={{ padding: pad, marginLeft: opticalShift }}
     >
@@ -73,6 +89,7 @@ export function AnimatedLockup({ dark = false, height = 68, className }: Animate
         {/* Same geometry as the lockup files: nested 90px caret at (30,25). */}
         <g transform="translate(30,25) scale(0.9)">
           <polyline
+            ref={caretRef}
             points="20,62 50,30 80,62"
             fill="none"
             stroke={ink}

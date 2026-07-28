@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { clsx } from "clsx";
 import { useElapsed } from "@/hooks/useElapsed";
 import { Button } from "../Button";
@@ -182,6 +182,20 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
   const draft = useFormDraft<Values>("ctl-application-draft-v1", EMPTY);
   const values = draft.value;
   const { stripRef: tabStripRef, barRef: tabBarRef } = useTabIndicator(step);
+
+  /* Moving between sections replaces the DOM (the keyed fade wrapper), so
+     focus is managed: it lands on the new section's heading, which also tells
+     screen reader users where they are. Skipped on first mount so loading the
+     page never steals focus. */
+  const headingRef = useRef<HTMLSpanElement>(null);
+  const mountedRef = useRef(false);
+  useEffect(() => {
+    if (!mountedRef.current) {
+      mountedRef.current = true;
+      return;
+    }
+    headingRef.current?.focus({ preventScroll: false });
+  }, [step]);
 
   const allGates = gates.every(Boolean);
   const last = step === SECTIONS.length - 1;
@@ -376,16 +390,25 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
         </Card>
       ) : null}
 
-      <div className="mt-6 max-w-[var(--form-measure)]">
-        {/* h2, not h3: this sits directly under the page h1, and an h3 here
-            skipped a level. Visual size is unchanged. */}
-        <Heading level={3} as="h2">
-          {SECTIONS[step].title}
-        </Heading>
-        <Body className="mt-3">{SECTIONS[step].intro}</Body>
-      </div>
+      {/* Keyed on step: changing section remounts this wrapper, replaying the
+          same 220ms fade-and-rise the routes use, so moving through the form
+          feels like moving through the site. The remount also lets focus be
+          sent to the new section's heading — with a keyed swap the previously
+          focused button is gone, and without managed focus a keyboard user
+          would be dropped back to the top of the document. */}
+      <div key={step} className="ctl-route-fade">
+        <div className="mt-6 max-w-[var(--form-measure)]">
+          {/* h2, not h3: this sits directly under the page h1, and an h3 here
+              skipped a level. Visual size is unchanged. */}
+          <Heading level={3} as="h2">
+            <span ref={headingRef} tabIndex={-1} className="outline-none">
+              {SECTIONS[step].title}
+            </span>
+          </Heading>
+          <Body className="mt-3">{SECTIONS[step].intro}</Body>
+        </div>
 
-      <div className="mt-6 grid max-w-[var(--form-measure)] gap-5">
+        <div className="mt-6 grid max-w-[var(--form-measure)] gap-5">
         {step === 0 ? (
           <>
             <Field label="Organisation name" required error={issueFor("orgName")}>
@@ -690,6 +713,7 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
             on this device.
           </p>
         ) : null}
+        </div>
       </div>
     </div>
   );

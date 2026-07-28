@@ -68,7 +68,7 @@ export function FunderCredit({ inverse = false, note = null, className }: Funder
           rel="noopener noreferrer"
           className={clsx(
             "ctl-link-grow mt-2 block font-heading text-body-md font-bold no-underline",
-            "underline decoration-transparent transition-[text-decoration-color] duration-[var(--duration-fast)] ease-brand hover:decoration-current",
+            "underline decoration-transparent hover:decoration-current",
             inverse ? "text-heading-inverse" : "text-heading",
           )}
         >

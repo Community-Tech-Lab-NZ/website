@@ -25,13 +25,13 @@ const button = cva(
     // order classes appear in className — so the outline variants would lose
     // their border at random.
     "cursor-pointer border-2 border-solid rounded-card",
-    "transition-[background-color,color,border-color,transform]",
-    "duration-[var(--duration-fast)] ease-brand",
-    // Motion override 4: hover lifts 1px, press drops 1px past it — a 2px
-    // travel that makes every button feel sprung. Reduce zeroes the duration
-    // and the utilities layer suppresses hover transforms entirely.
-    "hover:-translate-y-px active:translate-y-px",
-    "disabled:opacity-40 disabled:cursor-not-allowed disabled:active:translate-y-0",
+    // Motion override 4, second form: buttons grow on hover with the same
+    // slow stretch as the logos, and colour still steps quickly. The whole
+    // transition lives in .ctl-btn-motion (components layer) because any
+    // Tailwind transition utility here would overwrite the shorthand and
+    // flatten transform onto the fast timing.
+    "ctl-btn-motion",
+    "disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:transform-none",
   ],
   {
     variants: {

@@ -1,4 +1,7 @@
+"use client";
+
 import { clsx } from "clsx";
+import { knockEnd, knockEnter } from "@/lib/knock";
 import { Caret } from "./Caret";
 import { Eyebrow } from "./Typography";
 
@@ -45,8 +48,10 @@ function Side({
       ) : null}
 
       <div
+        onMouseEnter={knockEnter}
+        onAnimationEnd={knockEnd}
         className={clsx(
-          "font-heading text-subhead font-extrabold",
+          "ctl-knock font-heading text-subhead font-extrabold",
           inverse ? "text-heading-inverse" : "text-heading",
         )}
       >

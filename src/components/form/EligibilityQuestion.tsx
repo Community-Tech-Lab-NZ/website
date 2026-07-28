@@ -100,7 +100,7 @@ export function EligibilityQuestion({
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="ctl-link-grow cursor-pointer border-0 bg-transparent p-0 font-sans text-body-sm text-ink underline decoration-kowhai underline-offset-[var(--link-underline-offset)] transition-[text-decoration-color] duration-[var(--duration-fast)] ease-brand hover:decoration-fern"
+          className="ctl-link-grow cursor-pointer border-0 bg-transparent p-0 font-sans text-body-sm text-ink underline decoration-kowhai underline-offset-[var(--link-underline-offset)] hover:decoration-fern"
         >
           Get in touch before submitting
         </button>{" "}

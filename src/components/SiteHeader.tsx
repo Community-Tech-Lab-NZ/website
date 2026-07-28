@@ -113,8 +113,9 @@ export function SiteHeader({
                 // ctl-hit: the 20px line box is under the 24px target minimum.
                 // ctl-tab-underline: the border is the no-JS fallback; once
                 // the indicator mounts it takes over the underline.
+                // No Tailwind transition utilities here: ctl-link-grow owns
+                // the shorthand so the grow keeps its own slower timing.
                 "ctl-hit ctl-tab-underline ctl-link-grow border-b-2 border-solid pb-px font-heading text-body-sm font-bold no-underline",
-                "transition-[border-color] duration-[var(--duration-fast)] ease-brand",
                 isActive(item.href) ? "border-b-kowhai" : "border-b-transparent",
                 dark ? "text-oat hover:border-b-kowhai" : "text-ink hover:border-b-kowhai",
               )}

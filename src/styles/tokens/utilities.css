@@ -136,6 +136,15 @@
    promotion means constant rasterisation: no blip either side. */
 .ctl-knock.is-knocked{animation:ctl-knock 900ms var(--ease-standard) 1}
 
+/* Button motion: colour steps stay quick, but the hover growth runs on the
+   logos' slow stretch — one rule owning the whole transition shorthand,
+   because splitting it between Tailwind utilities and this layer would let
+   the utilities layer overwrite it. Press keeps the 1px drop, composed with
+   the grown scale so pressing never un-grows the button. */
+.ctl-btn-motion{transition:background-color var(--duration-fast) var(--ease-standard),color var(--duration-fast) var(--ease-standard),border-color var(--duration-fast) var(--ease-standard),transform var(--duration-hover) var(--ease-out-soft)}
+.ctl-btn-motion:hover{transform:scale(1.04)}
+.ctl-btn-motion:active{transform:scale(1.04) translateY(1px)}
+
 /* Hover lift and grow (override 4). Transform-only so nothing reflows.
    On --duration-hover, not --duration-fast: growth should stretch, not
    twitch. */
@@ -217,6 +226,8 @@
   .ctl-cursor-blink,.ctl-lockup-block.is-breathing{animation:none}
   .caret-mark.is-winking{animation:none}
   .ctl-link-grow:hover{transform:none}
+  .ctl-btn-motion:hover{transform:none}
+  .ctl-btn-motion:active{transform:translateY(1px)}
   .ctl-drift-slot{transition:none;transform:none !important}
   .ctl-motion-only{display:none}
   .ctl-still-only{display:inline}
@@ -249,11 +260,16 @@
 .ctl-cta-ping--tight::after{inset:-3px;border-radius:calc(var(--radius-card) + 3px);animation-delay:4.75s}
 
 /* Text links grow on hover (owner request): a gentle scale that eases both
-   in and out on --duration-hover, so leaving never cuts the motion off.
-   inline-block because inline boxes cannot transform; origin at the left so
-   the text stretches away from its anchor rather than sliding. */
-.ctl-link-grow{display:inline-block;transition:transform var(--duration-hover) var(--ease-out-soft);transform-origin:left center}
-.ctl-link-grow:hover{transform:scale(1.05)}
+   in and out, tuned twice — 1.05 about the left edge read as too much, too
+   fast on small text. 1.03 about the centre over 450ms matches the way the
+   logos feel: both ends ease outward a little instead of the whole line
+   lunging right. inline-block because inline boxes cannot transform. */
+/* Owns the FULL transition shorthand — colour steps included — because any
+   Tailwind transition utility on the same element would overwrite it and
+   flatten the grow onto the fast timing (the same layer collision
+   .ctl-btn-motion exists to avoid). */
+.ctl-link-grow{display:inline-block;transition:transform 450ms var(--ease-out-soft),color var(--duration-fast) var(--ease-standard),border-color var(--duration-fast) var(--ease-standard),text-decoration-color var(--duration-fast) var(--ease-standard)}
+.ctl-link-grow:hover{transform:scale(1.03)}
 
 /* The list-marker carets blink like the logo's eye when their row is
    hovered: a quick squash to flat and back. The rotation must ride along in
@@ -265,7 +281,10 @@
   45%{transform:scaleY(0.12) rotate(-45deg)}
   100%{transform:scaleY(1) rotate(-45deg)}
 }
-.caret-mark.is-winking{animation:ctl-mark-wink 600ms var(--ease-standard) 1;transform-origin:50% 100%}
+/* Origin stays at the default centre: the resting inline rotate pivots
+   there, and animating about any other origin shifts the glyph for the
+   duration of the blink and jolts it back after. */
+.caret-mark.is-winking{animation:ctl-mark-wink 600ms var(--ease-standard) 1}
 
 /* Focus list (the timelines): hovering one entry lifts it slightly and pales
    the rest, so the row under the pointer reads as the one in focus. */

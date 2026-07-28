@@ -56,6 +56,27 @@ const VIEWBOX = {
  */
 const INK_LEFT = { horizontal: 44.4, primary: null, icon: 16 } as const;
 
+/* The full ink box within each artboard, in viewBox units, for `crop`.
+ *
+ * The primary lockup is the reason this exists: its artwork occupies 201.5 of
+ * 360 units vertically, so 44% of that file is empty. Rendered at a 150px box
+ * the visible mark was only 107px, and simply setting a bigger height would
+ * have grown the empty margin at the same rate — a mark twice the size would
+ * have needed a 384px box.
+ *
+ * With `crop` the `height` prop means the height of the visible mark rather
+ * than the height of the file, so the box tracks the artwork.
+ *
+ * Measured the same way as INK_LEFT: rasterise, scan for non-background pixels.
+ * The horizontal figures depend on the wordmark's font metrics; the primary
+ * ones are stable because the caret sets its vertical extent.
+ */
+const INK_BOX = {
+  horizontal: { x: 44, y: 42.5, w: 275, h: 64.5 },
+  primary: { x: 161.5, y: 71.5, w: 199, h: 201.5 },
+  icon: { x: 16, y: 26, w: 68, h: 60 },
+} as const;
+
 export type LogoVariant = keyof typeof LOGO_FILES;
 
 type LogoProps = {
@@ -68,6 +89,12 @@ type LogoProps = {
    * Use `optical` anywhere the logo shares a left edge with text.
    */
   align?: "box" | "optical";
+  /**
+   * Trim the artboard's empty margin. With this on, `height` is the height of
+   * the visible mark rather than of the file. Clear space then has to come from
+   * the surrounding layout, so `clearSpace` is ignored.
+   */
+  crop?: boolean;
   className?: string;
   priority?: boolean;
 };
@@ -77,6 +104,7 @@ export function Logo({
   height = 40,
   clearSpace = true,
   align = "box",
+  crop = false,
   className,
   priority = false,
 }: LogoProps) {
@@ -88,6 +116,36 @@ export function Logo({
 
   const view = VIEWBOX[family];
   const width = Math.round(height * (view.w / view.h));
+
+  if (crop) {
+    /* Scale so the ink box is `height` tall, then show only that window of the
+       file. The file itself still renders whole; overflow hides the margin. */
+    const box = INK_BOX[family];
+    const scale = height / box.h;
+
+    return (
+      <span
+        className={clsx("block overflow-hidden", className)}
+        style={{ width: box.w * scale, height: box.h * scale }}
+      >
+        <img
+          src={`/logos/${LOGO_FILES[variant]}`}
+          alt="Community Tech Lab"
+          width={Math.round(view.w * scale)}
+          height={Math.round(view.h * scale)}
+          loading={priority ? "eager" : "lazy"}
+          fetchPriority={priority ? "high" : undefined}
+          className="block max-w-none"
+          style={{
+            width: view.w * scale,
+            height: view.h * scale,
+            marginLeft: -box.x * scale,
+            marginTop: -box.y * scale,
+          }}
+        />
+      </span>
+    );
+  }
 
   // Clear space equals the cursor-block height, scaled with the mark.
   const pad = clearSpace ? Math.max(8, Math.round(height * (family === "icon" ? 0.2 : 0.14))) : 0;

@@ -101,6 +101,7 @@ export function formatDeveloperApplication(
     field(L.hours, data.hours),
     field(L.shipped, data.shipped),
     `Understands the community rate and open source release: ${data.understood ? "yes" : "no"}\n`,
+    `Understands how AI tools are used: ${data.aiUnderstood ? "yes" : "no"}\n`,
   ].join("\n");
 }
 

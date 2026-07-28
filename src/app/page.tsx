@@ -61,11 +61,15 @@ export default function HomePage() {
             </Button>
           </div>
 
-          <div className="mt-9 grid grid-cols-[repeat(auto-fit,minmax(var(--hero-stat-min),max-content))] gap-8">
+          {/* gap-y-3 is the figure-to-label spacing, not a gap between stats:
+              each StatFigure spans both rows via subgrid, so every label starts
+              on the same line however many lines its figure took. */}
+          <div className="mt-9 grid grid-cols-[repeat(auto-fit,minmax(var(--hero-stat-min),max-content))] gap-x-8 gap-y-3">
             {HERO_STATS.map((stat) => (
               <StatFigure
                 key={stat.label}
                 inverse
+                align="row"
                 labelSize="md"
                 figure={stat.figure}
                 label={stat.label}
@@ -79,7 +83,9 @@ export default function HomePage() {
       {/* Two ways in — the audience fork */}
       <Section>
         <Reveal>
-          <Eyebrow as="h2" className="mb-5">Two ways in</Eyebrow>
+          {/* Was "Two ways in", which framed the programme as a pair of doors
+              you had to pick between. "Get involved" is an invitation. */}
+          <Eyebrow as="h2" className="mb-5">Get involved</Eyebrow>
           <div className="grid grid-cols-[repeat(auto-fit,minmax(var(--col-min-wide),1fr))] gap-6">
             <AudiencePath
               audience="community"

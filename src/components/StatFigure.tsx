@@ -20,6 +20,13 @@ type StatFigureProps = {
   inverse?: boolean;
   accent?: boolean;
   labelSize?: keyof typeof LABEL_SIZE;
+  /**
+   * `row` opts into a parent grid's rows via subgrid, so that figures share one
+   * row and labels share the next. Without it a figure that wraps onto two
+   * lines ("Open source") pushes its own label below everyone else's. The
+   * parent must define the two rows and own the vertical gap.
+   */
+  align?: "flow" | "row";
   className?: string;
 };
 
@@ -29,10 +36,13 @@ export function StatFigure({
   inverse = false,
   accent = false,
   labelSize = "sm",
+  align = "flow",
   className,
 }: StatFigureProps) {
+  const row = align === "row";
+
   return (
-    <div className={className}>
+    <div className={clsx(row && "row-span-2 grid grid-rows-subgrid", className)}>
       <div
         className={clsx(
           "font-heading text-headline font-black leading-none",
@@ -49,7 +59,9 @@ export function StatFigure({
       </div>
       <div
         className={clsx(
-          "mt-3 font-meta uppercase leading-tight",
+          "font-meta uppercase leading-tight",
+          // In row mode the parent's row-gap does this job.
+          row ? "mt-0" : "mt-3",
           LABEL_SIZE[labelSize],
           inverse ? "text-muted-inverse" : "text-muted",
         )}

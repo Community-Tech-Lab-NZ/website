@@ -46,7 +46,10 @@ export default function TermsPage() {
               key={section.number}
               className="grid grid-cols-[var(--terms-number-col)_1fr] gap-5 border-t border-solid border-hairline pt-6"
             >
-              <div className="font-meta text-body-sm font-bold text-fern">
+              {/* Darker Fern, not --ctl-fern. Fern on Oat is 3.58:1 and this is 14px
+                  bold, which is not "large text" under WCAG, so it needed 4.5:1.
+                  Same substitution StatusTag already makes; 4.74:1. */}
+              <div className="font-meta text-body-sm font-bold text-action-tertiary-hover">
                 {section.number}
               </div>
               <div>

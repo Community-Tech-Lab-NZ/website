@@ -91,10 +91,14 @@ const baseDev = {
   name: "Dev Person",
   email: "dev@example.nz",
   understood: true,
+  aiUnderstood: true,
 };
 check("developer form passes", developerSchema.safeParse(baseDev).success, true);
 check("unchecked understanding fails",
   developerSchema.safeParse({ ...baseDev, understood: false }).success, false);
+
+check("developer must acknowledge the AI disclosure",
+  developerSchema.safeParse({ ...baseDev, aiUnderstood: false }).success, false);
 check("invented seat rejected",
   developerSchema.safeParse({ ...baseDev, seat: "Chief Executive" }).success, false);
 

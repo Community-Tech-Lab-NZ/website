@@ -15,11 +15,18 @@ import { Eyebrow, Heading, Lede } from "@/components/Typography";
  * privacy officer.
  *
  * NEEDS REVIEW by Giovanni and Startup Queenstown Lakes before launch, and
- * ideally by whoever reviews the Pilot Organisation Agreement. Two things in
- * particular need confirming, both marked below:
- *   1. Whether SQL's existing privacy policy already covers this collection.
- *   2. How someone exercises access and correction rights. The Privacy Act
+ * ideally by whoever reviews the Pilot Organisation Agreement. Three things in
+ * particular need confirming, all flagged on the page itself:
+ *   1. How someone exercises access and correction rights. The Privacy Act
  *      requires a workable route, and the site publishes no address by design.
+ *   2. How long applications are actually kept.
+ *   3. Which AI providers section 05 refers to, and on what terms. That section
+ *      states submitted text is not used to train anyone's model, which has to
+ *      be true of whichever provider is actually used.
+ *
+ * SQL's own policy lives at /privacy-policy on their site and is linked from
+ * section 03. It is genuine but brief, and says nothing about AI, so this
+ * notice is the more detailed of the two rather than a restatement.
  */
 
 export const metadata: Metadata = {
@@ -29,7 +36,9 @@ export const metadata: Metadata = {
   alternates: { canonical: "/privacy" },
 };
 
-const SECTIONS = [
+/* Paragraphs are ReactNode rather than string so a couple of them can carry a
+   link. Everything else in here is plain text. */
+const SECTIONS: { number: string; title: string; paragraphs: React.ReactNode[] }[] = [
   {
     number: "01",
     title: "What we collect",
@@ -50,7 +59,21 @@ const SECTIONS = [
     number: "03",
     title: "Who holds it and who reads it",
     paragraphs: [
-      "Startup Queenstown Lakes holds this information as lead organisation and fund holder for Community Tech Lab.",
+      <>
+        Startup Queenstown Lakes holds this information as lead organisation and fund
+        holder for Community Tech Lab. Their{" "}
+        <a
+          href="https://www.startupqueenstownlakes.com/privacy-policy"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-ink underline"
+        >
+          privacy policy
+        </a>
+        <span className="sr-only"> (opens in a new tab)</span> covers how they handle
+        personal information generally. This notice covers what is specific to applying
+        to Community Tech Lab, and where the two differ this one is the more detailed.
+      </>,
       "The selection panel reads every application. The panel is drawn from the six partner organisations and from local technology and community people. Everyone on it is bound by the same confidentiality expectations, and anyone with a conflict of interest steps out of the discussion for that application.",
     ],
   },
@@ -64,6 +87,16 @@ const SECTIONS = [
   },
   {
     number: "05",
+    title: "How we use AI tools",
+    paragraphs: [
+      "We may use AI tools, including large language models run by other companies, to help us read what is submitted. That means summarising long answers, pulling out particular details, and organising applications so the panel can compare them consistently.",
+      "In practice this means the text of your application, and your CV if you attach one, may be sent to one of those providers to be processed. We use them on business terms under which what we send is not used to train their models.",
+      "People make the decisions. AI is used to help read and organise, never to score an application, rank it, or decide who is selected. The panel reads every application itself.",
+      "This is the other reason we ask you not to paste actual client records or personal information about other people into your answers. Describe the kind of information your organisation handles instead.",
+    ],
+  },
+  {
+    number: "06",
     title: "How long we keep it",
     paragraphs: [
       "Applications from the 2026 round are kept until the end of 2027, so we can report to the funder, answer questions about how decisions were made, and get in touch if a future round might suit you. After that they are deleted.",
@@ -71,7 +104,7 @@ const SECTIONS = [
     ],
   },
   {
-    number: "06",
+    number: "07",
     title: "Seeing or correcting what we hold",
     paragraphs: [
       "Under the Privacy Act 2020 you can ask to see the personal information we hold about you, and ask us to correct it if it is wrong. There is no charge and we will respond within 20 working days.",
@@ -80,7 +113,7 @@ const SECTIONS = [
     ],
   },
   {
-    number: "07",
+    number: "08",
     title: "Cookies and analytics",
     paragraphs: [
       "This site sets no cookies and runs no analytics or tracking. Fonts are served from this site rather than from Google, so visiting these pages does not tell anyone else you were here.",
@@ -114,7 +147,10 @@ export default function PrivacyPage() {
               key={section.number}
               className="grid grid-cols-[var(--terms-number-col)_1fr] gap-5 border-t border-solid border-hairline pt-6"
             >
-              <div className="font-meta text-body-sm font-bold text-fern">
+              {/* Darker Fern, not --ctl-fern. Fern on Oat is 3.58:1 and this is 14px
+                  bold, which is not "large text" under WCAG, so it needed 4.5:1.
+                  Same substitution StatusTag already makes; 4.74:1. */}
+              <div className="font-meta text-body-sm font-bold text-action-tertiary-hover">
                 {section.number}
               </div>
               <div>
@@ -136,11 +172,13 @@ export default function PrivacyPage() {
         <Card tone="sunk" className="mt-8 max-w-[var(--terms-measure)]">
           <Eyebrow>Before this goes live</Eyebrow>
           <p className="mt-3 max-w-measure font-sans text-body-sm text-body">
-            This notice is a draft and needs sign-off from Startup Queenstown Lakes, who
-            may already have a privacy policy this programme should sit under. Two details
-            need confirming: how long applications are actually kept, and how someone
-            makes an access or correction request given the programme publishes no email
-            address. The Privacy Act requires a route that works.
+            This notice is a draft and needs sign-off from Startup Queenstown Lakes.
+            Three details need confirming: how long applications are actually kept, how
+            someone makes an access or correction request given the programme publishes
+            no email address, and which AI providers are used in section 05 and on what
+            terms. The Privacy Act requires an access route that works, and the claim
+            that submitted text is not used to train anyone&rsquo;s model has to be true
+            of whichever provider is chosen.
           </p>
         </Card>
       </Section>

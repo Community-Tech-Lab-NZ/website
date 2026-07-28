@@ -33,8 +33,10 @@
      computes it from the artboard geometry via align="optical". */
   --header-height: 96px;
   --header-lockup: 56px;
-  --footer-lockup: 150px;
-  --footer-logo-bleed: -14px;
+  /* Height of the VISIBLE mark; SiteFooter crops the artboard margin away, so
+     this is no longer the height of the file. No bleed token any more: the
+     whitespace it compensated for is cropped rather than offset. */
+  --footer-lockup: 215px;
 
   /* Form controls: 12px vertical / 14px horizontal padding. The 14px is off the
      8px scale and is deliberate, giving the control a slightly wider gutter than
@@ -63,11 +65,12 @@
   --timeline-node-offset: 8px;
   --timeline-spine-offset: 6px;
 
-  /* Dashed placeholder slots. No partner logo files were supplied and the QLDC
-     mark needs written approval before use, so both render as empty slots
-     rather than anything pulled from the web. Delete these once real assets
-     land. */
-  --slot-label-size: 9px;
+  /* Dashed placeholder slots, still used by the two partners with no usable
+     logo file: Queenstown Coders Connect (none supplied) and Technology
+     Queenstown (supplied mark is the wrong variant). Delete once both land. */
+  /* 11px, was 9px. Same legibility reasoning as --size-label; 9px caps were
+     the smallest text on the site. */
+  --slot-label-size: 11px;
   --slot-label-tracking: 0.12em;
   --partner-cell-min: 84px;
   --partner-slot-w: 132px;

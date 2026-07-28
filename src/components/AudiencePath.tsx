@@ -6,10 +6,16 @@ import { Eyebrow } from "./Typography";
 /* One of the two audience paths.
  *
  * The site forks community organisations and developers straight from the hero;
- * the handoff is explicit that you never write one path serving both. The
- * community card sits on Oat with an outline action, the developer card on Ink
- * with the gold action — which is also how the "one gold thing per viewport"
- * rule stays satisfied when the two sit side by side.
+ * the handoff is explicit that you never write one path serving both.
+ *
+ * THE COMMUNITY CARD IS THE INK ONE. The prototype had it the other way round,
+ * and the Ink card plainly draws the eye first, so it was sending that attention
+ * to developers. The programme's actual constraint is finding community
+ * organisations with a real problem worth building for; developers are the
+ * easier side to fill. The emphasis follows the constraint.
+ *
+ * The gold action follows the Ink card, so "one gold thing per viewport" still
+ * holds with the two side by side — it has just moved to the community side.
  *
  * The whole card is a link target in practice, so the tier-three hover step on
  * the hairline is legitimate here: something does happen when you click it.
@@ -36,7 +42,7 @@ export function AudiencePath({
   actionHref,
   className,
 }: AudiencePathProps) {
-  const dark = audience === "developer";
+  const dark = audience === "community";
 
   return (
     <div
@@ -49,11 +55,12 @@ export function AudiencePath({
       )}
     >
       {eyebrow ? (
-        // Fern rather than muted on the developer card: the eyebrow is the one
-        // structural accent on an otherwise unbroken Ink surface.
-        <Eyebrow inverse={dark} className={dark ? "text-fern" : undefined}>
-          {eyebrow}
-        </Eyebrow>
+        /* This carried a text-fern class meant to accent the eyebrow on the Ink
+           card. It never took effect — text-muted-inverse from `inverse` wins on
+           stylesheet order — and it is just as well: Fern on Ink measures
+           4.05:1, under the 4.5:1 needed at this size. Removed rather than made
+           to work. The muted colour gives 7.69:1. */
+        <Eyebrow inverse={dark}>{eyebrow}</Eyebrow>
       ) : null}
 
       <h3

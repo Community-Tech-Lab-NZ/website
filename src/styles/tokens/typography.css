@@ -19,7 +19,16 @@
   --size-body:16px;
   --size-body-lg:18px;
   --size-body-sm:14px;
-  --size-label:11px;
+  /* Was 11px. Raised to 13px for legibility, and it is a deviation from the
+     locked scale, kept deliberately small.
+     Contrast was not the problem: --text-muted is 5.75:1 on Oat and
+     --text-muted-inverse is 7.70:1 on Ink, both comfortably past AA. The
+     problem is that this token is only ever used for Space Mono set in caps
+     with 0.16em tracking, and caps at 11px in a monospace face with the letters
+     pushed apart is hard work for anyone. It carries the eyebrows, the footer
+     meta and the timeline dates, so it is a lot of the site's connective text.
+     Reverting is a one-line change if the brand owner disagrees. */
+  --size-label:13px;
 
   --leading-display:1.02;
   --leading-headline:1.08;

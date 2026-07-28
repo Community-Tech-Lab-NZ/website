@@ -130,6 +130,9 @@ export const developerSchema = z.object({
   understood: z.literal(true, {
     message: "Please confirm you understand the rate and the open source release.",
   }),
+  aiUnderstood: z.literal(true, {
+    message: "Please confirm you understand how AI tools are used.",
+  }),
 });
 
 /** The eligibility question panel. Deliberately tiny. */

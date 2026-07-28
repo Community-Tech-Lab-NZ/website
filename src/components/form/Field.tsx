@@ -81,7 +81,12 @@ export function Field({
           >
             {label}
             {required ? (
-              <span className="text-fern">
+              /* Darker Fern: --ctl-fern on Oat is 3.58:1, and this asterisk is
+                 14px bold, which WCAG does not count as large text. The screen
+                 reader gets the word regardless, but the mark is the only
+                 visual cue that a field is required, so it has to clear 4.5:1.
+                 4.74:1 here, the same substitution StatusTag makes. */
+              <span className="text-action-tertiary-hover">
                 {" *"}
                 <span className="sr-only">required</span>
               </span>

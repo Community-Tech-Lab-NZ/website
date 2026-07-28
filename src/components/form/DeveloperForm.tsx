@@ -32,6 +32,7 @@ export function DeveloperForm({ canSubmit }: { canSubmit: boolean }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [understood, setUnderstood] = useState(false);
+  const [aiUnderstood, setAiUnderstood] = useState(false);
   const [cv, setCv] = useState<File | null>(null);
   const [honeypot, setHoneypot] = useState("");
 
@@ -61,6 +62,7 @@ export function DeveloperForm({ canSubmit }: { canSubmit: boolean }) {
         name,
         email,
         understood,
+        aiUnderstood,
       };
 
       const body = new FormData();
@@ -167,6 +169,12 @@ export function DeveloperForm({ canSubmit }: { canSubmit: boolean }) {
         label="I understand the rate is a community rate, well under commercial, and that everything built is released open source"
       />
 
+      <Checkbox
+        checked={aiUnderstood}
+        onChange={(e) => setAiUnderstood(e.target.checked)}
+        label="I understand AI tools may be used to help summarise and organise what I submit, and that people make every decision"
+      />
+
       <p className="max-w-measure font-sans text-body-sm text-muted">
         Startup Queenstown Lakes holds this information on behalf of the programme. See
         the{" "}
@@ -199,7 +207,7 @@ export function DeveloperForm({ canSubmit }: { canSubmit: boolean }) {
         <Button
           variant="primary"
           size="lg"
-          disabled={!understood || sending || !canSubmit}
+          disabled={!understood || !aiUnderstood || sending || !canSubmit}
           onClick={submit}
         >
           {sending ? "Sending" : "Send my application"}

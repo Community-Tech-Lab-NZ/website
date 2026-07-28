@@ -71,7 +71,7 @@ export default function DevelopersPage() {
       />
       <section className="bg-ink text-body-inverse">
         <div className="mx-auto max-w-page px-gutter pb-8 pt-9 lg:px-gutter-lg">
-          <Eyebrow inverse className="mb-4 text-fern">
+          <Eyebrow inverse className="mb-4">
             For developers
           </Eyebrow>
           <Heading level={1} fluid inverse className="max-w-[var(--page-heading-max)]">

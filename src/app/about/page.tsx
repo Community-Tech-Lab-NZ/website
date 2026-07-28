@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { CalloutBanner } from "@/components/CalloutBanner";
 import { Card } from "@/components/Card";
 import { CaretList } from "@/components/CaretList";
-import { FunderCredit } from "@/components/FunderCredit";
 import { Pairing } from "@/components/Pairing";
 import { PartnerRow } from "@/components/PartnerRow";
 import { Reveal } from "@/components/Reveal";
@@ -38,7 +37,7 @@ const PEOPLE = [
     paragraphs: [
       "Giovanni founded Queenstown Coders Connect, the district's regular meet-up for local developers, and chairs FLINT Queenstown, the local branch of TUANZ. He works as a software engineer building AI systems.",
       "From 2024 to 2026 he was community investment adviser at Queenstown Lakes District Council, managing the community fund and designing The Funding Series, a capability programme helping community groups become more financially sustainable. That work meant sitting across the table from a lot of local organisations and hearing the same thing repeatedly: the problem was not always money, it was that the tools they needed did not exist at a price they could pay.",
-      "He also advises Queenstown Resort College on its data and machine learning programmes, which is part of why QRC students have a guaranteed place in this cohort.",
+      "He also advised Queenstown Resort College on its data and machine learning programmes, which is part of why QRC students have a guaranteed place in this cohort.",
     ],
   },
 ];
@@ -179,9 +178,8 @@ export default function AboutPage() {
             {/* Eyebrow suppressed: the section already says who is involved. */}
             <PartnerRow eyebrow={null} />
           </div>
-          <div className="mt-7">
-            <FunderCredit note={null} />
-          </div>
+          {/* No FunderCredit here. It sits in the footer of every page, so on
+              this page it appeared twice within one scroll. */}
         </Reveal>
       </Section>
 

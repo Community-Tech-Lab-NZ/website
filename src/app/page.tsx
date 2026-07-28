@@ -6,7 +6,6 @@ import { Drift } from "@/components/Drift";
 import { TypeOn } from "@/components/TypeOn";
 import { Card } from "@/components/Card";
 import { CaretList } from "@/components/CaretList";
-import { FunderCredit } from "@/components/FunderCredit";
 import { PartnerRow } from "@/components/PartnerRow";
 import { Reveal } from "@/components/Reveal";
 import { Section } from "@/components/Section";
@@ -201,9 +200,9 @@ export default function HomePage() {
             Startup Queenstown Lakes is the lead organisation, fund holder, and the
             entity developers contract to.
           </p>
-          <div className="mt-7">
-            <FunderCredit />
-          </div>
+          {/* No FunderCredit here — it sits in the footer of every page,
+              which keeps the mandatory credit while avoiding it appearing
+              twice within one scroll. */}
         </Reveal>
       </Section>
 

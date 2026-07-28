@@ -110,16 +110,21 @@ cache expires.
       it enabled at OS level, so the animations were verified from the compiled
       CSS rather than observed running
 - [ ] Submit the sitemap in Google Search Console and confirm the domain
-- [ ] Replace the six partner logo placeholders and the QLDC funder logo, and
-      confirm QLDC's required credit wording
+- [ ] Replace the six partner logo placeholders
+- [ ] Confirm QLDC's required credit wording. The Economic Futures / QLDC
+      lockup is now in place, but a funder's own wording overrides ours and
+      the footer line is still the one we wrote
 
 ## Still outstanding
 
 Tracked here so they do not get lost:
 
 - **Partner logos.** All six render as dashed placeholder slots
-- **QLDC funder logo**, which needs written approval. The handoff is explicit
-  that it must not be pulled from the web
+- **Queenstown Coders Connect has no website**, so it is the one partner in the
+  footer without a link. If they have a page anywhere — even a LinkedIn or
+  Meetup — it belongs in `src/lib/navigation.ts`
+- **QLDC's required credit wording.** The funder logo is in place. Their
+  wording for the credit line is not confirmed and overrides ours when it is
 - **Privacy notice sign-off** from Startup Queenstown Lakes, plus two facts to
   confirm: how long applications are really kept, and how someone makes an
   access request given the site publishes no address

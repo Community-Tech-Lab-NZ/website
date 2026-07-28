@@ -83,14 +83,13 @@ export function SiteHeader({
       )}
     >
       <div className="mx-auto flex min-h-[var(--header-height)] max-w-page items-center gap-7 px-gutter lg:px-gutter-lg">
-        <Link
-          href="/"
-          className="ml-[var(--header-logo-bleed)] block no-underline"
-          aria-label="Community Tech Lab, home"
-        >
+        <Link href="/" className="block no-underline" aria-label="Community Tech Lab, home">
+          {/* align="optical" so the caret's left edge lands on the same column
+              as the h1 below it, rather than the lockup file's empty margin. */}
           <Logo
             variant={dark ? "horizontal-dark" : "horizontal-light"}
             height={56}
+            align="optical"
             priority
           />
         </Link>

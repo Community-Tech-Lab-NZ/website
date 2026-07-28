@@ -193,7 +193,7 @@ export default function HomePage() {
         <CalloutBanner
           bare
           eyebrow="Applications open 15 to 31 August"
-          title="Apply now"
+          title="Ready when you are"
           note="Three solutions get built this round. Applying commits you to nothing."
           actionLabel="Apply now"
           actionHref="/apply"

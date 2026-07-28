@@ -118,7 +118,7 @@ export default function OrganisationsPage() {
         <CalloutBanner
           bare
           eyebrow="Applications open 15 to 31 August"
-          title="Apply now"
+          title="Bring us a real problem"
           note="Applying commits you to nothing, and we reply to everyone."
           actionLabel="Apply now"
           actionHref="/apply"

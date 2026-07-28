@@ -39,16 +39,28 @@ export const FOOTER_COLUMNS: FooterColumn[] = [
     ],
   },
   {
-    // No hrefs: partner sites were not supplied, and all six are listed at
-    // strictly equal weight.
+    /* All six are listed at strictly equal weight, in the order the handoff
+     * gives them. An absolute href opens in a new tab; see SiteFooter.
+     *
+     * Queenstown Coders Connect has no href because it has no website. It is
+     * real and active — Queenstown's tourism board lists it alongside FLINT and
+     * the Chamber — but it runs through events and word of mouth rather than a
+     * site of its own. The only codersconnect domain on the web belongs to an
+     * unrelated recruitment agency in the UK, so linking anything here would be
+     * worse than linking nothing.
+     *
+     * FLINT is a TUANZ programme and the Queenstown chapter has no separate
+     * page, so the link goes to FLINT itself rather than a chapter URL that
+     * does not exist.
+     */
     title: "Partners",
     links: [
-      { label: "Startup Queenstown Lakes" },
+      { label: "Startup Queenstown Lakes", href: "https://www.startupqueenstownlakes.com" },
       { label: "Queenstown Coders Connect" },
-      { label: "FLINT Queenstown" },
-      { label: "Queenstown Resort College" },
-      { label: "huddl" },
-      { label: "Technology Queenstown" },
+      { label: "FLINT Queenstown", href: "https://tuanz.org.nz/about-flint/" },
+      { label: "Queenstown Resort College", href: "https://www.qrc.ac.nz" },
+      { label: "huddl", href: "https://huddl.nz" },
+      { label: "Technology Queenstown", href: "https://www.technologyqueenstown.com" },
     ],
   },
 ];

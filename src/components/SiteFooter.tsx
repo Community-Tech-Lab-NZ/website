@@ -32,22 +32,43 @@ export function SiteFooter() {
               <div key={col.title}>
                 <Eyebrow inverse>{col.title}</Eyebrow>
                 <ul className="m-0 mt-4 grid list-none gap-3 p-0">
-                  {col.links.map((link) => (
-                    <li key={link.label}>
-                      {link.href ? (
-                        <Link
-                          href={link.href}
-                          className="font-sans text-body-sm text-body-inverse no-underline hover:text-kowhai"
-                        >
-                          {link.label}
-                        </Link>
-                      ) : (
-                        <span className="font-sans text-body-sm text-body-inverse">
-                          {link.label}
-                        </span>
-                      )}
-                    </li>
-                  ))}
+                  {col.links.map((link) => {
+                    const style =
+                      "font-sans text-body-sm text-body-inverse no-underline hover:text-kowhai";
+
+                    /* Partner sites are absolute URLs and open in a new tab, so
+                       a half-finished application is never navigated away from.
+                       Plain <a>: next/link has nothing to prefetch off-site. */
+                    if (link.href?.startsWith("http")) {
+                      return (
+                        <li key={link.label}>
+                          <a
+                            href={link.href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={style}
+                          >
+                            {link.label}
+                            <span className="sr-only"> (opens in a new tab)</span>
+                          </a>
+                        </li>
+                      );
+                    }
+
+                    return (
+                      <li key={link.label}>
+                        {link.href ? (
+                          <Link href={link.href} className={style}>
+                            {link.label}
+                          </Link>
+                        ) : (
+                          <span className="font-sans text-body-sm text-body-inverse">
+                            {link.label}
+                          </span>
+                        )}
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
             ))}

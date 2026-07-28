@@ -27,10 +27,12 @@
   --rule-angled-inner: 48px;
   --rule-angled-overshoot: 104%;
 
-  /* SiteHeader minimum height and the horizontal lockup size within it. */
+  /* SiteHeader minimum height and the horizontal lockup size within it.
+     The header's logo offset is not a token: it depends on whitespace inside
+     the lockup file and so has to scale with the rendered height. Logo.tsx
+     computes it from the artboard geometry via align="optical". */
   --header-height: 96px;
   --header-lockup: 56px;
-  --header-logo-bleed: -8px;
   --footer-lockup: 150px;
   --footer-logo-bleed: -14px;
 
@@ -70,8 +72,9 @@
   --partner-cell-min: 84px;
   --partner-slot-w: 132px;
   --partner-slot-h: 44px;
-  --funder-slot-w: 132px;
-  --funder-slot-h: 64px;
+  /* Funder credit. The supplied Economic Futures / QLDC lockup is 885x159, so
+     the rendered height drives the width and only the height is a token. */
+  --funder-logo-h: 40px;
 
   /* CalloutBanner text column, narrower than the standard reading measure so
      the band keeps its title and action on one line at desktop widths. */

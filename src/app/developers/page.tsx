@@ -162,7 +162,7 @@ export default function DevelopersPage() {
         <CalloutBanner
           bare
           eyebrow="Applications open 15 to 31 August"
-          title="Apply now"
+          title="Six paid seats this round"
           note="Tell us which seat fits and what you have shipped before."
           actionLabel="Apply now"
           actionHref="/apply"

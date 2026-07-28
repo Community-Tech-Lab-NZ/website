@@ -189,7 +189,7 @@ export default function AboutPage() {
         <CalloutBanner
           bare
           eyebrow="Applications open 15 to 31 August"
-          title="Apply now"
+          title="Find your way in"
           note="Open to community organisations and to developers based in the district."
           actionLabel="Apply now"
           actionHref="/apply"

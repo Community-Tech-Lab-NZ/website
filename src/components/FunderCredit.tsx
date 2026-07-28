@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { clsx } from "clsx";
 import { Eyebrow } from "./Typography";
 
@@ -7,13 +8,21 @@ import { Eyebrow } from "./Typography";
  * the programme, so this is mandatory rather than decorative.
  *
  * Economic Futures is the team; the Economic Diversification Fund is the money.
- * Funder credits name the funding instrument, so the text carries the fund and
- * the logo slot carries whichever mark QLDC approves — likely the Economic
- * Futures one. Confirm their required wording when requesting logo approval,
- * because a funder's own wording overrides ours.
+ * The supplied mark is a combined Economic Futures / QLDC lockup, so the logo
+ * carries both organisations and the text carries the fund.
  *
- * Their logo needs written approval before use. This renders an empty slot
- * rather than a mark pulled from the web.
+ * THE WHITE PLATE IS DELIBERATE, and it is the one place on this site where a
+ * palette other than the brand's four colours appears. The lockup is purple and
+ * navy on white, a funder's mark may not be recoloured or reversed, and both
+ * colours are illegible on Ink. A light plate is the standard treatment and the
+ * only one that shows the mark as supplied.
+ *
+ * On the Oat surfaces it is not an exception at all: --surface-card is white, so
+ * the plate reads as an ordinary card there.
+ *
+ * next/image rather than the plain <img> that Logo uses. That comment explains
+ * itself: the lockups are SVG and have nothing to optimise. This is a 23KB
+ * JPEG, which does.
  */
 
 type FunderCreditProps = {
@@ -22,22 +31,17 @@ type FunderCreditProps = {
   className?: string;
 };
 
-export function FunderCredit({
-  inverse = false,
-  note = "Logo pending written approval",
-  className,
-}: FunderCreditProps) {
+export function FunderCredit({ inverse = false, note = null, className }: FunderCreditProps) {
   return (
     <div className={clsx("flex items-center gap-5", className)}>
-      <div
-        aria-hidden="true"
-        className={clsx(
-          "flex h-[var(--funder-slot-h)] w-[var(--funder-slot-w)] shrink-0 items-center justify-center border border-dashed p-2 text-center",
-          "font-meta text-[length:var(--slot-label-size)] uppercase tracking-[var(--slot-label-tracking)]",
-          inverse ? "border-hairline-inverse text-muted-inverse" : "border-hairline text-muted",
-        )}
-      >
-        QLDC logo slot
+      <div className="flex shrink-0 items-center justify-center rounded-card bg-white p-3">
+        <Image
+          src="/logos/economic_futures_logo.jpg"
+          alt="Economic Futures, Queenstown Lakes District Council"
+          width={885}
+          height={159}
+          className="block h-[var(--funder-logo-h)] w-auto"
+        />
       </div>
 
       <div>

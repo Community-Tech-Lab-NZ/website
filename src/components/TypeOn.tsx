@@ -11,6 +11,13 @@ import { clsx } from "clsx";
  * unhurried rest is most of each cycle, so the page reads as calm with a
  * heartbeat rather than busy.
  *
+ * The cadence is deliberately not constant. Typing carries a fixed jitter
+ * pattern (not Math.random: the same text always types the same way), pauses
+ * to settle after each word, and leans on the first keystroke of a cycle.
+ * Deleting is a held backspace key: the first few characters go slowly, then
+ * the repeat rate kicks in and accelerates. Constant-rate typing is what
+ * makes a fake typewriter feel fake.
+ *
  * Three layers, each doing one job:
  *   - an sr-only span with the full text: what screen readers and crawlers
  *     get, immediately and stably, while the visual text churns
@@ -34,12 +41,27 @@ type TypeOnProps = {
 };
 
 const REST_MS = 6500;
-const DELETE_SPEED = 20;
 const EMPTY_PAUSE_MS = 500;
+
+/* Per-character rhythm, cycled by position. Averages ~1. */
+const JITTER = [1, 0.8, 1.25, 0.9, 1.1, 0.7, 1.3, 0.85, 1.05, 0.95];
+
+/** Delay before typing the character at `index`. */
+function typeDelay(index: number, text: string, base: number) {
+  if (index === 0) return 350; // finding the first key
+  let d = base * JITTER[index % JITTER.length];
+  if (text[index - 1] === " ") d += 140; // settling into the next word
+  return d;
+}
+
+/** Held backspace: slow singles, then the key repeat takes over. */
+function deleteDelay(removed: number) {
+  return removed < 3 ? 130 : Math.max(24, 110 - removed * 12);
+}
 
 type Phase = "typing" | "resting" | "deleting";
 
-export function TypeOn({ text, speed = 34, loop = false, className }: TypeOnProps) {
+export function TypeOn({ text, speed = 52, loop = false, className }: TypeOnProps) {
   // -1 means "show everything": server render, reduced motion, or pre-effect.
   const [count, setCount] = useState(-1);
   const [phase, setPhase] = useState<Phase>("typing");
@@ -61,7 +83,7 @@ export function TypeOn({ text, speed = 34, loop = false, className }: TypeOnProp
       c += 1;
       setCount(c);
       if (c < text.length) {
-        schedule(type, speed);
+        schedule(type, typeDelay(c, text, speed));
       } else if (loop) {
         setPhase("resting");
         schedule(startDelete, REST_MS);
@@ -75,14 +97,14 @@ export function TypeOn({ text, speed = 34, loop = false, className }: TypeOnProp
       c -= 1;
       setCount(c);
       if (c > 0) {
-        schedule(erase, DELETE_SPEED);
+        schedule(erase, deleteDelay(text.length - c));
       } else {
         setPhase("typing");
         schedule(type, EMPTY_PAUSE_MS);
       }
     };
 
-    schedule(type, speed);
+    schedule(type, typeDelay(0, text, speed));
     return () => clearTimeout(timer);
   }, [text, speed, loop]);
 

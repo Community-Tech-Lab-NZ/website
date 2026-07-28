@@ -88,9 +88,9 @@ export default function DevelopersPage() {
           </Lede>
 
           <div className="mt-8 grid grid-cols-[repeat(auto-fit,minmax(var(--hero-stat-min),max-content))] gap-8">
-            <StatFigure inverse labelSize="md" figure="6" label="Paid seats" />
-            <StatFigure inverse labelSize="md" figure="3" label="Build teams" />
-            <StatFigure inverse labelSize="md" figure="~12 hrs" label="Per week, approximate" />
+            <StatFigure inverse knock labelSize="md" figure="6" label="Paid seats" />
+            <StatFigure inverse knock labelSize="md" figure="3" label="Build teams" />
+            <StatFigure inverse knock labelSize="md" figure="~12 hrs" label="Per week, approximate" />
           </div>
 
           <div className="mt-7">

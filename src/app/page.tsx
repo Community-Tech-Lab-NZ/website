@@ -84,6 +84,7 @@ export default function HomePage() {
                 align="row"
                 labelSize="md"
                 wipe
+                knock
                 figure={stat.figure}
                 label={stat.label}
               />

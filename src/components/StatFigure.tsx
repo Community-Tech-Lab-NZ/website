@@ -33,6 +33,9 @@ type StatFigureProps = {
    * banned counter: the figure itself never changes. Only makes sense on Ink.
    */
   wipe?: boolean;
+  /** Brushing the pointer past the stat knocks the figure like a vase: it
+   *  tips on its base and wobbles back to rest. */
+  knock?: boolean;
   className?: string;
 };
 
@@ -44,15 +47,19 @@ export function StatFigure({
   labelSize = "sm",
   align = "flow",
   wipe = false,
+  knock = false,
   className,
 }: StatFigureProps) {
   const row = align === "row";
 
   return (
-    <div className={clsx(row && "row-span-2 grid grid-rows-subgrid", className)}>
+    <div
+      className={clsx(row && "row-span-2 grid grid-rows-subgrid", knock && "ctl-knock-zone", className)}
+    >
       <div
         className={clsx(
           wipe && "ctl-wipe",
+          knock && "ctl-knock",
           "font-heading text-headline font-black leading-none",
           accent
             ? inverse

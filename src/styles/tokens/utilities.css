@@ -108,6 +108,21 @@
 }
 .ctl-lockup:hover .ctl-lockup-block{animation:ctl-cursor-breathe 2.2s var(--ease-standard) infinite}
 
+/* Brushed like a vase (override 4 family): passing the pointer over a hero
+   stat knocks the figure — it tips on its own base and wobbles back to rest
+   through a damped swing. One knock per brush; pivots at the bottom edge,
+   which is what sells "sitting on a shelf". */
+@keyframes ctl-knock{
+  0%{transform:rotate(0)}
+  18%{transform:rotate(2.4deg)}
+  42%{transform:rotate(-1.6deg)}
+  64%{transform:rotate(0.8deg)}
+  82%{transform:rotate(-0.35deg)}
+  100%{transform:rotate(0)}
+}
+.ctl-knock{transform-origin:50% 100%}
+.ctl-knock-zone:hover .ctl-knock{animation:ctl-knock 900ms var(--ease-standard) 1}
+
 /* Hover lift and grow (override 4). Transform-only so nothing reflows. */
 .ctl-lift{transition:transform var(--duration-fast) var(--ease-standard)}
 .ctl-lift:hover{transform:translateY(-2px)}
@@ -123,11 +138,23 @@
 .ctl-wipe::after{content:"";position:absolute;inset:0;background:var(--ctl-oat);transform:scaleX(1);transform-origin:right center;transition:transform var(--duration-entry) var(--ease-out-soft);transition-delay:calc(var(--rise-delay,0ms) + 260ms)}
 .is-in .ctl-wipe::after,.ctl-wipe.is-in::after{transform:scaleX(0)}
 
-/* Gold highlight sweep: the static .ctl-underline-gold, drawn in from the
-   left when the section enters. Same gold, same thickness, same one-gold-
-   thing-per-viewport discipline as the static version. */
-.ctl-sweep-gold{background-image:linear-gradient(rgba(240,168,30,.55),rgba(240,168,30,.55));background-repeat:no-repeat;background-position:0 82%;background-size:0% .28em;transition:background-size var(--duration-entry) var(--ease-out-soft);transition-delay:200ms}
-.is-in .ctl-sweep-gold{background-size:100% .28em}
+/* Gold highlight sweep, looping at the owner's direction: draws in from the
+   left over ~1s, holds for ~4s, wipes away left to right, rests, redraws.
+   The anchor swaps from left to right edge at the 55/56% keyframes — at full
+   width the jump is invisible, and the right anchor is what makes the erase
+   retreat the same direction the draw advanced, like a highlighter re-swiped.
+   Starts only once the section has entered (.is-in), and one per viewport —
+   the one-gold-thing rule counts a moving highlight double. */
+@keyframes ctl-sweep-cycle{
+  0%{background-position:0 82%;background-size:0% .28em}
+  12%{background-position:0 82%;background-size:100% .28em}
+  55%{background-position:0 82%;background-size:100% .28em}
+  56%{background-position:100% 82%;background-size:100% .28em}
+  68%{background-position:100% 82%;background-size:0% .28em}
+  100%{background-position:100% 82%;background-size:0% .28em}
+}
+.ctl-sweep-gold{background-image:linear-gradient(rgba(240,168,30,.55),rgba(240,168,30,.55));background-repeat:no-repeat;background-position:0 82%;background-size:0% .28em}
+.is-in .ctl-sweep-gold{animation:ctl-sweep-cycle 9s var(--ease-standard) infinite}
 
 /* Hero caret drift (override 3): faint carets rising on the Ink hero. Each
    span is a rotated square with two visible borders, the same construction as
@@ -172,8 +199,9 @@
   .ctl-motion-only{display:none}
   .ctl-still-only{display:inline}
   .ctl-lift:hover,.ctl-grow:hover{transform:none}
+  .ctl-knock-zone:hover .ctl-knock{animation:none}
   .ctl-wipe::after{display:none}
-  .ctl-sweep-gold{transition:none;background-size:100% .28em}
+  .ctl-sweep-gold,.is-in .ctl-sweep-gold{animation:none;transition:none;background-size:100% .28em}
   .ctl-drift-layer{display:none}
   .ctl-node-fade{transition-delay:0s}
 }

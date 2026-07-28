@@ -88,8 +88,9 @@
   /* Right-hand block of the footer's bottom bar. */
   --footer-note-max: 420px;
   /* Funder credit. The supplied Economic Futures / QLDC lockup is 885x159, so
-     the rendered height drives the width and only the height is a token. */
-  --funder-logo-h: 40px;
+     the rendered height drives the width and only the height is a token.
+     48px matches the partner wall logos. */
+  --funder-logo-h: 48px;
 
   /* CalloutBanner text column, narrower than the standard reading measure so
      the band keeps its title and action on one line at desktop widths. */

@@ -65,7 +65,7 @@ export default function HomePage() {
           </Reveal>
 
           <Reveal delay={550} className="mt-7">
-            <Button variant="primary" size="hero" href="/apply">
+            <Button variant="primary" size="hero" href="/apply" className="ctl-cta-ping">
               Apply now
             </Button>
           </Reveal>

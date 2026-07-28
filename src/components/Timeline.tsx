@@ -31,7 +31,7 @@ export function Timeline({ steps, inverse = false, className }: TimelineProps) {
   const ref = useRiseOnScroll<HTMLOListElement>();
 
   return (
-    <ol ref={ref} className={clsx("m-0 list-none p-0", className)}>
+    <ol ref={ref} className={clsx("ctl-focus-list m-0 list-none p-0", className)}>
       {steps.map((step, i) => {
         const last = i === steps.length - 1;
 

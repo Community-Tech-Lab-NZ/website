@@ -42,6 +42,9 @@ type AnimatedLockupProps = {
   size?: string;
   /** SMIL begin offset for the blink, to de-phase multiple lockups. */
   blinkOffset?: string;
+  /** Mark only: the big house-caret and its block, no wordmark. The footer
+   *  wears this large — the owner missed the old primary lockup's caret. */
+  mark?: boolean;
   className?: string;
 };
 
@@ -49,6 +52,7 @@ export function AnimatedLockup({
   dark = false,
   size,
   blinkOffset,
+  mark = false,
   className,
 }: AnimatedLockupProps) {
   const ink = dark ? "var(--ctl-kowhai)" : "var(--ctl-ink)";
@@ -63,31 +67,9 @@ export function AnimatedLockup({
     INK_LEFT.horizontal / 140
   ).toFixed(4)}))`;
 
-  return (
-    <span
-      className={clsx("ctl-lockup block", className)}
-      style={{
-        padding: "var(--lockup-pad)",
-        marginLeft: opticalShift,
-        ...(size ? ({ "--header-lockup": size } as React.CSSProperties) : null),
-      }}
-    >
-      <svg
-        aria-hidden="true"
-        viewBox="0 0 520 140"
-        className="block w-auto"
-        style={{ height: "var(--header-lockup)" }}
-      >
-        <image
-          href={`/logos/wordmark-horizontal-${dark ? "dark" : "light"}.svg`}
-          x={0}
-          y={0}
-          width={520}
-          height={140}
-        />
-        {/* Same geometry as the lockup files: nested 90px caret at (30,25). */}
-        <g transform="translate(30,25) scale(0.9)">
-          <polyline
+  const caretAndBlock = (
+    <>
+      <polyline
             className="ctl-motion-only"
             points="20,62 50,30 80,62"
             fill="none"
@@ -116,8 +98,55 @@ export function AnimatedLockup({
             strokeLinecap="round"
             strokeLinejoin="round"
           />
-          <rect className="ctl-lockup-block" x={44} y={76} width={12} height={10} fill={ink} />
-        </g>
+      <rect className="ctl-lockup-block" x={44} y={76} width={12} height={10} fill={ink} />
+    </>
+  );
+
+  if (mark) {
+    return (
+      <span
+        className={clsx("ctl-lockup block", className)}
+        style={{
+          padding: "var(--lockup-pad)",
+          ...(size ? ({ "--header-lockup": size } as React.CSSProperties) : null),
+        }}
+      >
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 100 100"
+          className="block w-auto"
+          style={{ height: "var(--header-lockup)" }}
+        >
+          {caretAndBlock}
+        </svg>
+      </span>
+    );
+  }
+
+  return (
+    <span
+      className={clsx("ctl-lockup block", className)}
+      style={{
+        padding: "var(--lockup-pad)",
+        marginLeft: opticalShift,
+        ...(size ? ({ "--header-lockup": size } as React.CSSProperties) : null),
+      }}
+    >
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 520 140"
+        className="block w-auto"
+        style={{ height: "var(--header-lockup)" }}
+      >
+        <image
+          href={`/logos/wordmark-horizontal-${dark ? "dark" : "light"}.svg`}
+          x={0}
+          y={0}
+          width={520}
+          height={140}
+        />
+        {/* Same geometry as the lockup files: nested 90px caret at (30,25). */}
+        <g transform="translate(30,25) scale(0.9)">{caretAndBlock}</g>
       </svg>
     </span>
   );

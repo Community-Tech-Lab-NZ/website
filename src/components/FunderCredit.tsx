@@ -25,6 +25,10 @@ import { Eyebrow } from "./Typography";
  * JPEG, which does.
  */
 
+/* The fund's page on the council site, verified live 28 July 2026. */
+const FUND_URL =
+  "https://www.qldc.govt.nz/community/community-funding/economic-diversification-fund/";
+
 type FunderCreditProps = {
   inverse?: boolean;
   note?: string | null;
@@ -37,7 +41,15 @@ export function FunderCredit({ inverse = false, note = null, className }: Funder
   // into horizontal scroll.
   return (
     <div className={clsx("flex flex-wrap items-center gap-5", className)}>
-      <div className="flex shrink-0 items-center justify-center rounded-card bg-white p-3">
+      {/* Plate and fund name both link to the fund's page on qldc.govt.nz,
+          and the plate grows on hover like the partner logos — same promise,
+          same behaviour. */}
+      <a
+        href={FUND_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="ctl-grow flex shrink-0 items-center justify-center rounded-card bg-white p-3 no-underline"
+      >
         <Image
           src="/logos/economic_futures_logo.jpg"
           alt="Economic Futures, Queenstown Lakes District Council"
@@ -45,18 +57,24 @@ export function FunderCredit({ inverse = false, note = null, className }: Funder
           height={159}
           className="block h-[var(--funder-logo-h)] w-auto"
         />
-      </div>
+        <span className="sr-only"> QLDC Economic Diversification Fund (opens in a new tab)</span>
+      </a>
 
       <div>
         <Eyebrow inverse={inverse}>Funded by</Eyebrow>
-        <div
+        <a
+          href={FUND_URL}
+          target="_blank"
+          rel="noopener noreferrer"
           className={clsx(
-            "mt-2 font-heading text-body-md font-bold",
+            "mt-2 block font-heading text-body-md font-bold no-underline",
+            "underline decoration-transparent transition-[text-decoration-color] duration-[var(--duration-fast)] ease-brand hover:decoration-current",
             inverse ? "text-heading-inverse" : "text-heading",
           )}
         >
           QLDC Economic Diversification Fund
-        </div>
+          <span className="sr-only"> (opens in a new tab)</span>
+        </a>
         {note ? (
           <div
             className={clsx(

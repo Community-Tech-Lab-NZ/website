@@ -102,30 +102,36 @@ export function PartnerRow({
             )}
           >
             {partner.logo ? (
-              partner.chip ? (
-                <span
-                  className="ctl-grow flex items-center justify-center rounded-card px-4 py-2"
-                  style={{ background: partner.chip }}
-                >
+              /* The logo is the same link as the name below it — a logo that
+                 grows on hover and then does nothing when clicked would be a
+                 broken promise. The img alt names the link; the sr-only span
+                 flags the new tab. */
+              <LinkedLogo name={partner.name}>
+                {partner.chip ? (
+                  <span
+                    className="ctl-grow flex items-center justify-center rounded-card px-4 py-2"
+                    style={{ background: partner.chip }}
+                  >
+                    <img
+                      src={partner.logo}
+                      alt={partner.name}
+                      width={partner.w}
+                      height={partner.h}
+                      loading="lazy"
+                      className="block h-[var(--partner-chip-logo-h)] w-auto max-w-[var(--partner-logo-max-w)] object-contain"
+                    />
+                  </span>
+                ) : (
                   <img
                     src={partner.logo}
                     alt={partner.name}
                     width={partner.w}
                     height={partner.h}
                     loading="lazy"
-                    className="block h-[var(--partner-chip-logo-h)] w-auto max-w-[var(--partner-logo-max-w)] object-contain"
+                    className="ctl-grow block h-[var(--partner-logo-h)] w-auto max-w-[var(--partner-logo-max-w)] object-contain"
                   />
-                </span>
-              ) : (
-                <img
-                  src={partner.logo}
-                  alt={partner.name}
-                  width={partner.w}
-                  height={partner.h}
-                  loading="lazy"
-                  className="ctl-grow block h-[var(--partner-logo-h)] w-auto max-w-[var(--partner-logo-max-w)] object-contain"
-                />
-              )
+                )}
+              </LinkedLogo>
             ) : (
               <span
                 aria-hidden="true"
@@ -160,5 +166,19 @@ export function PartnerRow({
         ))}
       </div>
     </div>
+  );
+}
+
+/* Wraps a partner logo in its site link where one exists; renders the logo
+   bare where it does not (no partner currently has a logo without a site,
+   but the data allows it). */
+function LinkedLogo({ name, children }: { name: string; children: React.ReactNode }) {
+  const href = PARTNER_URLS[name];
+  if (!href) return <>{children}</>;
+  return (
+    <a href={href} target="_blank" rel="noopener noreferrer" className="no-underline">
+      {children}
+      <span className="sr-only">{name} (opens in a new tab)</span>
+    </a>
   );
 }

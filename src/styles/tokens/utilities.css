@@ -125,14 +125,21 @@
   82%{transform:rotate(-0.35deg)}
   100%{transform:rotate(0)}
 }
-.ctl-knock{transform-origin:50% 100%}
+.ctl-knock{transform-origin:50% 100%;will-change:transform}
+/* will-change keeps the element on its own compositing layer at rest, not
+   just during the wobble. Without it the browser promotes the layer when the
+   animation starts and drops it when it ends, and the text re-rasterises on
+   each switch — a one-pixel shimmer exactly as the wobble freezes. Constant
+   promotion means constant rasterisation: no blip either side. */
 .ctl-knock.is-knocked{animation:ctl-knock 900ms var(--ease-standard) 1}
 
-/* Hover lift and grow (override 4). Transform-only so nothing reflows. */
-.ctl-lift{transition:transform var(--duration-fast) var(--ease-standard)}
-.ctl-lift:hover{transform:translateY(-2px)}
-.ctl-grow{transition:transform var(--duration-fast) var(--ease-standard)}
-.ctl-grow:hover{transform:scale(1.03)}
+/* Hover lift and grow (override 4). Transform-only so nothing reflows.
+   On --duration-hover, not --duration-fast: growth should stretch, not
+   twitch. */
+.ctl-lift{transition:transform var(--duration-hover) var(--ease-out-soft)}
+.ctl-lift:hover{transform:translateY(-3px)}
+.ctl-grow{transition:transform var(--duration-hover) var(--ease-out-soft)}
+.ctl-grow:hover{transform:scale(1.06)}
 
 /* Stat reveal wipe: an Oat block over the figure slides away to the right,
    reading as a selection un-highlighting. Deliberately NOT a counter; the
@@ -205,11 +212,34 @@
   .ctl-still-only{display:inline}
   .ctl-lift:hover,.ctl-grow:hover{transform:none}
   .ctl-knock.is-knocked{animation:none}
+  .ctl-cta-ping::after{animation:none}
+  .ctl-focus-list:hover>li{opacity:1;transform:none}
   .ctl-wipe::after{display:none}
   .ctl-sweep-gold,.is-in .ctl-sweep-gold{animation:none;transition:none;background-size:100% .28em}
   .ctl-drift-layer{display:none}
   .ctl-node-fade{transition-delay:0s}
 }
+
+/* The hero CTA's radar ping: the detached Kowhai ring the button already
+   wears expands and fades from its resting position every 5.5 seconds. The
+   common attention patterns are sheens, heartbeat scaling and periodic
+   wiggles; the ping wins here because it animates an affordance the brand
+   already owns instead of adding a new one, and it asks for the eye without
+   begging. The ::after starts coincident with the static ring (outline width
+   plus its 6px offset puts that edge at -8px). */
+@keyframes ctl-ping{
+  0%{opacity:.9;transform:scale(1)}
+  16%{opacity:0;transform:scale(1.12)}
+  100%{opacity:0}
+}
+.ctl-cta-ping{position:relative}
+.ctl-cta-ping::after{content:"";position:absolute;inset:-8px;border:var(--border-rule) solid var(--ctl-kowhai);border-radius:calc(var(--radius-card) + 8px);opacity:0;pointer-events:none;animation:ctl-ping 5.5s var(--ease-standard) 2s infinite}
+
+/* Focus list (the timelines): hovering one entry lifts it slightly and pales
+   the rest, so the row under the pointer reads as the one in focus. */
+.ctl-focus-list>li{transition:opacity var(--duration-hover) var(--ease-out-soft),transform var(--duration-hover) var(--ease-out-soft);transform-origin:left center}
+.ctl-focus-list:hover>li{opacity:.45}
+.ctl-focus-list:hover>li:hover{opacity:1;transform:scale(1.05)}
 
 /* Sliding tab underline (useTabIndicator). The per-item border classes stay
    in the markup as the no-JS fallback; ctl-tabs-live is added by the hook and

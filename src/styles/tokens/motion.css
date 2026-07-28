@@ -5,6 +5,10 @@
   --duration-fast:120ms; /* @kind other */
   --duration-base:220ms; /* @kind other */
   --duration-entry:420ms; /* @kind other */
+  /* Hover growth and lift. Deliberately slower than --duration-fast: a size
+     change at 120ms reads as a twitch; at 300ms with the soft ease it reads
+     as a stretch. Colour steps stay on --duration-fast. */
+  --duration-hover:300ms;
   --rise-distance:12px;
 }
 @media (prefers-reduced-motion:reduce){
@@ -12,6 +16,7 @@
     --duration-fast:0ms; /* @kind other */
     --duration-base:0ms; /* @kind other */
     --duration-entry:0ms; /* @kind other */
+    --duration-hover:0ms;
     --rise-distance:0px;
   }
 

@@ -12,10 +12,11 @@ import { knockEnd, knockEnter } from "@/lib/knock";
  * paragraph. Heading uses font-heading; Lede and Body use font-sans; Eyebrow uses
  * font-meta. There is no prop to cross those over.
  *
- * Every Heading carries the vase-knock (owner request): brush the pointer past
- * any header and it tips on its base and wobbles back to rest, finishing its
- * swing whether or not the pointer stays. Transform only, so nothing reflows,
- * and stilled under reduced motion with everything else.
+ * Every Heading and Eyebrow carries the vase-knock (owner request): brush the
+ * pointer past any header, or the small caps line above one, and it tips on
+ * its base and wobbles back to rest, finishing its swing whether or not the
+ * pointer stays. Transform only, so nothing reflows, and stilled under
+ * reduced motion with everything else.
  */
 
 type HeadingProps = {
@@ -123,8 +124,10 @@ export function Eyebrow({
 }: EyebrowProps) {
   return (
     <Tag
+      onMouseEnter={knockEnter}
+      onAnimationEnd={knockEnd}
       className={clsx(
-        "font-meta text-label font-normal uppercase",
+        "ctl-knock font-meta text-label font-normal uppercase",
         inverse ? "text-muted-inverse" : "text-muted",
         className,
       )}

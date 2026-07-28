@@ -32,16 +32,16 @@ export function SiteFooter() {
             deliberate gap rather than three accidental ones. */}
         <div className="grid grid-cols-1 items-start gap-8 md:grid-cols-[auto_1fr]">
           <div>
-            {/* The same living lockup as the header, sized for the footer:
-                the clamp keeps its ~3.7:1 width inside small phones and caps
-                it at 96px tall on desktop. The 4s blink offset keeps it out
-                of phase with the header's eye. Links home, like the header. */}
+            {/* The big house — the caret from the old primary lockup the
+                owner missed — now alive: the same blinking eye and breathing
+                block as the header, without the wordmark. Out of phase with
+                the header's blink, and linking home like it always did. */}
             <Link
               href="/"
               className="inline-block no-underline"
               aria-label="Community Tech Lab, home"
             >
-              <AnimatedLockup dark size="clamp(60px, 17vw, 96px)" blinkOffset="4s" />
+              <AnimatedLockup dark mark size="clamp(140px, 32vw, 200px)" blinkOffset="4s" />
             </Link>
           </div>
 

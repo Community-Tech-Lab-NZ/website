@@ -10,7 +10,7 @@ import { FileUpload } from "./FileUpload";
 import { Input } from "./Input";
 import { Select } from "./Select";
 import { Textarea } from "./Textarea";
-import { DEVELOPER_HOURS, DEVELOPER_SEATS } from "@/lib/form-options";
+import { DEVELOPER_HOURS, DEVELOPER_SEATS, EMAIL_PATTERN } from "@/lib/form-options";
 
 /* The developer application. A few minutes, single page.
  *
@@ -45,6 +45,26 @@ export function DeveloperForm({ canSubmit }: { canSubmit: boolean }) {
   const issueFor = (field: string) => issues.find((i) => i.field === field)?.message;
 
   async function submit() {
+    /* Client-side pass before anything is sent. Same messages as the server
+       schema, so a local hint and a server rejection never disagree; the
+       server still validates everything again. */
+    const found: Issue[] = [
+      ...(seat ? [] : [{ field: "seat", message: "Tell us which seat fits." }]),
+      ...(shipped.trim()
+        ? []
+        : [{ field: "shipped", message: "Point us at something you have shipped." }]),
+      ...(name.trim() ? [] : [{ field: "name", message: "This one is required." }]),
+      ...(!email.trim()
+        ? [{ field: "email", message: "We need an email address to reply to." }]
+        : !EMAIL_PATTERN.test(email.trim())
+          ? [{ field: "email", message: "That does not look like an email address." }]
+          : []),
+    ];
+    if (found.length) {
+      setIssues(found);
+      return;
+    }
+
     setSending(true);
     setIssues([]);
     setFormError("");

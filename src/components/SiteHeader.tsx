@@ -88,7 +88,7 @@ export function SiteHeader({
               as the h1 below it, rather than the lockup file's empty margin. */}
           <Logo
             variant={dark ? "horizontal-dark" : "horizontal-light"}
-            height={56}
+            height={68}
             align="optical"
             priority
           />

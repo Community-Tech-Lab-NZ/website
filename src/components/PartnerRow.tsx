@@ -9,24 +9,24 @@ import { Eyebrow } from "./Typography";
  * the handoff is explicit that this may be stated in text but must never be
  * shown as a bigger logo.
  *
- * THE PLATES ARE INK, and that is forced by the files rather than chosen. The
- * marks supplied are a mix of variants:
+ * EACH MARK SITS ON THE GROUND IT WAS DESIGNED FOR, checked against how the
+ * partners present themselves on their own sites. An earlier pass put every
+ * logo on an identical Ink plate, which read as six dark rectangles floating in
+ * light cells and forced the wrong ground onto half the marks:
  *
- *   Startup Queenstown Lakes  lime on transparent    needs a dark background
- *   huddl                     white on transparent   needs a dark background
- *   FLINT Queenstown          light blue disc        carries its own background
- *   Queenstown Resort College red tile               carries its own background
- *   Technology Queenstown     navy on transparent    needs a LIGHT background
+ *   FLINT           light blue disc, self-contained     direct on the cell
+ *   QRC             red tile, self-contained            direct on the cell
+ *   Technology Q    navy, designed for light            direct on the cell
+ *   Startup QL      lime reversed mark (their site      fitted Ink chip
+ *                   shows it on dark)
+ *   huddl           white one-colour version of a       fitted Ink chip
+ *                   teal-on-white brand
  *
- * No single plate colour suits all five. Ink suits four of them; white would
- * suit three and would render the two reversed marks invisible. So Ink, and
- * Technology Queenstown keeps a placeholder until a reversed version of their
- * mark arrives — navy on Ink would read as a rendering fault rather than as a
- * missing asset, which is worse than an honest empty slot.
+ * The chip hugs its logo rather than being a fixed plate, so it reads as a
+ * deliberate dark ground for a reversed mark, not as a mismatched box.
  *
  * Plain <img> rather than next/image: huddl's mark is an SVG, and next/image
  * refuses SVG unless dangerouslyAllowSVG is enabled for the whole project.
- * Enabling that to save a few KB across four small files is a bad trade.
  *
  * The prototype hard-coded three columns and drew cell borders with index maths
  * (i % 3, i < 3), which breaks the moment the grid reflows. This uses a 1px gap
@@ -41,6 +41,8 @@ type Partner = {
   /** Intrinsic pixel size, so the browser reserves the box and nothing shifts. */
   w?: number;
   h?: number;
+  /** Which ground the supplied mark needs. Defaults to light (direct on cell). */
+  ground?: "light" | "ink";
 };
 
 export const CTL_PARTNERS: readonly Partner[] = [
@@ -49,15 +51,14 @@ export const CTL_PARTNERS: readonly Partner[] = [
     logo: "/logos/startup_queenstown_lakes_logo.webp",
     w: 760,
     h: 300,
+    ground: "ink",
   },
   // No website and no logo file supplied.
   { name: "Queenstown Coders Connect" },
   { name: "FLINT Queenstown", logo: "/logos/flint_logo.png", w: 300, h: 300 },
   { name: "Queenstown Resort College", logo: "/logos/qrc_logo.png", w: 130, h: 130 },
-  { name: "huddl", logo: "/logos/huddl_logo.svg", w: 239, h: 100 },
-  // tq_logo.webp is on file but is the navy-on-transparent variant, which is
-  // illegible on Ink. Awaiting a reversed version.
-  { name: "Technology Queenstown" },
+  { name: "huddl", logo: "/logos/huddl_logo.svg", w: 239, h: 100, ground: "ink" },
+  { name: "Technology Queenstown", logo: "/logos/tq_logo.webp", w: 1500, h: 291 },
 ] as const;
 
 type PartnerRowProps = {
@@ -91,22 +92,33 @@ export function PartnerRow({
           <div
             key={partner.name}
             className={clsx(
-              "flex min-h-[var(--partner-cell-min)] flex-col items-center justify-center gap-4 px-4 py-5 text-center",
+              "flex min-h-[var(--partner-cell-min)] flex-col items-center justify-center gap-4 px-4 py-6 text-center",
               "font-heading text-body-sm font-bold leading-tight",
               inverse ? "bg-ink text-heading-inverse" : "bg-oat text-heading",
             )}
           >
             {partner.logo ? (
-              <span className="flex h-[var(--partner-slot-h)] w-full max-w-[var(--partner-slot-w)] items-center justify-center rounded-card bg-ink px-3 py-2">
+              partner.ground === "ink" ? (
+                <span className="flex items-center justify-center rounded-card bg-ink px-4 py-2">
+                  <img
+                    src={partner.logo}
+                    alt={partner.name}
+                    width={partner.w}
+                    height={partner.h}
+                    loading="lazy"
+                    className="block h-[var(--partner-chip-logo-h)] w-auto max-w-[var(--partner-logo-max-w)] object-contain"
+                  />
+                </span>
+              ) : (
                 <img
                   src={partner.logo}
                   alt={partner.name}
                   width={partner.w}
                   height={partner.h}
                   loading="lazy"
-                  className="max-h-full w-auto max-w-full object-contain"
+                  className="block h-[var(--partner-logo-h)] w-auto max-w-[var(--partner-logo-max-w)] object-contain"
                 />
-              </span>
+              )
             ) : (
               <span
                 aria-hidden="true"

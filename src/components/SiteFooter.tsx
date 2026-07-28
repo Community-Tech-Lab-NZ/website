@@ -20,7 +20,13 @@ export function SiteFooter() {
        the footer's 700. Same reasoning for the mt-6 gaps below. */
     <footer className="bg-ink py-6 text-body-inverse">
       <div className="mx-auto max-w-page px-gutter lg:px-gutter-lg">
-        <div className="grid grid-cols-1 items-start gap-8 md:grid-cols-[minmax(220px,1fr)_2fr]">
+        {/* auto column: the logo takes its own width and the links take the
+            rest. The old minmax(220px,1fr) column was nearly twice the logo's
+            width, which read as a hole in the middle of the footer. On md+ the
+            link columns hug their content and sit flush right, so the row is
+            logo hard left, links hard right, and the space between is one
+            deliberate gap rather than three accidental ones. */}
+        <div className="grid grid-cols-1 items-start gap-8 md:grid-cols-[auto_1fr]">
           <div>
             {/* crop, so height is the mark itself rather than the artboard.
                 44% of that file is empty margin, which is why the logo read as
@@ -30,7 +36,7 @@ export function SiteFooter() {
             <Logo variant="primary-dark" height={215} crop />
           </div>
 
-          <div className="grid grid-cols-[repeat(auto-fit,minmax(var(--footer-col-min),1fr))] gap-6">
+          <div className="grid grid-cols-[repeat(auto-fit,minmax(var(--footer-col-min),1fr))] gap-6 md:grid-cols-[repeat(3,max-content)] md:justify-end md:gap-x-12">
             {FOOTER_COLUMNS.map((col) => (
               <div key={col.title}>
                 <Eyebrow inverse>{col.title}</Eyebrow>
@@ -80,17 +86,22 @@ export function SiteFooter() {
           </div>
         </div>
 
-        <div className="mt-6">
-          <FunderCredit inverse />
-        </div>
-
         <hr className="mt-6 border-0 border-t border-solid border-hairline-inverse" />
 
-        <div className="mt-4 flex flex-wrap justify-between gap-4">
-          <p className="font-meta text-label uppercase text-muted-inverse">{FOOTER_NOTE}</p>
-          <p className="font-meta text-label uppercase text-muted-inverse">
-            {OPEN_SOURCE_NOTE}
-          </p>
+        {/* One bottom bar: funder credit left, meta notes right. The credit
+            used to float alone between the links and the rule, and the two
+            notes wrapped onto separate left-aligned lines below it — three
+            strays instead of one balanced row. The note block is capped so it
+            wraps to two right-aligned lines beside the credit rather than
+            forcing the row apart. */}
+        <div className="mt-5 flex flex-wrap items-center justify-between gap-6">
+          <FunderCredit inverse />
+          <div className="max-w-[var(--footer-note-max)] md:text-right">
+            <p className="font-meta text-label uppercase text-muted-inverse">{FOOTER_NOTE}</p>
+            <p className="mt-2 font-meta text-label uppercase text-muted-inverse">
+              {OPEN_SOURCE_NOTE}
+            </p>
+          </div>
         </div>
       </div>
     </footer>

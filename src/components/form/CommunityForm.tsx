@@ -14,9 +14,11 @@ import { Input } from "./Input";
 import { Select } from "./Select";
 import { Textarea } from "./Textarea";
 import { useFormDraft } from "@/hooks/useFormDraft";
+import { Caret } from "../Caret";
 import {
   CTL_GATES,
   DECLARATION_STATEMENTS,
+  EMAIL_PATTERN,
   LEGAL_STRUCTURES,
   ORG_SIZES,
   SENSITIVE_ANSWERS,
@@ -111,6 +113,58 @@ type Values = typeof EMPTY;
 
 type Issue = { field: string; message: string };
 
+/* Client-side mirror of the REQUIRED rules in the server schema, per section.
+ * Messages match schemas.ts word for word, so a client hint and a server
+ * rejection never disagree. The server stays the source of truth; this exists
+ * so someone finds out about a missing answer while they are looking at it,
+ * not from a round-trip after fifty minutes of work.
+ *
+ * The mirror is deliberately presence-only plus the email shape. Everything
+ * subtler (length caps, enum membership) still belongs to the server, where
+ * the rule "never lose a long form to a validation rule that did not need to
+ * exist" is enforced in one place. */
+function sectionIssues(
+  section: number,
+  values: Values,
+  gates: boolean[],
+  declared: boolean,
+): Issue[] {
+  const missing = (field: keyof Values, message: string): Issue[] =>
+    values[field].trim() ? [] : [{ field, message }];
+
+  switch (section) {
+    case 0:
+      return [
+        ...missing("orgName", "This one is required."),
+        ...missing("contactName", "This one is required."),
+        ...(!values.contactEmail.trim()
+          ? [{ field: "contactEmail", message: "We need an email address to reply to." }]
+          : !EMAIL_PATTERN.test(values.contactEmail.trim())
+            ? [{ field: "contactEmail", message: "That does not look like an email address." }]
+            : []),
+      ];
+    case 1:
+      return gates.every(Boolean)
+        ? []
+        : [{ field: "gates", message: "All six eligibility statements need to be confirmed." }];
+    case 2:
+      return missing("problem", "This one is required.");
+    case 3:
+      return []; // everything in Scope and fit is optional, by design
+    case 4:
+      return missing("readinessContact", "This one is required.");
+    case 5:
+      return [
+        ...missing("declarationName", "This one is required."),
+        ...(declared
+          ? []
+          : [{ field: "declared", message: "Please confirm the statements before sending." }]),
+      ];
+    default:
+      return [];
+  }
+}
+
 export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
   const [step, setStep] = useState(0);
   // Gates and the declaration are intentionally not persisted: restoring a
@@ -135,11 +189,51 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
     () => (key: keyof Values) => (event: { target: { value: string } }) => {
       const next = event.target.value;
       draft.setValue((prev) => ({ ...prev, [key]: next }));
+      // Typing into a field withdraws its complaint. Leaving a stale "this one
+      // is required" under a field someone is actively filling in reads as the
+      // form not listening.
+      setIssues((prev) => prev.filter((i) => i.field !== key));
     },
     [draft],
   );
 
+  /* Per-section completeness, recomputed every render. Cheap: presence checks
+     over a couple of dozen strings. */
+  const completeness = SECTIONS.map(
+    (_, i) => sectionIssues(i, values, gates, declared).length === 0,
+  );
+  const incomplete = SECTIONS.filter((_, i) => !completeness[i]);
+  const onlyDeclarationLeft =
+    incomplete.length === 1 && !completeness[5] && step < 5;
+
+  /* Next validates the section it is leaving. Errors render inline on the
+     fields in view and progression stops until they are dealt with — that is
+     the promised hint. The step nav above stays freely clickable on purpose:
+     validation guards the guided path, it does not lock people in. */
+  function next() {
+    const found = sectionIssues(step, values, gates, declared);
+    if (found.length) {
+      setIssues(found);
+      return;
+    }
+    setIssues([]);
+    setStep((s) => Math.min(s + 1, SECTIONS.length - 1));
+  }
+
   async function submit() {
+    /* Client-side pass over the whole form before anything leaves the device.
+       On failure, jump to the first section with a problem and show its
+       errors there — the same courtesy the server-error path already extends.
+       The server still validates everything again. */
+    for (let i = 0; i < SECTIONS.length; i++) {
+      const found = sectionIssues(i, values, gates, declared);
+      if (found.length) {
+        setIssues(found);
+        setStep(i);
+        return;
+      }
+    }
+
     setSending(true);
     setIssues([]);
     setFormError("");
@@ -227,9 +321,39 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
               {String(i + 1).padStart(2, "0")}
             </span>
             {section.label}
+            {/* The brand's own glyph as the completeness mark: a Fern caret
+                once a section has everything it requires. Fern is structural
+                here, not text, so the 4.5:1 rule does not apply to it. */}
+            {completeness[i] ? (
+              <>
+                <Caret direction="up" size={7} thickness={2} color="var(--ctl-fern)" />
+                <span className="sr-only">complete</span>
+              </>
+            ) : null}
           </button>
         ))}
       </div>
+
+      {/* Progress hint. Always states what is still needed, so nobody has to
+          hunt for the field holding things up; when only the declaration is
+          left it becomes a shortcut to finishing. */}
+      {incomplete.length ? (
+        onlyDeclarationLeft ? (
+          <div className="mt-4 flex flex-wrap items-center gap-4">
+            <p className="m-0 font-sans text-body-sm text-muted">
+              Everything is answered. Only the declaration is left.
+            </p>
+            <Button variant="secondary" size="sm" onClick={() => setStep(5)}>
+              Go to the declaration
+            </Button>
+          </div>
+        ) : (
+          <p className="mt-4 font-meta text-label uppercase tracking-[var(--tracking-step)] text-muted">
+            Still needed:{" "}
+            {incomplete.map((s) => s.label).join(" · ")}
+          </p>
+        )
+      ) : null}
 
       {draft.restored ? (
         <Card tone="sunk" className="mt-6 max-w-[var(--form-measure)]">
@@ -328,10 +452,18 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
                   const next = [...gates];
                   next[i] = e.target.checked;
                   setGates(next);
+                  if (next.every(Boolean)) {
+                    setIssues((prev) => prev.filter((issue) => issue.field !== "gates"));
+                  }
                 }}
                 label={gate}
               />
             ))}
+            {issueFor("gates") ? (
+              <p role="alert" className="font-sans text-body-sm font-semibold text-ink">
+                {issueFor("gates")}
+              </p>
+            ) : null}
             {!allGates ? (
               <p className="font-sans text-body-sm text-muted">
                 All six need to be confirmed before you can submit.
@@ -466,9 +598,19 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
             </div>
             <Checkbox
               checked={declared}
-              onChange={(e) => setDeclared(e.target.checked)}
+              onChange={(e) => {
+                setDeclared(e.target.checked);
+                if (e.target.checked) {
+                  setIssues((prev) => prev.filter((issue) => issue.field !== "declared"));
+                }
+              }}
               label="I confirm the statements above on behalf of my organisation"
             />
+            {issueFor("declared") ? (
+              <p role="alert" className="font-sans text-body-sm font-semibold text-ink">
+                {issueFor("declared")}
+              </p>
+            ) : null}
 
             <p className="max-w-measure font-sans text-body-sm text-muted">
               Startup Queenstown Lakes holds this information on behalf of the programme,
@@ -510,19 +652,21 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
           ) : null}
 
           {last ? (
+            /* Not disabled on incomplete answers, deliberately. A dead button
+               explains nothing; clicking this runs the client-side pass, which
+               jumps to the first problem and says what it is. Disabled remains
+               only for states a user cannot fix from here: mid-send, or the
+               window not being open. */
             <Button
               variant="primary"
               size="lg"
-              disabled={!allGates || !declared || sending || !canSubmit}
+              disabled={sending || !canSubmit}
               onClick={submit}
             >
               {sending ? "Sending" : "Send my application"}
             </Button>
           ) : (
-            <Button
-              variant="secondary"
-              onClick={() => setStep((s) => Math.min(s + 1, SECTIONS.length - 1))}
-            >
+            <Button variant="secondary" onClick={next}>
               Next: {SECTIONS[step + 1].label.toLowerCase()}
             </Button>
           )}

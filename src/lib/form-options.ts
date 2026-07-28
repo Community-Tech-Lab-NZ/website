@@ -64,3 +64,8 @@ export const DECLARATION_STATEMENTS = [
   "I understand the code would be published openly, so other organisations can use and adapt it.",
   "I understand that AI tools, including large language models run by other companies, may be used to help summarise, extract from and organise what we submit, and that people make every decision.",
 ] as const;
+
+/* Client-side mirror of the email rule in schemas.ts, which is server-only so
+ * Zod stays out of the browser bundle. Deliberately permissive there and
+ * identically permissive here: anything with an @ and a dot after it. */
+export const EMAIL_PATTERN = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;

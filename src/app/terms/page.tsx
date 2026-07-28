@@ -89,7 +89,7 @@ export default function TermsPage() {
         <CalloutBanner
           bare
           eyebrow="Applications open 15 to 31 August"
-          title="Find your way in"
+          title="Get involved"
           note="Open to community organisations and to developers based in the district."
           actionLabel="Apply now"
           actionHref="/apply"

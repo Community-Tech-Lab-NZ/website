@@ -32,7 +32,7 @@
      the lockup file and so has to scale with the rendered height. Logo.tsx
      computes it from the artboard geometry via align="optical". */
   --header-height: 96px;
-  --header-lockup: 56px;
+  --header-lockup: 68px;
   /* Height of the VISIBLE mark; SiteFooter crops the artboard margin away, so
      this is no longer the height of the file. No bleed token any more: the
      whitespace it compensated for is cropped rather than offset. */
@@ -74,11 +74,16 @@
   --slot-label-tracking: 0.12em;
   --partner-cell-min: 84px;
   --partner-slot-w: 132px;
-  /* 56, not 44. Every mark is normalised to the plate height, so a square logo
-     (FLINT, QRC) renders at the height and a wide one (huddl) at the height
-     too — 44px left the square marks looking undersized next to the wide ones
-     without actually being smaller. */
   --partner-slot-h: 56px;
+  /* Marks shown directly on the cell (their own ground is light or built in)
+     render at 48px; marks needing a dark ground sit in a fitted Ink chip at
+     40px, because the chip itself adds visual weight. The max width stops the
+     very wide Technology Queenstown wordmark dwarfing the square marks. */
+  --partner-logo-h: 48px;
+  --partner-chip-logo-h: 40px;
+  --partner-logo-max-w: 200px;
+  /* Right-hand block of the footer's bottom bar. */
+  --footer-note-max: 420px;
   /* Funder credit. The supplied Economic Futures / QLDC lockup is 885x159, so
      the rendered height drives the width and only the height is a token. */
   --funder-logo-h: 40px;

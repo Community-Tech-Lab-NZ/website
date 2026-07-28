@@ -1,4 +1,7 @@
+"use client";
+
 import { clsx } from "clsx";
+import { knockEnd, knockEnter } from "@/lib/knock";
 import { Button } from "./Button";
 import { Eyebrow } from "./Typography";
 
@@ -51,8 +54,10 @@ export function CalloutBanner({
         ) : null}
 
         <div
+          onMouseEnter={knockEnter}
+          onAnimationEnd={knockEnd}
           className={clsx(
-            "font-heading text-subhead font-bold",
+            "ctl-knock font-heading text-subhead font-bold",
             dark ? "text-heading-inverse" : "text-heading",
           )}
         >

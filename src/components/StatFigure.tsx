@@ -1,4 +1,7 @@
+"use client";
+
 import { clsx } from "clsx";
+import { knockEnd, knockEnter } from "@/lib/knock";
 
 /* A plain number that tells the story: three solutions, five-week build.
  *
@@ -54,9 +57,11 @@ export function StatFigure({
 
   return (
     <div
-      className={clsx(row && "row-span-2 grid grid-rows-subgrid", knock && "ctl-knock-zone", className)}
+      className={clsx(row && "row-span-2 grid grid-rows-subgrid", className)}
+      onMouseEnter={knock ? knockEnter : undefined}
     >
       <div
+        onAnimationEnd={knock ? knockEnd : undefined}
         className={clsx(
           wipe && "ctl-wipe",
           knock && "ctl-knock",

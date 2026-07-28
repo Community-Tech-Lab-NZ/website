@@ -32,8 +32,11 @@ type FunderCreditProps = {
 };
 
 export function FunderCredit({ inverse = false, note = null, className }: FunderCreditProps) {
+  // flex-wrap: the plate plus the fund name is ~380px, wider than small
+  // phones, so the text drops below the plate rather than pushing the page
+  // into horizontal scroll.
   return (
-    <div className={clsx("flex items-center gap-5", className)}>
+    <div className={clsx("flex flex-wrap items-center gap-5", className)}>
       <div className="flex shrink-0 items-center justify-center rounded-card bg-white p-3">
         <Image
           src="/logos/economic_futures_logo.jpg"

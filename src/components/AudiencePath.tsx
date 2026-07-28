@@ -1,4 +1,7 @@
+"use client";
+
 import { clsx } from "clsx";
+import { knockEnd, knockEnter } from "@/lib/knock";
 import { Button } from "./Button";
 import { CaretList } from "./CaretList";
 import { Eyebrow } from "./Typography";
@@ -67,8 +70,10 @@ export function AudiencePath({
       ) : null}
 
       <h3
+        onMouseEnter={knockEnter}
+        onAnimationEnd={knockEnd}
         className={clsx(
-          "font-heading text-subhead font-extrabold",
+          "ctl-knock font-heading text-subhead font-extrabold",
           dark ? "text-heading-inverse" : "text-heading",
         )}
       >

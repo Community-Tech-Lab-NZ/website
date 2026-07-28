@@ -108,10 +108,15 @@
 }
 .ctl-lockup:hover .ctl-lockup-block{animation:ctl-cursor-breathe 2.2s var(--ease-standard) infinite}
 
-/* Brushed like a vase (override 4 family): passing the pointer over a hero
-   stat knocks the figure — it tips on its own base and wobbles back to rest
-   through a damped swing. One knock per brush; pivots at the bottom edge,
-   which is what sells "sitting on a shelf". */
+/* Brushed like a vase (override 4 family): passing the pointer over a stat
+   or heading knocks it — it tips on its own base and wobbles back to rest
+   through a damped swing. Pivots at the bottom edge, which is what sells
+   "sitting on a shelf".
+
+   Driven by an is-knocked class (added on pointer entry, removed on
+   animationend by src/lib/knock.ts) rather than :hover, deliberately: a
+   :hover animation cancels the instant the pointer moves on, and a brushed
+   vase does not freeze mid-wobble because the hand has left. */
 @keyframes ctl-knock{
   0%{transform:rotate(0)}
   18%{transform:rotate(2.4deg)}
@@ -121,7 +126,7 @@
   100%{transform:rotate(0)}
 }
 .ctl-knock{transform-origin:50% 100%}
-.ctl-knock-zone:hover .ctl-knock{animation:ctl-knock 900ms var(--ease-standard) 1}
+.ctl-knock.is-knocked{animation:ctl-knock 900ms var(--ease-standard) 1}
 
 /* Hover lift and grow (override 4). Transform-only so nothing reflows. */
 .ctl-lift{transition:transform var(--duration-fast) var(--ease-standard)}
@@ -199,7 +204,7 @@
   .ctl-motion-only{display:none}
   .ctl-still-only{display:inline}
   .ctl-lift:hover,.ctl-grow:hover{transform:none}
-  .ctl-knock-zone:hover .ctl-knock{animation:none}
+  .ctl-knock.is-knocked{animation:none}
   .ctl-wipe::after{display:none}
   .ctl-sweep-gold,.is-in .ctl-sweep-gold{animation:none;transition:none;background-size:100% .28em}
   .ctl-drift-layer{display:none}

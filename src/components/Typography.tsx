@@ -1,4 +1,7 @@
+"use client";
+
 import { clsx } from "clsx";
+import { knockEnd, knockEnter } from "@/lib/knock";
 
 /* Text primitives, ported from the design handoff prototype.
  *
@@ -8,6 +11,11 @@ import { clsx } from "clsx";
  * Brand rule encoded here: body copy never moves into Archivo, however short the
  * paragraph. Heading uses font-heading; Lede and Body use font-sans; Eyebrow uses
  * font-meta. There is no prop to cross those over.
+ *
+ * Every Heading carries the vase-knock (owner request): brush the pointer past
+ * any header and it tips on its base and wobbles back to rest, finishing its
+ * swing whether or not the pointer stays. Transform only, so nothing reflows,
+ * and stilled under reduced motion with everything else.
  */
 
 type HeadingProps = {
@@ -41,8 +49,10 @@ export function Heading({
   return (
     <Tag
       id={id}
+      onMouseEnter={knockEnter}
+      onAnimationEnd={knockEnd}
       className={clsx(
-        "font-heading",
+        "ctl-knock font-heading",
         // The fluid clamp exists for hero display type, where 52px would
         // otherwise overflow a narrow viewport.
         fluid && level === 1 ? "text-display-fluid font-black" : HEADING_SIZE[level],

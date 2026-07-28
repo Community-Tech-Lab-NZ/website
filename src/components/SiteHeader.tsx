@@ -87,12 +87,12 @@ export function SiteHeader({
         dark ? "bg-ink border-hairline-inverse" : "bg-oat border-hairline",
       )}
     >
-      <div className="mx-auto flex min-h-[var(--header-height)] max-w-page items-center gap-7 px-gutter lg:px-gutter-lg">
+      <div className="mx-auto flex min-h-[var(--header-height)] max-w-page items-center gap-4 px-gutter md:gap-7 lg:px-gutter-lg">
         <Link href="/" className="block no-underline" aria-label="Community Tech Lab, home">
           {/* Optically aligned like Logo align="optical": the caret's left
               edge lands on the same column as the h1 below it. The cursor
               block blinks — motion override 1. */}
-          <AnimatedLockup dark={dark} height={68} />
+          <AnimatedLockup dark={dark} />
         </Link>
 
         {/* Desktop nav */}

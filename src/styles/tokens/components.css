@@ -32,7 +32,14 @@
      the lockup file and so has to scale with the rendered height. Logo.tsx
      computes it from the artboard geometry via align="optical". */
   --header-height: 96px;
-  --header-lockup: 68px;
+  /* Lockup height is responsive: at 68px the header needs ~440px of width
+     (lockup + gaps + Apply now + menu), which overflowed phones and pushed
+     the whole page into horizontal scroll — the Ink sections then looked
+     inset from the right edge. 44px fits a 359px viewport with room; the
+     full 68px returns at md. The clear-space padding and the optical
+     pull-left both derive from the same variable so they track it. */
+  --header-lockup: 44px;
+  --lockup-pad: max(8px, calc(var(--header-lockup) * 0.14));
   /* Height of the VISIBLE mark; SiteFooter crops the artboard margin away, so
      this is no longer the height of the file. No bleed token any more: the
      whitespace it compensated for is cropped rather than offset. */
@@ -140,4 +147,10 @@
   /* Matches the global link underline offset from base.css, for elements that
      look like links but are not anchors. */
   --link-underline-offset: 3px;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --header-lockup: 68px;
+  }
 }

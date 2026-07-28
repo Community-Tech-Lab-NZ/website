@@ -36,29 +36,32 @@ import { INK_LEFT } from "./Logo";
 
 type AnimatedLockupProps = {
   dark?: boolean;
-  height?: number;
   className?: string;
 };
 
-export function AnimatedLockup({ dark = false, height = 68, className }: AnimatedLockupProps) {
-  const width = Math.round(height * (520 / 140));
-  // Identical to Logo: clear space scaled with the mark, optical pull-left.
-  const pad = Math.max(8, Math.round(height * 0.14));
-  const opticalShift = -(pad + INK_LEFT.horizontal * (height / 140));
-
+export function AnimatedLockup({ dark = false, className }: AnimatedLockupProps) {
   const ink = dark ? "var(--ctl-kowhai)" : "var(--ctl-ink)";
+
+  /* Sizing lives in CSS so it can be responsive: --header-lockup is 44px on
+     phones and 68px from md (see components.css — the 68px header overflowed
+     small viewports). Padding is the scaled clear space and the negative
+     margin is the optical pull-left, both derived from the same variable;
+     0.3171 is INK_LEFT.horizontal / 140, kept in JS so the constant stays
+     single-sourced. */
+  const opticalShift = `calc(-1 * (var(--lockup-pad) + var(--header-lockup) * ${(
+    INK_LEFT.horizontal / 140
+  ).toFixed(4)}))`;
 
   return (
     <span
       className={clsx("ctl-lockup block", className)}
-      style={{ padding: pad, marginLeft: opticalShift }}
+      style={{ padding: "var(--lockup-pad)", marginLeft: opticalShift }}
     >
       <svg
         aria-hidden="true"
-        width={width}
-        height={height}
         viewBox="0 0 520 140"
-        className="block"
+        className="block w-auto"
+        style={{ height: "var(--header-lockup)" }}
       >
         <image
           href={`/logos/wordmark-horizontal-${dark ? "dark" : "light"}.svg`}

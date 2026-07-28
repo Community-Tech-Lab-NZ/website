@@ -14,6 +14,7 @@ import { Input } from "./Input";
 import { Select } from "./Select";
 import { Textarea } from "./Textarea";
 import { useFormDraft } from "@/hooks/useFormDraft";
+import { useTabIndicator } from "@/hooks/useTabIndicator";
 import { Caret } from "../Caret";
 import {
   CTL_GATES,
@@ -180,6 +181,7 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
 
   const draft = useFormDraft<Values>("ctl-application-draft-v1", EMPTY);
   const values = draft.value;
+  const { stripRef: tabStripRef, barRef: tabBarRef } = useTabIndicator(step);
 
   const allGates = gates.every(Boolean);
   const last = step === SECTIONS.length - 1;
@@ -297,21 +299,26 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
 
   return (
     <div>
-      {/* Step nav. The active tab carries the 2px Kowhai underline; it slides
-          between sections rather than jumping, which is the approved motion.
+      {/* Step nav. The active tab carries the 2px Kowhai underline, and via
+          useTabIndicator it genuinely slides between sections now — the
+          per-tab border classes remain as the no-JS fallback.
           A three-column grid rather than flex-wrap: six sections wrapped 4 + 2
           at this width, which reads as an accident. Three and three is even at
           every breakpoint, and justify-items-start keeps each underline hugging
           its label instead of stretching to the full column. */}
-      <div className="mt-6 grid grid-cols-2 justify-items-start gap-x-5 border-b border-solid border-hairline sm:grid-cols-3">
+      <div
+        ref={tabStripRef as React.Ref<HTMLDivElement>}
+        className="ctl-tab-strip mt-6 grid grid-cols-2 justify-items-start gap-x-5 border-b border-solid border-hairline sm:grid-cols-3"
+      >
         {SECTIONS.map((section, i) => (
           <button
             key={section.id}
             type="button"
             onClick={() => setStep(i)}
             aria-current={step === i ? "step" : undefined}
+            data-tab-active={step === i || undefined}
             className={clsx(
-              "-mb-px flex cursor-pointer items-baseline gap-2 border-0 border-b-2 border-solid bg-transparent px-px py-3",
+              "ctl-tab-underline -mb-px flex cursor-pointer items-baseline gap-2 border-0 border-b-2 border-solid bg-transparent px-px py-3",
               "font-heading text-body-sm font-bold",
               "transition-[color,border-color] duration-[var(--duration-base)] ease-brand",
               step === i ? "border-b-kowhai text-ink" : "border-b-transparent text-muted",
@@ -332,6 +339,7 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
             ) : null}
           </button>
         ))}
+        <span ref={tabBarRef} aria-hidden="true" className="ctl-tab-indicator" />
       </div>
 
       {/* Progress hint. Always states what is still needed, so nobody has to

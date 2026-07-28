@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Card } from "@/components/Card";
 import { ScoringTable, SCORING_APPLY } from "@/components/ScoringTable";
 import { Section } from "@/components/Section";
+import { Reveal } from "@/components/Reveal";
 import { StatusTag } from "@/components/StatusTag";
 import { Timeline } from "@/components/Timeline";
 import { Body, Eyebrow, Heading } from "@/components/Typography";
@@ -39,7 +40,7 @@ export default function ApplyPage() {
 
   return (
     <Section>
-      <div className="grid grid-cols-1 items-start gap-9 lg:grid-cols-[minmax(var(--col-min-wide),1fr)_minmax(var(--col-min-narrow),0.6fr)]">
+      <Reveal className="grid grid-cols-1 items-start gap-9 lg:grid-cols-[minmax(var(--col-min-wide),1fr)_minmax(var(--col-min-narrow),0.6fr)]">
         <div>
           <div className="mb-4 flex flex-wrap items-center gap-4">
             <StatusTag tone={copy.tone}>{copy.tag}</StatusTag>
@@ -85,7 +86,7 @@ export default function ApplyPage() {
             </ScoringTable>
           ) : null}
         </div>
-      </div>
+      </Reveal>
     </Section>
   );
 }

@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { AudiencePath } from "@/components/AudiencePath";
 import { Button } from "@/components/Button";
 import { CalloutBanner } from "@/components/CalloutBanner";
+import { HeroDrift } from "@/components/HeroDrift";
+import { TypeOn } from "@/components/TypeOn";
 import { Card } from "@/components/Card";
 import { CaretList } from "@/components/CaretList";
 import { FunderCredit } from "@/components/FunderCredit";
@@ -43,39 +45,50 @@ const HOW_IT_RUNS = [
 export default function HomePage() {
   return (
     <>
-      {/* Hero — the one Ink moment on the site, and the one gold thing in view */}
-      <section className="bg-ink text-body-inverse">
-        <div className="mx-auto max-w-page px-gutter pb-8 pt-9 lg:px-gutter-lg">
+      {/* Hero — the one Ink moment on the site, and the one gold thing in view.
+          This is also where nearly all of the chosen motion overrides live:
+          the headline types on, faint carets drift and settle, and the lede,
+          CTA and stats rise in sequence while the typing finishes. Each block
+          is offset as a whole; nothing inside a block cascades. */}
+      <section className="relative bg-ink text-body-inverse">
+        <HeroDrift />
+        <div className="relative mx-auto max-w-page px-gutter pb-8 pt-9 lg:px-gutter-lg">
           <Heading level={1} fluid inverse className="max-w-[var(--hero-heading-max)]">
-            Solutions that get used.
+            <TypeOn text="Solutions that get used." />
           </Heading>
 
-          <Lede inverse className="mt-6">
-            Local developers build something useful for community organisations across
-            the Queenstown Lakes district, at no cost to the organisation.
-          </Lede>
+          <Reveal delay={400}>
+            <Lede inverse className="mt-6">
+              Local developers build something useful for community organisations across
+              the Queenstown Lakes district, at no cost to the organisation.
+            </Lede>
+          </Reveal>
 
-          <div className="mt-7">
+          <Reveal delay={550} className="mt-7">
             <Button variant="primary" size="hero" href="/apply">
               Apply now
             </Button>
-          </div>
+          </Reveal>
 
           {/* gap-y-3 is the figure-to-label spacing, not a gap between stats:
               each StatFigure spans both rows via subgrid, so every label starts
               on the same line however many lines its figure took. */}
-          <div className="mt-9 grid grid-cols-[repeat(auto-fit,minmax(var(--hero-stat-min),max-content))] gap-x-8 gap-y-3">
+          <Reveal
+            delay={700}
+            className="mt-9 grid grid-cols-[repeat(auto-fit,minmax(var(--hero-stat-min),max-content))] gap-x-8 gap-y-3"
+          >
             {HERO_STATS.map((stat) => (
               <StatFigure
                 key={stat.label}
                 inverse
                 align="row"
                 labelSize="md"
+                wipe
                 figure={stat.figure}
                 label={stat.label}
               />
             ))}
-          </div>
+          </Reveal>
         </div>
         <SectionRule variant="gold" />
       </section>
@@ -137,7 +150,7 @@ export default function HomePage() {
             <div>
               <Eyebrow className="mb-4">Built once, used by many</Eyebrow>
               <Heading level={3} as="h2">
-                Everything is open source
+                Everything is <span className="ctl-sweep-gold">open source</span>
               </Heading>
               <Body className="mt-4">
                 Only three solutions get built, so each one is chosen partly on how many

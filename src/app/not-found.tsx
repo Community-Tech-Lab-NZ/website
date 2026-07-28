@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Button } from "@/components/Button";
 import { CaretList } from "@/components/CaretList";
+import { Reveal } from "@/components/Reveal";
 import { Section } from "@/components/Section";
 import { Body, Eyebrow, Heading } from "@/components/Typography";
 
@@ -24,7 +25,7 @@ export const metadata: Metadata = {
 export default function NotFound() {
   return (
     <Section>
-      <div className="max-w-measure">
+      <Reveal className="max-w-measure">
         <Eyebrow className="mb-4">404</Eyebrow>
         <Heading level={1} fluid>
           That page is not here.
@@ -54,7 +55,7 @@ export default function NotFound() {
             Apply now
           </Button>
         </div>
-      </div>
+      </Reveal>
     </Section>
   );
 }

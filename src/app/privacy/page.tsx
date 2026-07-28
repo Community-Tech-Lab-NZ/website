@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Card } from "@/components/Card";
+import { Reveal } from "@/components/Reveal";
 import { Section } from "@/components/Section";
 import { SectionRule } from "@/components/SectionRule";
 import { Eyebrow, Heading, Lede } from "@/components/Typography";
@@ -143,7 +144,8 @@ export default function PrivacyPage() {
       <Section>
         <div className="grid max-w-[var(--terms-measure)] gap-7">
           {SECTIONS.map((section) => (
-            <section
+            <Reveal
+              as="section"
               key={section.number}
               className="grid grid-cols-[var(--terms-number-col)_1fr] gap-5 border-t border-solid border-hairline pt-6"
             >
@@ -165,7 +167,7 @@ export default function PrivacyPage() {
                   ))}
                 </div>
               </div>
-            </section>
+            </Reveal>
           ))}
         </div>
 

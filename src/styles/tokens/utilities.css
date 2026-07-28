@@ -12,7 +12,7 @@
 .ctl-highlight{color:var(--ctl-kowhai)} /* only on Ink surfaces */
 .ctl-underline-gold{box-shadow:inset 0 -.28em 0 rgba(240,168,30,.55)} /* gold as decoration on Oat */
 .ctl-rule-gold{border:0;border-top:var(--border-rule) solid var(--ctl-kowhai);margin:0}
-.ctl-rise{opacity:0;transform:translateY(var(--rise-distance));transition:opacity var(--duration-entry) var(--ease-out-soft),transform var(--duration-entry) var(--ease-out-soft)}
+.ctl-rise{opacity:0;transform:translateY(var(--rise-distance));transition:opacity var(--duration-entry) var(--ease-out-soft),transform var(--duration-entry) var(--ease-out-soft);transition-delay:var(--rise-delay,0ms)}
 .ctl-rise.is-in{opacity:1;transform:none}
 
 /* Enlarged hit area for text links that render short of the 24px WCAG 2.2
@@ -35,12 +35,14 @@
    would come out blank. That matters here: the terms and privacy pages are
    exactly the ones people save as a PDF or hand to a board. */
 @media print{
-  .ctl-rise,.ctl-rule-draw{opacity:1 !important;transform:none !important;animation:none !important}
+  .ctl-rise,.ctl-rule-draw,.ctl-spine-draw,.ctl-node-fade,.ctl-wipe::after,.ctl-sweep-gold{opacity:1 !important;transform:none !important;animation:none !important;background-size:100% .28em !important}
+  .ctl-wipe::after{display:none !important}
+  .ctl-drift-layer{display:none !important}
 }
 
 /* Approved addition: a fade between routes, so the six pages read as one
    surface. Runs on --duration-base, so prefers-reduced-motion zeroes it. */
-@keyframes ctl-route-fade{from{opacity:0}to{opacity:1}}
+@keyframes ctl-route-fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 .ctl-route-fade{animation:ctl-route-fade var(--duration-base) var(--ease-standard)}
 
 /* Approved addition: the cursor block in the lockup settles on first load. The
@@ -59,3 +61,87 @@
 @media (prefers-reduced-motion:reduce){
   .ctl-cursor-settle{animation:none}
 }
+
+/* ============================================================================
+   MOTION OVERRIDES, chosen by the brand owner on 28 July 2026.
+
+   The brand guide bans hover lift/scale and lists blinking cursor animations
+   and the caret-as-pattern under things to avoid. Giovanni, who owns the
+   brand, decided the site should be visually striking and explicitly chose
+   these four deviations in their bounded forms:
+
+     1. Cursor blink on the header logo    3 blinks on load, once on hover
+     2. Typing hero headline               types once, cursor rests
+     3. Hero caret drift                   sparse, faint, settles within 5s
+     4. Hover lift/grow                    <=2px translate / 1.03 scale
+
+   Hard limits shared by all of them: everything zeroes under
+   prefers-reduced-motion, no autonomous movement past five seconds of load
+   (WCAG 2.2.2), nothing approaching three flashes a second (2.3.1), and zero
+   layout shift.
+   ========================================================================= */
+
+/* One blink, for re-triggering on hover. Same envelope as ctl-cursor-settle. */
+.ctl-cursor-blink-once{animation:ctl-cursor-settle 1.1s var(--ease-standard) 1}
+
+/* Hover lift and grow (override 4). Transform-only so nothing reflows. */
+.ctl-lift{transition:transform var(--duration-fast) var(--ease-standard)}
+.ctl-lift:hover{transform:translateY(-2px)}
+.ctl-grow{transition:transform var(--duration-fast) var(--ease-standard)}
+.ctl-grow:hover{transform:scale(1.03)}
+
+/* Stat reveal wipe: an Oat block over the figure slides away to the right,
+   reading as a selection un-highlighting. Deliberately NOT a counter; the
+   figure itself never changes. The ::after is the block. */
+.ctl-wipe{position:relative}
+/* The extra 260ms lets the parent's rise mostly land first, so the block is
+   seen as a solid selection for a beat before it slides off. */
+.ctl-wipe::after{content:"";position:absolute;inset:0;background:var(--ctl-oat);transform:scaleX(1);transform-origin:right center;transition:transform var(--duration-entry) var(--ease-out-soft);transition-delay:calc(var(--rise-delay,0ms) + 260ms)}
+.is-in .ctl-wipe::after,.ctl-wipe.is-in::after{transform:scaleX(0)}
+
+/* Gold highlight sweep: the static .ctl-underline-gold, drawn in from the
+   left when the section enters. Same gold, same thickness, same one-gold-
+   thing-per-viewport discipline as the static version. */
+.ctl-sweep-gold{background-image:linear-gradient(rgba(240,168,30,.55),rgba(240,168,30,.55));background-repeat:no-repeat;background-position:0 82%;background-size:0% .28em;transition:background-size var(--duration-entry) var(--ease-out-soft);transition-delay:200ms}
+.is-in .ctl-sweep-gold{background-size:100% .28em}
+
+/* Hero caret drift (override 3): faint carets rising on the Ink hero. Each
+   span is a rotated square with two visible borders, the same construction as
+   the Caret component. Iteration counts are finite so the layer is still
+   before the five-second mark, and the whole layer disappears under reduced
+   motion rather than merely freezing mid-air. */
+@keyframes ctl-drift{
+  0%{opacity:0;transform:translateY(0) rotate(-45deg)}
+  15%{opacity:1}
+  85%{opacity:1}
+  100%{opacity:0;transform:translateY(-48px) rotate(-45deg)}
+}
+.ctl-drift-layer{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.ctl-drift{position:absolute;display:block;border-style:solid;border-color:var(--ctl-oat-16);border-width:2px 2px 0 0;opacity:0;animation-name:ctl-drift;animation-timing-function:var(--ease-standard);animation-fill-mode:forwards}
+
+/* Timeline: the spine draws down as the section enters, then the nodes fade
+   in as one group. Two phases, not a per-item cascade. */
+.ctl-spine-draw{transform:scaleY(0);transform-origin:center top;transition:transform var(--duration-entry) var(--ease-out-soft)}
+.is-in .ctl-spine-draw{transform:scaleY(1)}
+.ctl-node-fade{opacity:0;transition:opacity var(--duration-entry) var(--ease-out-soft);transition-delay:var(--duration-entry)}
+.is-in .ctl-node-fade{opacity:1}
+
+@media (prefers-reduced-motion:reduce){
+  .ctl-rise{transition-delay:0s}
+  .ctl-cursor-blink-once{animation:none}
+  .ctl-lift:hover,.ctl-grow:hover{transform:none}
+  .ctl-wipe::after{display:none}
+  .ctl-sweep-gold{transition:none;background-size:100% .28em}
+  .ctl-drift-layer{display:none}
+  .ctl-node-fade{transition-delay:0s}
+}
+
+/* Sliding tab underline (useTabIndicator). The per-item border classes stay
+   in the markup as the no-JS fallback; ctl-tabs-live is added by the hook and
+   hands the underline to the single bar. The !important is doing layer work:
+   this file sits in the components layer, below Tailwind's utilities layer,
+   so nothing here would beat border-b-kowhai without it. */
+.ctl-tab-strip{position:relative}
+.ctl-tab-indicator{position:absolute;bottom:-1px;left:0;width:0;height:2px;opacity:0;background:var(--ctl-kowhai);pointer-events:none;transition:left var(--duration-base) var(--ease-standard),width var(--duration-base) var(--ease-standard),opacity var(--duration-fast) var(--ease-standard)}
+.ctl-tab-indicator--fern{background:var(--ctl-fern)}
+.ctl-tabs-live .ctl-tab-underline{border-bottom-color:transparent !important}

@@ -54,7 +54,7 @@ const VIEWBOX = {
  * the text is outlined, but a centred lockup has no business being optically
  * left-aligned to a text column, so no value is offered.
  */
-const INK_LEFT = { horizontal: 44.4, primary: null, icon: 16 } as const;
+export const INK_LEFT = { horizontal: 44.4, primary: null, icon: 16 } as const;
 
 /* The full ink box within each artboard, in viewBox units, for `crop`.
  *

@@ -4,10 +4,11 @@ import { useEffect, useId, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { clsx } from "clsx";
+import { AnimatedLockup } from "./AnimatedLockup";
 import { Button } from "./Button";
 import { Caret } from "./Caret";
-import { Logo } from "./Logo";
 import { NAV } from "@/lib/navigation";
+import { useTabIndicator } from "@/hooks/useTabIndicator";
 
 /* Site header.
  *
@@ -75,6 +76,10 @@ export function SiteHeader({
 
   const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
 
+  // Sliding underline: rests on the active route, glides to the hovered link,
+  // returns on leave. Keyed on pathname so route changes re-measure.
+  const { stripRef, barRef, moveTo, rest } = useTabIndicator(pathname);
+
   return (
     <header
       className={clsx(
@@ -84,26 +89,31 @@ export function SiteHeader({
     >
       <div className="mx-auto flex min-h-[var(--header-height)] max-w-page items-center gap-7 px-gutter lg:px-gutter-lg">
         <Link href="/" className="block no-underline" aria-label="Community Tech Lab, home">
-          {/* align="optical" so the caret's left edge lands on the same column
-              as the h1 below it, rather than the lockup file's empty margin. */}
-          <Logo
-            variant={dark ? "horizontal-dark" : "horizontal-light"}
-            height={68}
-            align="optical"
-            priority
-          />
+          {/* Optically aligned like Logo align="optical": the caret's left
+              edge lands on the same column as the h1 below it. The cursor
+              block blinks — motion override 1. */}
+          <AnimatedLockup dark={dark} height={68} />
         </Link>
 
         {/* Desktop nav */}
-        <nav aria-label="Main" className="ml-auto hidden items-center gap-6 md:flex">
+        <nav
+          ref={stripRef as React.Ref<HTMLElement>}
+          aria-label="Main"
+          onMouseLeave={rest}
+          className="ctl-tab-strip ml-auto hidden items-center gap-6 md:flex"
+        >
           {NAV.map((item) => (
             <Link
               key={item.href}
               href={item.href}
               aria-current={isActive(item.href) ? "page" : undefined}
+              data-tab-active={isActive(item.href) || undefined}
+              onMouseEnter={(e) => moveTo(e.currentTarget)}
               className={clsx(
                 // ctl-hit: the 20px line box is under the 24px target minimum.
-                "ctl-hit border-b-2 border-solid pb-px font-heading text-body-sm font-bold no-underline",
+                // ctl-tab-underline: the border is the no-JS fallback; once
+                // the indicator mounts it takes over the underline.
+                "ctl-hit ctl-tab-underline border-b-2 border-solid pb-px font-heading text-body-sm font-bold no-underline",
                 "transition-[border-color] duration-[var(--duration-fast)] ease-brand",
                 isActive(item.href) ? "border-b-kowhai" : "border-b-transparent",
                 dark ? "text-oat hover:border-b-kowhai" : "text-ink hover:border-b-kowhai",
@@ -112,6 +122,7 @@ export function SiteHeader({
               {item.label}
             </Link>
           ))}
+          <span ref={barRef} aria-hidden="true" className="ctl-tab-indicator" />
         </nav>
 
         <div className="ml-auto flex items-center gap-4 md:ml-0">

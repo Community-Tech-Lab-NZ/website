@@ -106,9 +106,11 @@ cache expires.
 - [ ] Failure-path test: revoke the service account's access to the Sheet and
       submit. The applicant must see an honest "could not save, try again",
       never a false success
-- [ ] Check the site with reduced motion **off**. Both development machines had
-      it enabled at OS level, so the animations were verified from the compiled
-      CSS rather than observed running
+- [ ] Glance at the site on a machine with reduced motion **off**. The full
+      motion pass (typing headline, logo blink, caret drift, wipes, sweeps,
+      sliding underlines) was verified running in-browser by overriding the
+      reduce tokens, and the reduced state was verified natively — but one look
+      at the real thing on a normal machine is still worth thirty seconds
 - [ ] Submit the sitemap in Google Search Console and confirm the domain
 - [ ] Replace the six partner logo placeholders
 - [ ] Confirm QLDC's required credit wording. The Economic Futures / QLDC

@@ -25,9 +25,12 @@ const button = cva(
     // order classes appear in className — so the outline variants would lose
     // their border at random.
     "cursor-pointer border-2 border-solid rounded-card",
-    "transition-[background-color,color,border-color]",
+    "transition-[background-color,color,border-color,transform]",
     "duration-[var(--duration-fast)] ease-brand",
-    "active:translate-y-px",
+    // Motion override 4: hover lifts 1px, press drops 1px past it — a 2px
+    // travel that makes every button feel sprung. Reduce zeroes the duration
+    // and the utilities layer suppresses hover transforms entirely.
+    "hover:-translate-y-px active:translate-y-px",
     "disabled:opacity-40 disabled:cursor-not-allowed disabled:active:translate-y-0",
   ],
   {

@@ -104,7 +104,7 @@ export function PartnerRow({
             {partner.logo ? (
               partner.chip ? (
                 <span
-                  className="flex items-center justify-center rounded-card px-4 py-2"
+                  className="ctl-grow flex items-center justify-center rounded-card px-4 py-2"
                   style={{ background: partner.chip }}
                 >
                   <img
@@ -123,7 +123,7 @@ export function PartnerRow({
                   width={partner.w}
                   height={partner.h}
                   loading="lazy"
-                  className="block h-[var(--partner-logo-h)] w-auto max-w-[var(--partner-logo-max-w)] object-contain"
+                  className="ctl-grow block h-[var(--partner-logo-h)] w-auto max-w-[var(--partner-logo-max-w)] object-contain"
                 />
               )
             ) : (
@@ -146,7 +146,7 @@ export function PartnerRow({
                 target="_blank"
                 rel="noopener noreferrer"
                 className={clsx(
-                  "no-underline hover:underline",
+                  "underline decoration-transparent transition-[text-decoration-color] duration-[var(--duration-fast)] ease-brand hover:decoration-current",
                   inverse ? "text-heading-inverse" : "text-heading",
                 )}
               >

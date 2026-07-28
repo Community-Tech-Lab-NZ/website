@@ -15,8 +15,8 @@ import { clsx } from "clsx";
  * sr-only but still focusable, and the visual box picks up the focus ring
  * through peer-focus-visible.
  *
- * The tick is targeted with peer-checked:[&_[data-tick]]:block rather than a
- * bare peer-checked:block — the tick sits inside the label, so it is a
+ * The tick is targeted with peer-checked:[&_[data-tick]]:opacity-100 rather
+ * than a bare peer-checked utility — the tick sits inside the label, so it is a
  * descendant of the peer's sibling rather than a sibling itself.
  */
 
@@ -72,7 +72,7 @@ export function Checkbox({
           disabled ? "cursor-not-allowed" : "cursor-pointer",
           // Checked and focus states reach the box and tick from the input.
           "peer-checked:[&_[data-box]]:border-fern peer-checked:[&_[data-box]]:bg-fern",
-          "peer-checked:[&_[data-tick]]:block",
+          "peer-checked:[&_[data-tick]]:opacity-100",
           "peer-focus-visible:[&_[data-box]]:outline-2 peer-focus-visible:[&_[data-box]]:outline-offset-2 peer-focus-visible:[&_[data-box]]:outline-fern",
         )}
       >
@@ -88,7 +88,7 @@ export function Checkbox({
         >
           <span
             data-tick
-            className="hidden h-[var(--checkbox-tick-h)] w-[var(--checkbox-tick-w)] rotate-[-45deg] border-b-2 border-l-2 border-solid border-oat"
+            className="h-[var(--checkbox-tick-h)] w-[var(--checkbox-tick-w)] rotate-[-45deg] border-b-2 border-l-2 border-solid border-oat opacity-0 transition-opacity duration-[var(--duration-fast)] ease-brand"
           />
         </span>
 

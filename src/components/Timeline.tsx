@@ -1,10 +1,18 @@
+"use client";
+
 import { clsx } from "clsx";
 import { Caret } from "./Caret";
+import { useRiseOnScroll } from "@/hooks/useRiseOnScroll";
 
 /* Programme timeline. Space Mono dates, caret nodes on a hairline spine.
  *
  * `done` renders a gold node. The spine is suppressed on the final step so the
  * line terminates at the last node rather than trailing past it.
+ *
+ * On entry the spine segments draw downward and the nodes then fade in as one
+ * group — two phases, not a per-item cascade. The component observes itself
+ * (same hook as SectionRule) so it still animates when used outside a Reveal,
+ * and never strands itself invisible.
  */
 
 export type TimelineStep = {
@@ -20,8 +28,10 @@ type TimelineProps = {
 };
 
 export function Timeline({ steps, inverse = false, className }: TimelineProps) {
+  const ref = useRiseOnScroll<HTMLOListElement>();
+
   return (
-    <ol className={clsx("m-0 list-none p-0", className)}>
+    <ol ref={ref} className={clsx("m-0 list-none p-0", className)}>
       {steps.map((step, i) => {
         const last = i === steps.length - 1;
 
@@ -35,11 +45,11 @@ export function Timeline({ steps, inverse = false, className }: TimelineProps) {
                 size={9}
                 thickness={2}
                 color={step.done ? "var(--ctl-kowhai)" : "var(--ctl-fern)"}
-                className="mt-[var(--timeline-node-offset)]"
+                className="ctl-node-fade mt-[var(--timeline-node-offset)]"
               />
               <span
                 className={clsx(
-                  "mt-[var(--timeline-spine-offset)] w-px",
+                  "ctl-spine-draw mt-[var(--timeline-spine-offset)] w-px",
                   last
                     ? "bg-transparent"
                     : inverse

@@ -27,6 +27,12 @@ type StatFigureProps = {
    * parent must define the two rows and own the vertical gap.
    */
   align?: "flow" | "row";
+  /**
+   * Reveal the figure with an Oat block that slides off, like a selection
+   * un-highlighting, once an ancestor `.is-in` lands. Explicitly NOT the
+   * banned counter: the figure itself never changes. Only makes sense on Ink.
+   */
+  wipe?: boolean;
   className?: string;
 };
 
@@ -37,6 +43,7 @@ export function StatFigure({
   accent = false,
   labelSize = "sm",
   align = "flow",
+  wipe = false,
   className,
 }: StatFigureProps) {
   const row = align === "row";
@@ -45,6 +52,7 @@ export function StatFigure({
     <div className={clsx(row && "row-span-2 grid grid-rows-subgrid", className)}>
       <div
         className={clsx(
+          wipe && "ctl-wipe",
           "font-heading text-headline font-black leading-none",
           accent
             ? inverse

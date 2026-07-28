@@ -189,7 +189,8 @@ export default function AboutPage() {
         <Reveal>
           <Eyebrow className="mb-5">Who is involved</Eyebrow>
           <Heading level={3} as="h2">
-            Six organisations deliver Community Tech Lab together
+            Six organisations deliver Community Tech Lab{" "}
+            <span className="ctl-sweep-gold">together</span>
           </Heading>
           <div className="mt-6">
             <CaretList items={PARTNER_ROLES} />

@@ -98,7 +98,7 @@ export default function RootLayout({
             IntersectionObserver. Without JS nothing would ever reveal it, so
             neutralise the class entirely rather than leave a civic site blank. */}
         <noscript>
-          <style>{`.ctl-rise{opacity:1!important;transform:none!important}`}</style>
+          <style>{`.ctl-rise,.ctl-rule-draw,.ctl-spine-draw,.ctl-node-fade{opacity:1!important;transform:none!important}.ctl-sweep-gold{background-size:100% .28em!important}`}</style>
         </noscript>
         {/* Site-wide structured data. Page-specific schemas are added by the
             routes that need them. */}

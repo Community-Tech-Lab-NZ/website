@@ -5,6 +5,7 @@ import { clsx } from "clsx";
 import { CommunityForm } from "./CommunityForm";
 import { DeveloperForm } from "./DeveloperForm";
 import { Body } from "../Typography";
+import { useTabIndicator } from "@/hooks/useTabIndicator";
 
 /* The two-tab fork at the top of the apply page.
  *
@@ -22,6 +23,8 @@ type TabId = (typeof TABS)[number]["id"];
 
 export function ApplyTabs({ canSubmit }: { canSubmit: boolean }) {
   const [path, setPath] = useState<TabId>("community");
+  // Sliding Fern underline; the per-tab borders stay as the no-JS fallback.
+  const { stripRef, barRef } = useTabIndicator(path);
 
   return (
     <div>
@@ -34,7 +37,8 @@ export function ApplyTabs({ canSubmit }: { canSubmit: boolean }) {
       <div
         role="tablist"
         aria-label="Which kind of application"
-        className="mt-6 flex gap-5 border-b border-solid border-hairline"
+        ref={stripRef as React.Ref<HTMLDivElement>}
+        className="ctl-tab-strip mt-6 flex gap-5 border-b border-solid border-hairline"
       >
         {TABS.map((tab) => (
           <button
@@ -43,10 +47,11 @@ export function ApplyTabs({ canSubmit }: { canSubmit: boolean }) {
             type="button"
             id={`tab-${tab.id}`}
             aria-selected={path === tab.id}
+            data-tab-active={path === tab.id || undefined}
             aria-controls={`panel-${tab.id}`}
             onClick={() => setPath(tab.id)}
             className={clsx(
-              "-mb-px cursor-pointer border-0 border-b-2 border-solid bg-transparent px-1 py-3",
+              "ctl-tab-underline -mb-px cursor-pointer border-0 border-b-2 border-solid bg-transparent px-1 py-3",
               "font-heading text-body-md font-extrabold",
               "transition-[color,border-color] duration-[var(--duration-base)] ease-brand",
               path === tab.id ? "border-b-fern text-ink" : "border-b-transparent text-muted",
@@ -55,6 +60,11 @@ export function ApplyTabs({ canSubmit }: { canSubmit: boolean }) {
             {tab.label}
           </button>
         ))}
+        <span
+          ref={barRef}
+          aria-hidden="true"
+          className="ctl-tab-indicator ctl-tab-indicator--fern"
+        />
       </div>
 
       <div

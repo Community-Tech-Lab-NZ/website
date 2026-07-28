@@ -47,10 +47,13 @@ export function AudiencePath({
   return (
     <div
       className={clsx(
-        "flex flex-col gap-4 rounded-card p-7",
+        // ctl-lift is motion override 4. Both cards carry a border so their
+        // boxes match; the Ink card's is invisible until hover.
+        "ctl-lift flex flex-col gap-4 rounded-card border border-solid p-7",
+        "transition-[border-color,transform] duration-[var(--duration-fast)] ease-brand hover:border-fern",
         dark
-          ? "bg-ink text-body-inverse"
-          : "border border-solid border-hairline bg-oat text-body transition-[border-color] duration-[var(--duration-fast)] ease-brand hover:border-fern",
+          ? "border-transparent bg-ink text-body-inverse"
+          : "border-hairline bg-oat text-body",
         className,
       )}
     >

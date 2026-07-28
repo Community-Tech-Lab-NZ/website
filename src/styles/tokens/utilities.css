@@ -231,6 +231,7 @@
   .ctl-btn-motion:hover{transform:none}
   .ctl-btn-motion:active{transform:translateY(1px)}
   .ctl-drift-slot{transition:none;transform:none !important}
+  .ctl-ripple-word{transition:none;transform:none !important}
   .ctl-motion-only{display:none}
   .ctl-still-only{display:inline}
   .ctl-lift:hover,.ctl-grow:hover{transform:none}
@@ -282,6 +283,11 @@
    difference. */
 .ctl-link-grow{display:inline-block;transition:transform 450ms var(--ease-out-soft),color var(--duration-fast) var(--ease-standard),border-color var(--duration-fast) var(--ease-standard),text-decoration-color var(--duration-fast) var(--ease-standard)}
 .ctl-link-grow:hover{transform:scale(1.03)}
+
+/* The pond (see useRipple): words in prose sway away from the pointer and
+   drift home. inline-block so they can transform; the 700ms soft ease is
+   both the lagged push (water resistance) and the slow wake behind it. */
+.ctl-ripple-word{display:inline-block;transition:transform 700ms var(--ease-out-soft)}
 
 /* Focus list (the timelines): hovering one entry lifts it slightly and pales
    the rest, so the row under the pointer reads as the one in focus. */

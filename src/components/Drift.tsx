@@ -1,3 +1,7 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+
 /* Ambient drift layers: the brand's own glyphs in slow, continuous motion.
  *
  * MOTION OVERRIDE 3 (see the register in tokens/utilities.css), extended at
@@ -17,6 +21,13 @@
  * purity aside, a randomised scatter reads worse than a composed one more
  * often than not. Durations are mutually prime-ish so the loops never sync
  * into a visible pattern.
+ *
+ * The glyphs also dodge the pointer (owner request — "you could chase them"):
+ * within ~110px they slide away, up to ~48px at point blank, easing back when
+ * the pointer moves on. Each glyph sits in a slot: the slot takes position
+ * and the repulsion translate, the glyph inside runs the drift loop, because
+ * one transform cannot serve two masters. rAF-throttled, layout read from
+ * offsetLeft/Top (transform-free), and skipped entirely under reduced motion.
  */
 
 type Drifter = {
@@ -71,6 +82,9 @@ const PRESETS = {
   footer: { items: FOOTER, variant: "ctl-drift--block" },
 } as const;
 
+const RADIUS = 110;
+const PUSH = 48;
+
 export function Drift({
   preset = "hero",
   onLight = false,
@@ -80,23 +94,67 @@ export function Drift({
   onLight?: boolean;
 }) {
   const { items, variant } = PRESETS[preset];
+  const layerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const layer = layerRef.current;
+    const host = layer?.parentElement;
+    if (!layer || !host) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const slots = [...layer.children] as HTMLElement[];
+    let raf = 0;
+
+    const onMove = (event: PointerEvent) => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        const lr = layer.getBoundingClientRect();
+        for (const slot of slots) {
+          const cx = lr.left + slot.offsetLeft + slot.offsetWidth / 2;
+          const cy = lr.top + slot.offsetTop + slot.offsetHeight / 2;
+          const dx = cx - event.clientX;
+          const dy = cy - event.clientY;
+          const d = Math.hypot(dx, dy);
+          if (d < RADIUS && d > 0.01) {
+            const f = ((1 - d / RADIUS) * PUSH) / d;
+            slot.style.transform = `translate(${dx * f}px, ${dy * f}px)`;
+          } else if (slot.style.transform) {
+            slot.style.transform = "";
+          }
+        }
+      });
+    };
+    const onLeave = () => {
+      for (const slot of slots) slot.style.transform = "";
+    };
+
+    host.addEventListener("pointermove", onMove);
+    host.addEventListener("pointerleave", onLeave);
+    return () => {
+      host.removeEventListener("pointermove", onMove);
+      host.removeEventListener("pointerleave", onLeave);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
 
   return (
-    <div aria-hidden="true" className="ctl-drift-layer">
+    <div ref={layerRef} aria-hidden="true" className="ctl-drift-layer">
       {items.map((d, i) => (
         <span
           key={i}
-          className={`ctl-drift ${variant}${onLight ? " ctl-drift--ink" : ""}`}
-          style={{
-            left: d.left,
-            top: d.top,
-            width: d.size,
-            height: d.size,
-            animationDelay: `${d.delay}ms`,
-            animationDuration: `${d.duration}ms`,
-            animationIterationCount: "infinite",
-          }}
-        />
+          className="ctl-drift-slot"
+          style={{ left: d.left, top: d.top, width: d.size, height: d.size }}
+        >
+          <span
+            className={`ctl-drift ${variant}${onLight ? " ctl-drift--ink" : ""}`}
+            style={{
+              animationDelay: `${d.delay}ms`,
+              animationDuration: `${d.duration}ms`,
+              animationIterationCount: "infinite",
+            }}
+          />
+        </span>
       ))}
     </div>
   );

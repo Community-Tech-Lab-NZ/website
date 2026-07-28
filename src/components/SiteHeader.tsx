@@ -113,7 +113,7 @@ export function SiteHeader({
                 // ctl-hit: the 20px line box is under the 24px target minimum.
                 // ctl-tab-underline: the border is the no-JS fallback; once
                 // the indicator mounts it takes over the underline.
-                "ctl-hit ctl-tab-underline border-b-2 border-solid pb-px font-heading text-body-sm font-bold no-underline",
+                "ctl-hit ctl-tab-underline ctl-link-grow border-b-2 border-solid pb-px font-heading text-body-sm font-bold no-underline",
                 "transition-[border-color] duration-[var(--duration-fast)] ease-brand",
                 isActive(item.href) ? "border-b-kowhai" : "border-b-transparent",
                 dark ? "text-oat hover:border-b-kowhai" : "text-ink hover:border-b-kowhai",
@@ -127,7 +127,12 @@ export function SiteHeader({
 
         <div className="ml-auto flex items-center gap-4 md:ml-0">
           {actionLabel ? (
-            <Button variant={dark ? "primary" : "secondary"} size="sm" href={actionHref}>
+            <Button
+              variant={dark ? "primary" : "secondary"}
+              size="sm"
+              href={actionHref}
+              className="ctl-cta-ping ctl-cta-ping--tight"
+            >
               {actionLabel}
             </Button>
           ) : null}

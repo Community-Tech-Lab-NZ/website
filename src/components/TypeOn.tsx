@@ -18,12 +18,13 @@ import { clsx } from "clsx";
  * the repeat rate kicks in and accelerates. Constant-rate typing is what
  * makes a fake typewriter feel fake.
  *
- * Three layers, each doing one job:
- *   - an sr-only span with the full text: what screen readers and crawlers
- *     get, immediately and stably, while the visual text churns
- *   - an invisible ghost reserving the final layout, so typing causes zero
- *     layout shift and the block after it never moves
- *   - the aria-hidden visual layer that actually types
+ * The visual layer renders the FULL text always, with the untyped remainder
+ * invisible rather than absent. Wrap points therefore never move while the
+ * text appears — the fix for mobile, where growing text used to hop between
+ * lines as words completed. The cursor is absolutely positioned from a
+ * zero-width anchor at the boundary, so it adds no width and cannot disturb
+ * the wrapping either. An sr-only span gives screen readers and crawlers the
+ * text immediately and stably.
  *
  * The server renders the full text, so no-JS visitors and the first paint see
  * the finished headline; hydration starts the cycle. Reduced motion skips
@@ -110,23 +111,28 @@ export function TypeOn({ text, speed = 52, loop = false, className }: TypeOnProp
 
   const done = count < 0 || count >= text.length;
 
+  const shown = count < 0 ? text.length : count;
+
   return (
-    <span className={clsx("grid", className)}>
+    <span className={clsx("block", className)}>
       <span className="sr-only">{text}</span>
-      <span aria-hidden="true" className="invisible col-start-1 row-start-1">
-        {text}
-      </span>
-      <span aria-hidden="true" className="col-start-1 row-start-1">
-        {count < 0 ? text : text.slice(0, count)}
-        <span
-          className={clsx(
-            "ml-[var(--type-cursor-gap)] inline-block h-[var(--type-cursor-h)] w-[var(--type-cursor-w)] translate-y-[var(--type-cursor-drop)] bg-current",
-            // One-shot: settle and rest. Looping: blink through the rest
-            // phase, solid while typing or deleting.
-            done && count >= 0 && !loop && "ctl-cursor-settle",
-            loop && phase === "resting" && "ctl-cursor-blink",
-          )}
-        />
+      <span aria-hidden="true">
+        {text.slice(0, shown)}
+        {/* Zero-width anchor: the cursor hangs off it without occupying any
+            inline space, so wrap points stay exactly where the finished
+            headline puts them. */}
+        <span className="relative">
+          <span
+            className={clsx(
+              "absolute bottom-[calc(-1*var(--type-cursor-drop))] left-[var(--type-cursor-gap)] h-[var(--type-cursor-h)] w-[var(--type-cursor-w)] bg-current",
+              // One-shot: settle and rest. Looping: blink through the rest
+              // phase, solid while typing or deleting.
+              done && count >= 0 && !loop && "ctl-cursor-settle",
+              loop && phase === "resting" && "ctl-cursor-blink",
+            )}
+          />
+        </span>
+        <span className="invisible">{text.slice(shown)}</span>
       </span>
     </span>
   );

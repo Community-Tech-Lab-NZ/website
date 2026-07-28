@@ -54,7 +54,7 @@ function PartnerName({ name }: { name: string }) {
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="font-bold text-ink underline"
+      className="ctl-link-grow font-bold text-ink underline"
     >
       {name}
       <span className="sr-only"> (opens in a new tab)</span>

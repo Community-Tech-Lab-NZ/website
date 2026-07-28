@@ -648,7 +648,7 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
               and the selection panel reads it to assess applications. It is stored in
               Google Workspace in the United States. You can ask to see or correct it at
               any time. See the{" "}
-              <a href="/privacy" className="text-ink underline">
+              <a href="/privacy" className="ctl-link-grow text-ink underline">
                 privacy notice
               </a>
               .

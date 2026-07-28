@@ -1,3 +1,6 @@
+"use client";
+
+import { useRef } from "react";
 import { clsx } from "clsx";
 import { INK_LEFT } from "./Logo";
 
@@ -27,8 +30,10 @@ import { INK_LEFT } from "./Logo";
  * except the motion matches Logo with align="optical" pixel for pixel: same
  * clear-space padding, same optical margin from INK_LEFT.
  *
- * Entirely CSS-driven — no client JS, no event handlers, and reduced motion
- * stills both pieces through the usual media block.
+ * The blink is CSS/SMIL; the breathe needs three small handlers so that when
+ * the pointer leaves mid-breath, the cycle in progress completes and stops at
+ * its iteration boundary (opacity back at 1) instead of snapping. Reduced
+ * motion stills everything through the usual media block.
  *
  * Used in the header and, at the owner's request, the footer — where it
  * replaces the static primary lockup. The two blink out of phase (the footer
@@ -67,6 +72,30 @@ export function AnimatedLockup({
     INK_LEFT.horizontal / 140
   ).toFixed(4)}))`;
 
+  const blockRef = useRef<SVGRectElement>(null);
+
+  /* Graceful breathe: entering starts it; leaving only FLAGS it to stop, and
+     the animationiteration handler removes the class at the next cycle
+     boundary, where opacity is back at 1 — so a breath in progress always
+     completes instead of snapping. */
+  function breatheStart() {
+    const b = blockRef.current;
+    if (!b) return;
+    delete b.dataset.stop;
+    b.classList.add("is-breathing");
+  }
+  function breatheStop() {
+    const b = blockRef.current;
+    if (b) b.dataset.stop = "1";
+  }
+  function breatheIteration() {
+    const b = blockRef.current;
+    if (b?.dataset.stop) {
+      b.classList.remove("is-breathing");
+      delete b.dataset.stop;
+    }
+  }
+
   const caretAndBlock = (
     <>
       <polyline
@@ -98,13 +127,24 @@ export function AnimatedLockup({
             strokeLinecap="round"
             strokeLinejoin="round"
           />
-      <rect className="ctl-lockup-block" x={44} y={76} width={12} height={10} fill={ink} />
+      <rect
+        ref={blockRef}
+        onAnimationIteration={breatheIteration}
+        className="ctl-lockup-block"
+        x={44}
+        y={76}
+        width={12}
+        height={10}
+        fill={ink}
+      />
     </>
   );
 
   if (mark) {
     return (
       <span
+        onMouseEnter={breatheStart}
+        onMouseLeave={breatheStop}
         className={clsx("ctl-lockup block", className)}
         style={{
           padding: "var(--lockup-pad)",
@@ -125,6 +165,8 @@ export function AnimatedLockup({
 
   return (
     <span
+      onMouseEnter={breatheStart}
+      onMouseLeave={breatheStop}
       className={clsx("ctl-lockup block", className)}
       style={{
         padding: "var(--lockup-pad)",

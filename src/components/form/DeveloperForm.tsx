@@ -198,7 +198,7 @@ export function DeveloperForm({ canSubmit }: { canSubmit: boolean }) {
       <p className="max-w-measure font-sans text-body-sm text-muted">
         Startup Queenstown Lakes holds this information on behalf of the programme. See
         the{" "}
-        <a href="/privacy" className="text-ink underline">
+        <a href="/privacy" className="ctl-link-grow text-ink underline">
           privacy notice
         </a>
         .

@@ -24,3 +24,19 @@ export function knockEnd(event: AnimationEvent<HTMLElement>) {
   if (event.animationName !== "ctl-knock") return;
   (event.target as HTMLElement).classList.remove("is-knocked");
 }
+
+/* Same run-to-completion contract for the list-marker wink: hovering a list
+ * row blinks its caret marker like the logo's eye, and the blink finishes
+ * whether or not the pointer stays. */
+
+export function winkEnter(event: MouseEvent<HTMLElement>) {
+  const mark = event.currentTarget.querySelector<HTMLElement>(".caret-mark");
+  if (mark && !mark.classList.contains("is-winking")) {
+    mark.classList.add("is-winking");
+  }
+}
+
+export function winkEnd(event: AnimationEvent<HTMLElement>) {
+  if (event.animationName !== "ctl-mark-wink") return;
+  (event.target as HTMLElement).classList.remove("is-winking");
+}

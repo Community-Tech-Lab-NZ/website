@@ -152,7 +152,7 @@ export function PartnerRow({
                 target="_blank"
                 rel="noopener noreferrer"
                 className={clsx(
-                  "underline decoration-transparent transition-[text-decoration-color] duration-[var(--duration-fast)] ease-brand hover:decoration-current",
+                  "ctl-link-grow underline decoration-transparent transition-[text-decoration-color] duration-[var(--duration-fast)] ease-brand hover:decoration-current",
                   inverse ? "text-heading-inverse" : "text-heading",
                 )}
               >

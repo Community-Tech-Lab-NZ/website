@@ -101,12 +101,15 @@
 .ctl-still-only{display:none}
 
 /* Hovering the lockup makes the cursor block breathe — a slow fade out and
-   back, gentler than a blink, running only while the pointer stays. */
+   back, gentler than a blink. Class-driven (AnimatedLockup's handlers), not
+   :hover: when the pointer leaves, the breath in progress completes its
+   cycle and stops at the iteration boundary instead of snapping to opaque
+   mid-fade. */
 @keyframes ctl-cursor-breathe{
   0%,100%{opacity:1}
   50%{opacity:.2}
 }
-.ctl-lockup:hover .ctl-lockup-block{animation:ctl-cursor-breathe 2.2s var(--ease-standard) infinite}
+.ctl-lockup-block.is-breathing{animation:ctl-cursor-breathe 2.2s var(--ease-standard) infinite}
 
 /* Brushed like a vase (override 4 family): passing the pointer over a stat
    or heading knocks it — it tips on its own base and wobbles back to rest
@@ -192,7 +195,11 @@
   100%{opacity:0;transform:translateY(-40px)}
 }
 .ctl-drift-layer{position:absolute;inset:0;overflow:hidden;pointer-events:none}
-.ctl-drift{position:absolute;display:block;border-style:solid;border-color:var(--ctl-oat-16);border-width:2px 2px 0 0;opacity:0;animation-name:ctl-drift;animation-timing-function:var(--ease-standard);animation-fill-mode:forwards}
+/* The slot owns position and the mouse-repulsion translate; the glyph inside
+   owns the drift loop. Two elements because one transform cannot serve two
+   masters. */
+.ctl-drift-slot{position:absolute;transition:transform 250ms var(--ease-out-soft);will-change:transform}
+.ctl-drift{display:block;width:100%;height:100%;border-style:solid;border-color:var(--ctl-oat-16);border-width:2px 2px 0 0;opacity:0;animation-name:ctl-drift;animation-timing-function:var(--ease-standard);animation-fill-mode:forwards}
 .ctl-drift--diag{animation-name:ctl-drift-diag}
 .ctl-drift--block{border:0;background:var(--ctl-oat-16);animation-name:ctl-drift-block}
 /* On Oat heroes the carets are Ink instead of Oat; same 16% presence. */
@@ -207,7 +214,10 @@
 
 @media (prefers-reduced-motion:reduce){
   .ctl-rise{transition-delay:0s}
-  .ctl-cursor-blink,.ctl-lockup:hover .ctl-lockup-block{animation:none}
+  .ctl-cursor-blink,.ctl-lockup-block.is-breathing{animation:none}
+  .caret-mark.is-winking{animation:none}
+  .ctl-link-grow:hover{transform:none}
+  .ctl-drift-slot{transition:none;transform:none !important}
   .ctl-motion-only{display:none}
   .ctl-still-only{display:inline}
   .ctl-lift:hover,.ctl-grow:hover{transform:none}
@@ -234,6 +244,28 @@
 }
 .ctl-cta-ping{position:relative}
 .ctl-cta-ping::after{content:"";position:absolute;inset:-8px;border:var(--border-rule) solid var(--ctl-kowhai);border-radius:calc(var(--radius-card) + 8px);opacity:0;pointer-events:none;animation:ctl-ping 5.5s var(--ease-standard) 2s infinite}
+/* The nav Apply button has no resting detached ring, so its ping starts
+   closer to the edge; the 2.75s offset keeps it alternating with the hero. */
+.ctl-cta-ping--tight::after{inset:-3px;border-radius:calc(var(--radius-card) + 3px);animation-delay:4.75s}
+
+/* Text links grow on hover (owner request): a gentle scale that eases both
+   in and out on --duration-hover, so leaving never cuts the motion off.
+   inline-block because inline boxes cannot transform; origin at the left so
+   the text stretches away from its anchor rather than sliding. */
+.ctl-link-grow{display:inline-block;transition:transform var(--duration-hover) var(--ease-out-soft);transform-origin:left center}
+.ctl-link-grow:hover{transform:scale(1.05)}
+
+/* The list-marker carets blink like the logo's eye when their row is
+   hovered: a quick squash to flat and back. The rotation must ride along in
+   the keyframes because the marker's resting rotate lives in an inline style
+   that an animation would otherwise override. Run-to-completion via
+   is-winking (src/lib/knock.ts), same contract as the knock. */
+@keyframes ctl-mark-wink{
+  0%{transform:scaleY(1) rotate(-45deg)}
+  45%{transform:scaleY(0.12) rotate(-45deg)}
+  100%{transform:scaleY(1) rotate(-45deg)}
+}
+.caret-mark.is-winking{animation:ctl-mark-wink 600ms var(--ease-standard) 1;transform-origin:50% 100%}
 
 /* Focus list (the timelines): hovering one entry lifts it slightly and pales
    the rest, so the row under the pointer reads as the one in focus. */

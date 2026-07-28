@@ -67,7 +67,7 @@ const SECTIONS: { number: string; title: string; paragraphs: React.ReactNode[] }
           href="https://www.startupqueenstownlakes.com/privacy-policy"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-ink underline"
+          className="ctl-link-grow text-ink underline"
         >
           privacy policy
         </a>

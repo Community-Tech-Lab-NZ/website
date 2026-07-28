@@ -54,7 +54,7 @@ export function SiteFooter() {
                     // ctl-hit: 20px line boxes on a 32px pitch; the utility
                     // brings each to 32px of clickable height, exactly abutting.
                     const style =
-                      "ctl-hit font-sans text-body-sm text-body-inverse no-underline transition-[color] duration-[var(--duration-fast)] ease-brand hover:text-kowhai";
+                      "ctl-hit ctl-link-grow font-sans text-body-sm text-body-inverse no-underline transition-[color] duration-[var(--duration-fast)] ease-brand hover:text-kowhai";
 
                     /* Partner sites are absolute URLs and open in a new tab, so
                        a half-finished application is never navigated away from.

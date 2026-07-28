@@ -30,16 +30,27 @@ import { INK_LEFT } from "./Logo";
  * Entirely CSS-driven — no client JS, no event handlers, and reduced motion
  * stills both pieces through the usual media block.
  *
- * Header only. The footer keeps the static Logo; two blinking marks on one
- * page would be a tic, not a brand.
+ * Used in the header and, at the owner's request, the footer — where it
+ * replaces the static primary lockup. The two blink out of phase (the footer
+ * starts its cycle four seconds later), so the page never winks with both
+ * eyes at once.
  */
 
 type AnimatedLockupProps = {
   dark?: boolean;
+  /** CSS length overriding the responsive --header-lockup height. */
+  size?: string;
+  /** SMIL begin offset for the blink, to de-phase multiple lockups. */
+  blinkOffset?: string;
   className?: string;
 };
 
-export function AnimatedLockup({ dark = false, className }: AnimatedLockupProps) {
+export function AnimatedLockup({
+  dark = false,
+  size,
+  blinkOffset,
+  className,
+}: AnimatedLockupProps) {
   const ink = dark ? "var(--ctl-kowhai)" : "var(--ctl-ink)";
 
   /* Sizing lives in CSS so it can be responsive: --header-lockup is 44px on
@@ -55,7 +66,11 @@ export function AnimatedLockup({ dark = false, className }: AnimatedLockupProps)
   return (
     <span
       className={clsx("ctl-lockup block", className)}
-      style={{ padding: "var(--lockup-pad)", marginLeft: opticalShift }}
+      style={{
+        padding: "var(--lockup-pad)",
+        marginLeft: opticalShift,
+        ...(size ? ({ "--header-lockup": size } as React.CSSProperties) : null),
+      }}
     >
       <svg
         aria-hidden="true"
@@ -84,6 +99,7 @@ export function AnimatedLockup({ dark = false, className }: AnimatedLockupProps)
             <animate
               attributeName="points"
               dur="8s"
+              begin={blinkOffset}
               repeatCount="indefinite"
               values="20,62 50,30 80,62; 20,62 50,30 80,62; 20,62 50,60 80,62; 20,62 50,60 80,62; 20,62 50,30 80,62; 20,62 50,30 80,62"
               keyTimes="0;0.7;0.79;0.83;0.92;1"

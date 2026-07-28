@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Eyebrow } from "./Typography";
 import { Drift } from "./Drift";
 import { FunderCredit } from "./FunderCredit";
-import { Logo } from "./Logo";
+import { AnimatedLockup } from "./AnimatedLockup";
 import { FOOTER_COLUMNS, FOOTER_NOTE, OPEN_SOURCE_NOTE } from "@/lib/navigation";
 
 /* Site footer on Ink: primary lockup, link columns, funder credit.
@@ -32,12 +32,17 @@ export function SiteFooter() {
             deliberate gap rather than three accidental ones. */}
         <div className="grid grid-cols-1 items-start gap-8 md:grid-cols-[auto_1fr]">
           <div>
-            {/* crop, so height is the mark itself rather than the artboard.
-                44% of that file is empty margin, which is why the logo read as
-                small at a nominal 150px — the visible mark was 107px. At 215 it
-                is genuinely twice the size and still shorter than the link
-                columns beside it, so the row does not grow. */}
-            <Logo variant="primary-dark" height={215} crop />
+            {/* The same living lockup as the header, sized for the footer:
+                the clamp keeps its ~3.7:1 width inside small phones and caps
+                it at 96px tall on desktop. The 4s blink offset keeps it out
+                of phase with the header's eye. Links home, like the header. */}
+            <Link
+              href="/"
+              className="inline-block no-underline"
+              aria-label="Community Tech Lab, home"
+            >
+              <AnimatedLockup dark size="clamp(60px, 17vw, 96px)" blinkOffset="4s" />
+            </Link>
           </div>
 
           <div className="grid grid-cols-[repeat(auto-fit,minmax(var(--footer-col-min),1fr))] gap-6 md:grid-cols-[repeat(3,max-content)] md:justify-end md:gap-x-12">

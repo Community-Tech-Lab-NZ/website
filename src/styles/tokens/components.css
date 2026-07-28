@@ -40,10 +40,6 @@
      pull-left both derive from the same variable so they track it. */
   --header-lockup: 44px;
   --lockup-pad: max(8px, calc(var(--header-lockup) * 0.14));
-  /* Height of the VISIBLE mark; SiteFooter crops the artboard margin away, so
-     this is no longer the height of the file. No bleed token any more: the
-     whitespace it compensated for is cropped rather than offset. */
-  --footer-lockup: 215px;
 
   /* Form controls: 12px vertical / 14px horizontal padding. The 14px is off the
      8px scale and is deliberate, giving the control a slightly wider gutter than

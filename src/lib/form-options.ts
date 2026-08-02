@@ -1,4 +1,5 @@
-/* Plain form data: the option lists, eligibility gates and declaration text.
+/* Plain form data: the questions, option lists, eligibility gates and
+ * declaration text.
  *
  * Deliberately kept in its own module with NO dependencies.
  *
@@ -13,8 +14,70 @@
  *      because nothing on the client actually parsed with it, but the browser
  *      was reporting a blocked eval on every visit.
  *
- * Keep this file dependency-free so that stays true.
+ * Keep this file dependency-free so that stays true. It is also why the
+ * QUESTIONS live here rather than beside the schema that labels them: the form
+ * components need them in the browser, and COMMUNITY_LABELS sits in schemas.ts,
+ * which is the module this one exists to keep out of the client bundle.
  */
+
+/* The questions, worded exactly as the form asks them.
+ *
+ * These were written out twice — once in the JSX, once in COMMUNITY_LABELS for
+ * the Doc and the confirmation email — and twenty of the twenty-five pairs were
+ * character-for-character identical. Nothing kept them that way. Reword a
+ * question and the panel would go on reading the old wording, in a document
+ * whose entire job is to show the applicant's answers under the question they
+ * actually answered.
+ *
+ * Same argument as FORM_MESSAGES at the bottom of this file: one constant makes
+ * "the form and the record ask the same thing" a structural fact rather than a
+ * discipline. The five places they genuinely differ are declared as overrides
+ * in schemas.ts, where they can be read as a list.
+ *
+ * Keys match CommunityApplication field for field, in the order the form asks
+ * them — the Sheet takes its column order from this. */
+export const COMMUNITY_ASKS = {
+  orgName: "Organisation name",
+  legalStructure: "Legal structure",
+  registrationNumber: "Charities or NZBN number",
+  contactName: "Main contact name",
+  contactRole: "Role or position",
+  contactEmail: "Email",
+  contactPhone: "Phone",
+  basedIn: "Where you are based",
+  orgSize: "Roughly how many people run your organisation",
+  // "a tool", not "a digital solution". The site stopped saying "solution"
+  // everywhere else; this is the question the whole application turns on, and
+  // it was the last place a volunteer treasurer met the sector's word for it.
+  problem: "What is the problem you are hoping a tool could help with",
+  problemToday: "How do you handle this today, and what does it cost you",
+  problemWho: "Who is affected, and how",
+  problemSuccess: "What would success look like",
+  scopeEssentials:
+    "If you have a sense of what it might do, list the few things that matter most",
+  scopeReuse: "Could something like this help other organisations in the district",
+  scopeSystems: "Does it need to connect to, or replace, systems you already use",
+  scopeSystemsWhich: "Which systems",
+  scopeSensitive: "Would it handle personal or sensitive information",
+  scopeSensitiveWhat: "Briefly, what kind of information",
+  readinessContact:
+    "Who would be the main point of contact during the build, and how much time could they give",
+  readinessOwner:
+    "After handover, who would look after it and help your people start using it",
+  readinessTiming: "Is there anything time-sensitive about your need",
+  readinessAnythingElse: "Anything else the selection panel should know",
+  declarationName: "Name",
+  declarationRole: "Role",
+} as const;
+
+export const DEVELOPER_ASKS = {
+  seat: "Which seat fits",
+  shipped: "Something you have shipped",
+  basedIn: "Where in the district are you based",
+  hours: "Roughly how many hours a week could you give",
+  name: "Your name",
+  email: "Email",
+} as const;
 
 export const LEGAL_STRUCTURES = [
   "Registered charity",

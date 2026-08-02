@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useElapsed } from "@/hooks/useElapsed";
 import { Button } from "../Button";
 import { Card } from "../Card";
-import { Eyebrow } from "../Typography";
+import { Eyebrow, Note } from "../Typography";
 import { Field } from "./Field";
 import { FormAlert } from "./FormAlert";
 import { Input } from "./Input";
@@ -83,17 +83,17 @@ export function EligibilityQuestion({
     return (
       <Card tone="sunk">
         <Eyebrow>Question sent</Eyebrow>
-        <p className="mt-3 max-w-measure font-sans text-body-sm text-body">
+        <Note className="mt-3">
           Thanks. We will come back to you by email. Your application is still here and
           nothing has been submitted.
-        </p>
+        </Note>
       </Card>
     );
   }
 
   if (!open) {
     return (
-      <p className="max-w-measure font-sans text-body-sm text-muted">
+      <Note muted>
         Cannot tick one of these?{" "}
         <button
           type="button"
@@ -103,16 +103,16 @@ export function EligibilityQuestion({
           Get in touch before submitting
         </button>{" "}
         and we will talk it through. Some of them can be discussed.
-      </p>
+      </Note>
     );
   }
 
   return (
     <Card tone="sunk">
       <Eyebrow>Ask about eligibility</Eyebrow>
-      <p className="mt-3 max-w-measure font-sans text-body-sm text-body">
+      <Note className="mt-3">
         Four questions. Your application stays exactly where it is.
-      </p>
+      </Note>
 
       <div className="mt-5 grid gap-5">
         <Field label="Which one is the problem">
@@ -125,10 +125,19 @@ export function EligibilityQuestion({
         </Field>
         <div className="grid gap-5 sm:grid-cols-2">
           <Field label="Your name" required>
-            <Input value={name} onChange={(e) => setName(e.target.value)} />
+            <Input
+              autoComplete="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
           </Field>
           <Field label="Email" required>
-            <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+            <Input
+              type="email"
+              autoComplete="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
           </Field>
         </div>
         <Field label="What would you like to ask" required>

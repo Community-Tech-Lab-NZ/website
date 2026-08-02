@@ -1,6 +1,8 @@
 import { z } from "zod";
 import {
+  COMMUNITY_ASKS,
   CTL_GATES,
+  DEVELOPER_ASKS,
   DEVELOPER_HOURS,
   DEVELOPER_SEATS,
   EMAIL_PATTERN,
@@ -160,44 +162,39 @@ export type DeveloperApplication = z.infer<typeof developerSchema>;
 export type Question = z.infer<typeof questionSchema>;
 export type Submission = z.infer<typeof submissionSchema>;
 
-/* Field labels for the generated Google Doc and the confirmation email.
+/* Field labels for the generated Google Doc, the confirmation email and the
+ * Sheet's column order.
  *
- * Kept beside the schema so a new field cannot be added without a human-readable
- * name, which is what the panel actually reads.
+ * THE QUESTION IS THE LABEL, unless it is said here that it is not. The asks
+ * come straight from form-options.ts so a reworded question reaches the panel's
+ * copy on its own; the overrides below are the handful of places where the two
+ * surfaces genuinely want different words, and listing them together is the
+ * point — they can be read, and argued with, as a set.
+ *
+ * Why they differ at all: the form ASKS, so it can afford a full sentence with
+ * the conditional framing that makes an optional question feel optional. The
+ * Doc LABELS an answer already given, where that framing is noise the panel
+ * reads thirty times. "If you have a sense of what it might do, list the few
+ * things that matter most" is a kind question; as a heading over someone's
+ * answer it is a paragraph.
+ *
+ * Spread first, then override: re-assigning an existing key leaves it where it
+ * was, so the Sheet's columns stay in the order the form asks them.
  */
 export const COMMUNITY_LABELS: Record<string, string> = {
-  orgName: "Organisation name",
-  legalStructure: "Legal structure",
-  registrationNumber: "Charities or NZBN number",
-  contactName: "Main contact name",
-  contactRole: "Role or position",
-  contactEmail: "Email",
-  contactPhone: "Phone",
-  basedIn: "Where you are based",
-  orgSize: "Roughly how many people run your organisation",
-  problem: "What is the problem you are hoping a digital solution could help with",
-  problemToday: "How do you handle this today, and what does it cost you",
-  problemWho: "Who is affected, and how",
-  problemSuccess: "What would success look like",
+  ...COMMUNITY_ASKS,
   scopeEssentials: "The few things that matter most",
-  scopeReuse: "Could something like this help other organisations in the district",
-  scopeSystems: "Does it need to connect to, or replace, systems you already use",
-  scopeSystemsWhich: "Which systems",
-  scopeSensitive: "Would it handle personal or sensitive information",
   scopeSensitiveWhat: "What kind of information",
   readinessContact: "Main point of contact during the build, and how much time",
   readinessOwner: "After handover, who would look after it",
   readinessTiming: "Anything time-sensitive about your need",
-  readinessAnythingElse: "Anything else the selection panel should know",
+  // "Name" alone is unambiguous under a form heading that says Declaration.
+  // In a document listing twenty-five answers it is one of four names.
   declarationName: "Declared by",
-  declarationRole: "Role",
 };
 
 export const DEVELOPER_LABELS: Record<string, string> = {
-  seat: "Which seat fits",
-  shipped: "Something you have shipped",
-  basedIn: "Where in the district are you based",
+  ...DEVELOPER_ASKS,
   hours: "Hours available per week",
   name: "Name",
-  email: "Email",
 };

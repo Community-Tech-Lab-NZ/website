@@ -51,7 +51,16 @@ export function useFormDraft<T extends Record<string, unknown>>(
 
   const { value, restored, restoredAt } = state;
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const loaded = useRef(false);
+  /* Only a real edit writes to storage. Was `loaded`, which merely meant the
+     component had mounted, and that let two empty drafts get written — an empty
+     draft being still a draft, both of which surfaced as "we restored your
+     progress" over a blank form on the NEXT visit:
+       - opening the page and touching nothing wrote one 500ms later;
+       - Start over emptied the values, which is itself a change, so the
+         debounce put the empty form straight back.
+     Restoring a draft does not count as an edit either, so arriving, reading
+     and leaving never rewrites what is already there. */
+  const dirty = useRef(false);
 
   // Reading localStorage HAS to happen in an effect, not in a lazy useState
   // initialiser: the server has no localStorage, so initialising from it would
@@ -59,7 +68,6 @@ export function useFormDraft<T extends Record<string, unknown>>(
   // one setState-in-effect unavoidable here, and it is a single combined update
   // rather than a cascade.
   useEffect(() => {
-    loaded.current = true;
     try {
       const raw = window.localStorage.getItem(key);
       if (!raw) return;
@@ -80,6 +88,7 @@ export function useFormDraft<T extends Record<string, unknown>>(
   }, [key]);
 
   const setValue = useCallback((updater: T | ((prev: T) => T)) => {
+    dirty.current = true;
     setState((prev) => ({
       ...prev,
       value:
@@ -89,8 +98,8 @@ export function useFormDraft<T extends Record<string, unknown>>(
 
   // Debounced persist.
   useEffect(() => {
-    if (!loaded.current) return;
     if (timer.current) clearTimeout(timer.current);
+    if (!dirty.current) return;
 
     timer.current = setTimeout(() => {
       try {
@@ -115,6 +124,10 @@ export function useFormDraft<T extends Record<string, unknown>>(
   }, [key, value, omit]);
 
   const clear = useCallback(() => {
+    // A write still in the debounce would land after the removal and put the
+    // draft straight back. Matters most on the submit path, where what came
+    // back would be a copy of an application that has already been sent.
+    if (timer.current) clearTimeout(timer.current);
     try {
       window.localStorage.removeItem(key);
     } catch {
@@ -124,6 +137,8 @@ export function useFormDraft<T extends Record<string, unknown>>(
 
   const discard = useCallback(() => {
     clear();
+    // An empty form is not an edit, so nothing is written until someone types.
+    dirty.current = false;
     setState({ value: initial, restored: false, restoredAt: null });
   }, [clear, initial]);
 

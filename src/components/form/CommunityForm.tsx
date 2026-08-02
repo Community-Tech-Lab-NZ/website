@@ -5,7 +5,7 @@ import { useElapsed } from "@/hooks/useElapsed";
 import { Button } from "../Button";
 import { CaretList } from "../CaretList";
 import { Card } from "../Card";
-import { Body, Eyebrow, Heading } from "../Typography";
+import { Body, Eyebrow, Heading, Note } from "../Typography";
 import { Checkbox } from "./Checkbox";
 import { EligibilityQuestion } from "./EligibilityQuestion";
 import { Field } from "./Field";
@@ -19,6 +19,7 @@ import { Textarea } from "./Textarea";
 import { emailIssues, postApplication, requiredIssue, type Issue } from "./submit";
 import { useFormDraft } from "@/hooks/useFormDraft";
 import {
+  COMMUNITY_ASKS as ASK,
   CTL_GATES,
   DECLARATION_STATEMENTS,
   FORM_MESSAGES,
@@ -245,6 +246,28 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
   });
   const done = marks.filter((m) => m === "done").length;
 
+  /* Start over. draft.discard() only empties the saved answers, and on its own
+     that left the form in a state nobody asked for: still on section four, the
+     rail still ticked from a draft that no longer exists — and, because those
+     sections had been visited and were now unresolved, ticks turning into
+     warnings on a form the reader had just asked to be rid of.
+     Everything the reader accumulated resets together, so "start over" means
+     what it says. The gates and declaration are session state rather than draft
+     state, and they clear here too: leaving legal confirmations ticked on an
+     otherwise blank form would be exactly the wrong thing to keep.
+     Sending step to 0 also moves focus to the first section's heading, through
+     the effect above. */
+  function startOver() {
+    draft.discard();
+    setStep(0);
+    setVisited([0]);
+    setTriedSubmit(false);
+    setGates(CTL_GATES.map(() => false));
+    setDeclared(false);
+    setIssues([]);
+    setFormError("");
+  }
+
   /* Next validates the section it is leaving. Errors render inline on the
      fields in view and progression stops until they are dealt with — that is
      the promised hint. The step nav above stays freely clickable on purpose:
@@ -362,9 +385,7 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
               thing it cannot: that the outstanding one is only a signature. */}
           {onlyDeclarationLeft ? (
             <div className="mb-6 flex flex-wrap items-center gap-4">
-              <p className="m-0 font-sans text-body-sm text-muted">
-                Everything is answered. Only the declaration is left.
-              </p>
+              <Note muted>Everything is answered. Only the declaration is left.</Note>
               <Button variant="secondary" size="sm" onClick={() => setStep(5)}>
                 Go to the declaration
               </Button>
@@ -373,11 +394,9 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
 
           {draft.restored ? (
             <Card tone="sunk" className="mb-6 max-w-[var(--form-measure)]">
-              <p className="font-sans text-body-sm text-body">
-                We restored your progress from this device. Nothing has been sent yet.
-              </p>
+              <Note>We restored your progress from this device. Nothing has been sent yet.</Note>
               <div className="mt-4">
-                <Button variant="outline" size="sm" onClick={draft.discard}>
+                <Button variant="outline" size="sm" onClick={startOver}>
                   Start over
                 </Button>
               </div>
@@ -411,15 +430,23 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
             <div className="mt-6 grid max-w-[var(--form-measure)] gap-5">
             {step === 0 ? (
               <>
-                <Field label="Organisation name" required error={issueFor("orgName")}>
+                {/* autoComplete throughout this block. It is worth more here
+                    than on a typical contact form: this is 32 fields and 45 to
+                    60 minutes, most of it on a phone, and the identity fields
+                    are the boring toll a reader pays before reaching the
+                    questions that actually matter. type="email" and type="tel"
+                    were already choosing the right KEYBOARD; only these tokens
+                    let iOS and Android offer the value itself. */}
+                <Field label={ASK.orgName} required error={issueFor("orgName")}>
                   <Input
+                    autoComplete="organization"
                     value={values.orgName}
                     onChange={set("orgName")}
                     placeholder="Wakatipu Community Trust"
                   />
                 </Field>
                 <Field
-                  label="Legal structure"
+                  label={ASK.legalStructure}
                   hint="Registered charity, incorporated society, charitable trust, community group, not-for-profit."
                 >
                   <Select
@@ -429,38 +456,57 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
                     onChange={set("legalStructure")}
                   />
                 </Field>
-                <Field label="Charities or NZBN number" hint="If you have one.">
+                <Field label={ASK.registrationNumber} hint="If you have one.">
                   <Input value={values.registrationNumber} onChange={set("registrationNumber")} />
                 </Field>
                 <div className="grid gap-5 sm:grid-cols-2">
-                  <Field label="Main contact name" required error={issueFor("contactName")}>
-                    <Input value={values.contactName} onChange={set("contactName")} />
+                  <Field label={ASK.contactName} required error={issueFor("contactName")}>
+                    <Input
+                      autoComplete="name"
+                      value={values.contactName}
+                      onChange={set("contactName")}
+                    />
                   </Field>
-                  <Field label="Role or position">
-                    <Input value={values.contactRole} onChange={set("contactRole")} />
+                  <Field label={ASK.contactRole}>
+                    <Input
+                      autoComplete="organization-title"
+                      value={values.contactRole}
+                      onChange={set("contactRole")}
+                    />
                   </Field>
                 </div>
                 <div className="grid gap-5 sm:grid-cols-2">
-                  <Field label="Email" required error={issueFor("contactEmail")}>
+                  <Field label={ASK.contactEmail} required error={issueFor("contactEmail")}>
                     <Input
                       type="email"
+                      autoComplete="email"
                       value={values.contactEmail}
                       onChange={set("contactEmail")}
                       placeholder="you@organisation.nz"
                     />
                   </Field>
-                  <Field label="Phone">
-                    <Input type="tel" value={values.contactPhone} onChange={set("contactPhone")} />
+                  <Field label={ASK.contactPhone}>
+                    <Input
+                      type="tel"
+                      autoComplete="tel"
+                      value={values.contactPhone}
+                      onChange={set("contactPhone")}
+                    />
                   </Field>
                 </div>
                 <Field
-                  label="Where you are based"
+                  label={ASK.basedIn}
                   hint="Town or area within the Queenstown Lakes district."
                 >
-                  <Input value={values.basedIn} onChange={set("basedIn")} placeholder="Wānaka" />
+                  <Input
+                    autoComplete="address-level2"
+                    value={values.basedIn}
+                    onChange={set("basedIn")}
+                    placeholder="Wānaka"
+                  />
                 </Field>
                 <Field
-                  label="Roughly how many people run your organisation"
+                  label={ASK.orgSize}
                   hint="Paid staff and regular volunteers. This helps us understand capacity, not to rule you out."
                 >
                   <Select
@@ -492,9 +538,7 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
                 ))}
                 {issueFor("gates") ? <FormAlert>{issueFor("gates")}</FormAlert> : null}
                 {!allGates ? (
-                  <p className="font-sans text-body-sm text-muted">
-                    All six need to be confirmed before you can submit.
-                  </p>
+                  <Note muted>All six need to be confirmed before you can submit.</Note>
                 ) : null}
 
                 {/* Makes the section's own instruction true. The copy says "get in
@@ -506,7 +550,7 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
             {step === 2 ? (
               <>
                 <Field
-                  label="What is the problem you are hoping a digital solution could help with"
+                  label={ASK.problem}
                   required
                   error={issueFor("problem")}
                   hint="A sentence or two. Plain language is perfect. For example: we track volunteer hours on paper and it takes hours to total them each month."
@@ -514,19 +558,19 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
                   <Textarea rows={3} value={values.problem} onChange={set("problem")} />
                 </Field>
                 <Field
-                  label="How do you handle this today, and what does it cost you"
+                  label={ASK.problemToday}
                   hint="Time, money, errors, frustration, or things you cannot do because of it. About 100 to 150 words."
                 >
                   <Textarea rows={5} value={values.problemToday} onChange={set("problemToday")} />
                 </Field>
                 <Field
-                  label="Who is affected, and how"
+                  label={ASK.problemWho}
                   hint="Staff, volunteers, the people you serve, your board. Roughly how many, and how often. About 80 to 120 words."
                 >
                   <Textarea rows={4} value={values.problemWho} onChange={set("problemWho")} />
                 </Field>
                 <Field
-                  label="What would success look like"
+                  label={ASK.problemSuccess}
                   hint="Describe it in a way you could later tell whether it happened. About 80 to 120 words."
                 >
                   <Textarea rows={4} value={values.problemSuccess} onChange={set("problemSuccess")} />
@@ -537,18 +581,18 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
             {step === 3 ? (
               <>
                 <Field
-                  label="If you have a sense of what it might do, list the few things that matter most"
+                  label={ASK.scopeEssentials}
                   hint="Just the essentials. We work out the details with you later if you are selected."
                 >
                   <Textarea rows={4} value={values.scopeEssentials} onChange={set("scopeEssentials")} />
                 </Field>
                 <Field
-                  label="Could something like this help other organisations in the district"
+                  label={ASK.scopeReuse}
                   hint="Reuse carries real weight in scoring. If you are not sure, say so."
                 >
                   <Textarea rows={3} value={values.scopeReuse} onChange={set("scopeReuse")} />
                 </Field>
-                <Field label="Does it need to connect to, or replace, systems you already use">
+                <Field label={ASK.scopeSystems}>
                   <Select
                     placeholder="Select one"
                     options={SYSTEM_ANSWERS}
@@ -557,13 +601,13 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
                   />
                 </Field>
                 <Field
-                  label="Which systems"
+                  label={ASK.scopeSystemsWhich}
                   hint="A CRM, spreadsheet, website, payment or membership system."
                 >
                   <Input value={values.scopeSystemsWhich} onChange={set("scopeSystemsWhich")} />
                 </Field>
                 <Field
-                  label="Would it handle personal or sensitive information"
+                  label={ASK.scopeSensitive}
                   hint="Client records, health information, children's details, donor or payment data. This does not rule you out, it helps us plan."
                 >
                   <Select
@@ -573,7 +617,7 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
                     onChange={set("scopeSensitive")}
                   />
                 </Field>
-                <Field label="Briefly, what kind of information">
+                <Field label={ASK.scopeSensitiveWhat}>
                   <Textarea rows={2} value={values.scopeSensitiveWhat} onChange={set("scopeSensitiveWhat")} />
                 </Field>
               </>
@@ -582,7 +626,7 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
             {step === 4 ? (
               <>
                 <Field
-                  label="Who would be the main point of contact during the build, and how much time could they give"
+                  label={ASK.readinessContact}
                   required
                   error={issueFor("readinessContact")}
                   hint="A real person and a realistic amount of time, even if small, makes a selected project far more likely to succeed."
@@ -590,18 +634,18 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
                   <Textarea rows={3} value={values.readinessContact} onChange={set("readinessContact")} />
                 </Field>
                 <Field
-                  label="After handover, who would look after it and help your people start using it"
+                  label={ASK.readinessOwner}
                   hint="It is fine if this is the same person, or if you are not sure yet."
                 >
                   <Textarea rows={3} value={values.readinessOwner} onChange={set("readinessOwner")} />
                 </Field>
                 <Field
-                  label="Is there anything time-sensitive about your need"
+                  label={ASK.readinessTiming}
                   hint="A funding round, a season, an event, or a system being switched off. Optional."
                 >
                   <Textarea rows={2} value={values.readinessTiming} onChange={set("readinessTiming")} />
                 </Field>
-                <Field label="Anything else the selection panel should know" hint="Optional.">
+                <Field label={ASK.readinessAnythingElse} hint="Optional.">
                   <Textarea
                     rows={3}
                     value={values.readinessAnythingElse}
@@ -613,14 +657,22 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
 
             {step === 5 ? (
               <>
-                <Body className="text-body-sm">By submitting this application, I confirm that:</Body>
+                <Note>By submitting this application, I confirm that:</Note>
                 <CaretList items={DECLARATION_STATEMENTS} />
                 <div className="grid gap-5 sm:grid-cols-2">
-                  <Field label="Name" required error={issueFor("declarationName")}>
-                    <Input value={values.declarationName} onChange={set("declarationName")} />
+                  <Field label={ASK.declarationName} required error={issueFor("declarationName")}>
+                    <Input
+                      autoComplete="name"
+                      value={values.declarationName}
+                      onChange={set("declarationName")}
+                    />
                   </Field>
-                  <Field label="Role">
-                    <Input value={values.declarationRole} onChange={set("declarationRole")} />
+                  <Field label={ASK.declarationRole}>
+                    <Input
+                      autoComplete="organization-title"
+                      value={values.declarationRole}
+                      onChange={set("declarationRole")}
+                    />
                   </Field>
                 </div>
                 <Checkbox
@@ -635,7 +687,7 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
                 />
                 {issueFor("declared") ? <FormAlert>{issueFor("declared")}</FormAlert> : null}
 
-                <p className="max-w-measure font-sans text-body-sm text-muted">
+                <Note muted>
                   Startup Queenstown Lakes holds this information on behalf of the programme,
                   and the selection panel reads it to assess applications. It is stored in
                   Google Workspace in the United States. You can ask to see or correct it at
@@ -644,7 +696,7 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
                     privacy notice
                   </a>
                   .
-                </p>
+                </Note>
               </>
             ) : null}
 
@@ -683,10 +735,10 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
             </div>
 
             {last && !canSubmit ? (
-              <p className="font-sans text-body-sm text-muted">
+              <Note muted>
                 Applications open on 15 August. You can fill this in now and it will be saved
                 on this device.
-              </p>
+              </Note>
             ) : null}
             </div>
           </div>

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useElapsed } from "@/hooks/useElapsed";
 import { Button } from "../Button";
-import { Body, Eyebrow, Heading } from "../Typography";
+import { Body, Eyebrow, Heading, Note } from "../Typography";
 import { Checkbox } from "./Checkbox";
 import { Field } from "./Field";
 import { FileUpload } from "./FileUpload";
@@ -13,7 +13,12 @@ import { Input } from "./Input";
 import { Select } from "./Select";
 import { Textarea } from "./Textarea";
 import { emailIssues, postApplication, requiredIssue, type Issue } from "./submit";
-import { DEVELOPER_HOURS, DEVELOPER_SEATS, FORM_MESSAGES } from "@/lib/form-options";
+import {
+  DEVELOPER_ASKS as ASK,
+  DEVELOPER_HOURS,
+  DEVELOPER_SEATS,
+  FORM_MESSAGES,
+} from "@/lib/form-options";
 
 /* The developer application. A few minutes, single page.
  *
@@ -112,7 +117,7 @@ export function DeveloperForm({ canSubmit }: { canSubmit: boolean }) {
 
   return (
     <div className="mt-6 grid max-w-[var(--form-measure)] gap-5">
-      <Field label="Which seat fits" required error={issueFor("seat")}>
+      <Field label={ASK.seat} required error={issueFor("seat")}>
         <Select
           placeholder="Select one"
           options={DEVELOPER_SEATS}
@@ -122,7 +127,7 @@ export function DeveloperForm({ canSubmit }: { canSubmit: boolean }) {
       </Field>
 
       <Field
-        label="Something you have shipped"
+        label={ASK.shipped}
         required
         error={issueFor("shipped")}
         hint="A repository, a site, or a short description. Anything real."
@@ -139,8 +144,9 @@ export function DeveloperForm({ canSubmit }: { canSubmit: boolean }) {
         <FileUpload onChange={setCv} />
       </Field>
 
-      <Field label="Where in the district are you based">
+      <Field label={ASK.basedIn}>
         <Input
+          autoComplete="address-level2"
           value={basedIn}
           onChange={(e) => setBasedIn(e.target.value)}
           placeholder="Frankton"
@@ -148,7 +154,7 @@ export function DeveloperForm({ canSubmit }: { canSubmit: boolean }) {
       </Field>
 
       <Field
-        label="Roughly how many hours a week could you give"
+        label={ASK.hours}
         hint="The build assumes about 12 hours a week for five weeks, evenings and weekends."
       >
         <Select
@@ -160,12 +166,17 @@ export function DeveloperForm({ canSubmit }: { canSubmit: boolean }) {
       </Field>
 
       <div className="grid gap-5 sm:grid-cols-2">
-        <Field label="Your name" required error={issueFor("name")}>
-          <Input value={name} onChange={(e) => setName(e.target.value)} />
+        <Field label={ASK.name} required error={issueFor("name")}>
+          <Input
+            autoComplete="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
         </Field>
-        <Field label="Email" required error={issueFor("email")}>
+        <Field label={ASK.email} required error={issueFor("email")}>
           <Input
             type="email"
+            autoComplete="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="you@example.nz"
@@ -185,14 +196,14 @@ export function DeveloperForm({ canSubmit }: { canSubmit: boolean }) {
         label="I understand AI tools may be used to help summarise and organise what I submit, and that people make every decision"
       />
 
-      <p className="max-w-measure font-sans text-body-sm text-muted">
+      <Note muted>
         Startup Queenstown Lakes holds this information on behalf of the programme. See
         the{" "}
         <a href="/privacy" className="ctl-link-grow text-ink underline">
           privacy notice
         </a>
         .
-      </p>
+      </Note>
 
       <Honeypot id="ctl-dev-website" value={honeypot} onChange={setHoneypot} />
 
@@ -210,9 +221,9 @@ export function DeveloperForm({ canSubmit }: { canSubmit: boolean }) {
       </div>
 
       {!canSubmit ? (
-        <p className="font-sans text-body-sm text-muted">
+        <Note muted>
           Applications open on 15 August.
-        </p>
+        </Note>
       ) : null}
     </div>
   );

@@ -189,6 +189,10 @@ export async function POST(request: Request) {
     }
   } catch (error) {
     log("doc generation", error);
+    // The Doc is a convenience, not a record: everything in it is formatted
+    // from the `_raw` row, so it can be rebuilt at any time. Saying so in the
+    // cell beats a blank that reads like "no Doc was ever wanted".
+    docUrl = "DOC FAILED — regenerate from _raw";
   }
 
   // A failed CV upload must not cost the application. The answers matter more
@@ -206,6 +210,12 @@ export async function POST(request: Request) {
       );
     } catch (error) {
       log("cv upload", error);
+      // Unlike the Doc, this one is GONE. The file existed only in this request
+      // and there is no second copy to rebuild from, so the row has to carry
+      // the fact that a CV was sent and lost — otherwise an empty cell is
+      // indistinguishable from an applicant who simply did not attach one, and
+      // nobody thinks to ask them to resend.
+      cvUrl = "CV SUBMITTED — UPLOAD FAILED, ask the applicant to resend";
     }
   }
 

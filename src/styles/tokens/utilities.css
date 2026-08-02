@@ -377,3 +377,139 @@
    selects would need their own rule; none exist today. */
 select:has(option[value=""]:checked){color:var(--text-muted) !important}
 select option{font-family:var(--font-body);font-size:var(--size-body);color:var(--ctl-ink);background:var(--ctl-white)}
+
+/* Select picker.
+ *
+ * The control below the pointer was ours and the panel that opened was the
+ * operating system's: a translucent sheet in the system face, with a blue
+ * highlight the palette does not contain, laid OVER the box so the chosen row
+ * sat where the box had been. Nothing about it said it had come from that
+ * field.
+ *
+ * appearance:base-select opts the picker into the page, where it can be
+ * styled: same width as the box it drops from, same hairline and radius, same
+ * face and the same left inset for the text, so the list reads as the box
+ * opening rather than as a panel arriving from somewhere else. The selected row
+ * carries the Fern rail this site already uses for "you are here".
+ *
+ * This was once fenced off behind (pointer:fine), on the reasoning that a phone
+ * was better served by the platform sheet than by anything we could draw. Half
+ * of that holds. The SHAPE was right — a sheet at the bottom of the screen, rows
+ * under the thumb — but it was wearing the same foreign materials described
+ * above. So the picker is styled everywhere now, and the coarse-pointer block
+ * below keeps the shape while replacing the materials.
+ *
+ * Browsers without base-select (Firefox, Safari before 27) keep their own
+ * picker and lose nothing: appearance:none below is the same flat control they
+ * render now, and the closed box is identical either way.
+ *
+ * The appearance declarations sit here rather than in controlClasses because a
+ * Tailwind `appearance-none` lives in the utilities layer, above this one, and
+ * would win over the base-select opt-in. */
+select{appearance:none}
+
+@supports (appearance:base-select){
+  select,::picker(select){appearance:base-select}
+  /* Select.tsx draws the brand caret over the control; this is the UA's. */
+  select::picker-icon{display:none}
+
+  select::picker(select){
+    position-area:block-end span-inline-end;
+    min-inline-size:anchor-size(inline);
+    margin-block-start:var(--space-1);
+    padding:0;
+    border:var(--border-hairline) solid var(--ctl-ink-16);
+    border-radius:var(--radius-sm);
+    background:var(--ctl-white);
+    /* The one place a shadow is permitted: this floats over content. */
+    box-shadow:var(--shadow-overlay);
+    /* A quiet fade, which is what the brand allows. The duration comes from
+       the motion tokens, so reduced motion zeroes it and the panel simply
+       appears. */
+    opacity:0;
+    transition:opacity var(--duration-fast) var(--ease-standard),
+      display var(--duration-fast) allow-discrete,
+      overlay var(--duration-fast) allow-discrete;
+  }
+  select:open::picker(select){opacity:1}
+  @starting-style{select:open::picker(select){opacity:0}}
+
+  /* padding-left is short by the rail's width so the option text lands on the
+     same column as the text in the closed box, rail or no rail. */
+  select option{
+    padding:var(--space-2) var(--control-padding-x);
+    padding-left:calc(var(--control-padding-x) - var(--border-rule));
+    border-left:var(--border-rule) solid transparent;
+    line-height:var(--control-leading);
+    min-block-size:auto;
+  }
+  /* The tick is replaced by the fill and the rail, which say the same thing
+     in the site's own vocabulary. Screen readers still hear "selected". */
+  select option::checkmark{display:none}
+  /* Two different things, so two different fills: the row under the pointer
+     or arrow key is Oat pressed one step down, the row already chosen is flat
+     Oat with the rail. Arrowing through a list whose selected row is already
+     tinted has to stay legible. */
+  select option:hover,select option:focus-visible{background:var(--ctl-oat-sunk);outline:none}
+  select option:checked{background:var(--ctl-oat);border-left-color:var(--ctl-fern)}
+  /* The placeholder is disabled and cannot be chosen, so in an in-page panel
+     it is a dead row repeating the words already showing in the box directly
+     above it. The closed control still reads "Select one": the button renders
+     a <selectedcontent> copy, which this does not touch. */
+  select option[value=""]{display:none}
+
+  /* The touch sheet.
+   *
+   * A panel anchored to the field is a pointer idea: it assumes a cursor is
+   * already there and that a 38px row is a comfortable target. Neither is true
+   * of a thumb. So on a coarse pointer the same panel, in the same materials,
+   * is released from the field and pinned to the bottom of the screen instead —
+   * full bleed, rising from the edge, rows tall enough to hit.
+   *
+   * position-area is what ties the panel to the field, so clearing it back to
+   * none is what frees the sheet; the fallbacks go with it, or the browser will
+   * try to reflow the sheet back alongside its anchor. */
+  @media (pointer:coarse){
+    select::picker(select){
+      position:fixed;
+      position-area:none;
+      position-try-fallbacks:none;
+      inset:auto 0 0 0;
+      margin:0;
+      /* Undoes the anchor-size match: the sheet takes the screen, not the box.
+         The explicit 100% is load-bearing — the picker's own width is
+         fit-content, and left/right insets alone leave it shrink-wrapped
+         around the longest option. */
+      min-inline-size:0;
+      max-inline-size:none;
+      inline-size:100%;
+      /* Long lists scroll inside the sheet rather than growing past the top of
+         the screen. --select-sheet-max-block leaves the field visible above. */
+      max-block-size:var(--select-sheet-max-block);
+      overflow-y:auto;
+      /* Only the top edge is a border now: the other three meet the screen. The
+         radius follows, and the bottom pad clears the home indicator. */
+      border-width:var(--border-hairline) 0 0;
+      border-radius:var(--radius-sm) var(--radius-sm) 0 0;
+      padding-block-end:env(safe-area-inset-bottom);
+      /* Thrown upward, at the page the sheet has covered. */
+      box-shadow:var(--shadow-sheet);
+      /* A sheet that faded in place would read as a panel that had always been
+         there. Rising from the edge it came from is the honest motion, and it
+         is still one quiet move. --duration-base is zeroed under reduced
+         motion, so the sheet simply appears. */
+      translate:0 100%;
+      transition:opacity var(--duration-fast) var(--ease-standard),
+        translate var(--duration-base) var(--ease-standard),
+        display var(--duration-base) allow-discrete,
+        overlay var(--duration-base) allow-discrete;
+    }
+    select:open::picker(select){translate:0 0}
+    @starting-style{select:open::picker(select){opacity:0;translate:0 100%}}
+
+    /* 12px against a 22.4px line is a 46px row, over the 44px touch floor. The
+       horizontal inset is left alone so the text still lands on the column it
+       occupies in the closed box. */
+    select option{padding-block:var(--space-3)}
+  }
+}

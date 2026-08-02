@@ -11,6 +11,12 @@ import { controlClasses } from "./control";
  * support and the platform picker on mobile for free, and none of that is worth
  * rebuilding for six dropdowns. The caret is the brand's own glyph, so no icon
  * set is introduced.
+ *
+ * The `appearance` of the control is NOT set here, unlike every other control
+ * style. It lives in utilities.css beside the picker-panel rules, because on a
+ * pointer device the two are one decision — see "Select picker" there — and
+ * because a Tailwind `appearance-none` in the utilities layer would beat the
+ * base-select opt-in the panel styling depends on.
  */
 
 export type SelectOption = string | { value: string; label: string };
@@ -56,7 +62,7 @@ export function Select({
         className={controlClasses({
           inverse: isInverse,
           invalid: isInvalid,
-          className: "cursor-pointer appearance-none pr-[var(--select-padding-right)]",
+          className: "cursor-pointer pr-[var(--select-padding-right)]",
         })}
         {...props}
       >

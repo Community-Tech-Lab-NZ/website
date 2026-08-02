@@ -90,6 +90,10 @@
   /* Native select needs room for the caret indicator on the right. */
   --select-padding-right: 40px;
   --select-caret-right: 16px;
+  /* The touch picker rises as a sheet and stops here, so the field it came from
+     and the question above it stay on screen behind it. svh, not vh: on a phone
+     the mobile browser's chrome is showing while the sheet is open. */
+  --select-sheet-max-block: 60svh;
   --checkbox-size: 20px;
   --checkbox-offset: 2px;
   --checkbox-tick-w: 9px;

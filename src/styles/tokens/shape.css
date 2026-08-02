@@ -14,6 +14,10 @@
   --shadow-card:0 1px 0 var(--ctl-ink-08);
   --shadow-raised:0 2px 8px rgba(20,33,26,.10);
   --shadow-overlay:0 12px 32px rgba(20,33,26,.22);
+  /* The same overlay shadow, thrown upward. A panel that rises from the bottom
+     edge has nothing below it to cast onto: the page it needs to separate from
+     is the one above it. */
+  --shadow-sheet:0 -12px 32px rgba(20,33,26,.22);
 
   --caret-angle:38deg; /* @kind other */ /* roofline angle of the mark */
   --caret-stroke:2px;

@@ -66,9 +66,12 @@ export default function ApplyPage() {
 
           {state === "closed" ? <Body className="mt-4">{copy.body}</Body> : null}
 
+          {/* max-w-measure on the Card, not only on the paragraph inside it.
+              Out here the heading block spans the container, and a 1024px card
+              wrapped around 560px of text is mostly empty card. */}
           {state === "before" ? (
-            <Card tone="sunk" className="mt-5">
-              <p className="max-w-measure font-sans text-body-sm text-body">{copy.body}</p>
+            <Card tone="sunk" className="mt-5 max-w-measure">
+              <p className="font-sans text-body-sm text-body">{copy.body}</p>
             </Card>
           ) : null}
 

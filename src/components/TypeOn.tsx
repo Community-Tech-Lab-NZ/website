@@ -26,6 +26,23 @@ import { clsx } from "clsx";
  * the wrapping either. An sr-only span gives screen readers and crawlers the
  * text immediately and stably.
  *
+ * Holding that promise takes two things beyond zero width, both of which only
+ * ever showed on phones, where the headline is the one place it wraps:
+ *
+ *   1. The anchor must not be an atomic inline. A line can break either side
+ *      of an inline-block, so an inline-block anchor hands the browser a break
+ *      opportunity that travels with the cursor: mid-word breaks that walk one
+ *      letter per keystroke, and a cursor that teleports to the start of the
+ *      next line while its word is still on this one.
+ *   2. The headline breaks greedily rather than inheriting `text-wrap: pretty`.
+ *      Pretty's scoring reads the inline structure, so it broke the split text
+ *      in one place and the finished text — one text node, no split — in
+ *      another, re-wrapping the headline every time a cycle finished or
+ *      started. Greedy breaking asks only how wide the words are, which is the
+ *      same question all cycle, so the break holds still. It lands where the
+ *      finished headline already sat, so nothing about the resting line looks
+ *      different; balance was the other candidate and moves it.
+ *
  * The server renders the full text, so no-JS visitors and the first paint see
  * the finished headline; hydration starts the cycle. Reduced motion skips
  * everything — full text, resting cursor, nothing moves — and the loop holds
@@ -114,21 +131,27 @@ export function TypeOn({ text, speed = 52, loop = false, className }: TypeOnProp
   const shown = count < 0 ? text.length : count;
 
   return (
-    <span className={clsx("block", className)}>
+    <span className={clsx("block text-wrap [--type-cursor-em:1em]", className)}>
       <span className="sr-only">{text}</span>
       <span aria-hidden="true">
         {text.slice(0, shown)}
         {/* Zero-size anchor: the cursor hangs off it without occupying any
             inline space, so wrap points stay exactly where the finished
-            headline puts them. It has to be an empty inline-block rather than
-            a plain inline — an inline box's bottom edge is the descender
-            line, so the cursor would hang a full descent (0.21em in Archivo)
-            below the text. An empty zero-height inline-block's box sits on
-            the baseline, which is what the drop token is measured from. */}
-        <span className="relative inline-block h-0 w-0 align-baseline">
+            headline puts them. `font-size: 0` is what makes it zero-size, and
+            it is doing two jobs at once. An inline box's bottom edge is the
+            descender line, so at any other font size the cursor would hang a
+            full descent (0.21em in Archivo) below the text; with no font there
+            is no descent, and the box sits on the baseline the drop token is
+            measured from. And it stays a plain inline while doing it, so it
+            adds no break opportunity — an inline-block would sit on the
+            baseline too, and break the line at the cursor.
+
+            The cursor takes its em back from --type-cursor-em, which the
+            headline captured before the anchor zeroed it out. */}
+        <span className="relative [font-size:0]">
           <span
             className={clsx(
-              "absolute bottom-[calc(-1*var(--type-cursor-drop))] left-[var(--type-cursor-gap)] h-[var(--type-cursor-h)] w-[var(--type-cursor-w)] bg-current",
+              "absolute bottom-[calc(-1*var(--type-cursor-drop))] left-[var(--type-cursor-gap)] h-[var(--type-cursor-h)] w-[var(--type-cursor-w)] bg-current [font-size:var(--type-cursor-em)]",
               // One-shot: settle and rest. Looping: blink through the rest
               // phase, solid while typing or deleting.
               done && count >= 0 && !loop && "ctl-cursor-settle",

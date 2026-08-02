@@ -188,7 +188,9 @@
 
   /* The typing headline's block cursor, sized relative to the text so it
      works at the fluid display size. Width and height echo the lockup's
-     cursor block proportions. */
+     cursor block proportions. The em they are measured against is
+     --type-cursor-em, because the cursor's own anchor has no font size —
+     see the registration below and TypeOn. */
   --type-cursor-w: 0.44em;
   --type-cursor-h: 0.78em;
   --type-cursor-gap: 0.06em;
@@ -221,6 +223,26 @@
    element, and an unregistered property would inherit this calc() as tokens
    and resolve it against that new value — a cycle, and a mark of no height. */
 @property --header-mark {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
+
+/* The typing cursor's em, captured before its anchor throws it away.
+ *
+ * TypeOn's cursor hangs off an anchor with `font-size: 0` — the only way to
+ * collapse an inline box onto the baseline without either measuring the font's
+ * descent or making the anchor an inline-block, which would let the line break
+ * at the cursor (see TypeOn). A zero font size takes the em with it, so the
+ * cursor tokens above would all resolve to 0.
+ *
+ * Registering the property is what saves them: a registered <length> computes
+ * where it is DECLARED, so `--type-cursor-em: 1em` on the headline resolves
+ * against the headline's font size and inherits into the anchor as that many
+ * pixels. The cursor takes its font size from it and the em tokens mean what
+ * they say again. An unregistered custom property would inherit the literal
+ * token `1em` instead and resolve it against the anchor's zero. */
+@property --type-cursor-em {
   syntax: "<length>";
   inherits: true;
   initial-value: 0px;

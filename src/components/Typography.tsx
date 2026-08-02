@@ -11,8 +11,11 @@ import { useWordKnock } from "@/hooks/useWordKnock";
  * concern and are almost always read together.
  *
  * Brand rule encoded here: body copy never moves into Archivo, however short the
- * paragraph. Heading uses font-heading; Lede and Body use font-sans; Eyebrow uses
- * font-meta. There is no prop to cross those over.
+ * paragraph. Heading uses font-heading; the prose ladder — Lede, Body, Note —
+ * uses font-sans; Eyebrow uses font-meta. There is no prop to cross those over.
+ *
+ * The prose ladder is three rungs and only three: 18px Lede, 16px Body, 14px
+ * Note. Anything smaller is Eyebrow's 11px, which is a label rather than prose.
  *
  * Every Heading and Eyebrow carries the vase-knock (owner request): brush the
  * pointer past any header, or the small caps line above one, and it tips on
@@ -170,6 +173,57 @@ export function Body({ children, inverse = false, className }: ProseProps) {
   );
 }
 
+/* 14px prose: the rung below Body, and the one that was missing.
+ *
+ * Nineteen places were writing `font-sans text-body-sm` plus a colour plus,
+ * usually, `max-w-measure` by hand — the privacy notes under both forms, the
+ * "applications open on 15 August" lines, the role summaries, the section
+ * intros on terms and privacy. One of them had given up and written
+ * `<Body className="text-body-sm">`, which is the tell: the ladder had a gap
+ * and callers were improvising across it.
+ *
+ * They had drifted in the way hand-copied classes do. Some capped the measure
+ * and some did not. More tellingly, four carried the word-knock and the rest
+ * did not, so the same rung of the same ladder answered the pointer or ignored
+ * it depending on who wrote the line. Lede and Body both knock; this settles
+ * the question the way they already answer it.
+ *
+ * `muted` rather than a second component, because the two are one rung in two
+ * voices: plain is the content, still, only secondary — a role summary, a
+ * section intro. Muted is an aside ABOUT the content — where the data is held,
+ * when applications open. Colour is the whole difference and the token layer
+ * already names it, so a boolean is the honest shape.
+ *
+ * A <p> by default, unlike Body and Lede, which are divs. No reason beyond
+ * history for theirs, and every caller this replaces was already a paragraph.
+ */
+export function Note({
+  children,
+  muted = false,
+  inverse = false,
+  as = "p",
+  className,
+}: ProseProps & { muted?: boolean; as?: "p" | "div" | "span" }) {
+  return (
+    <WordKnockText
+      as={as}
+      className={clsx(
+        "max-w-measure font-sans text-body-sm",
+        muted
+          ? inverse
+            ? "text-muted-inverse"
+            : "text-muted"
+          : inverse
+            ? "text-body-inverse"
+            : "text-body",
+        className,
+      )}
+    >
+      {children}
+    </WordKnockText>
+  );
+}
+
 /** Non-heading text that carries the header vase-knock: card titles rendered
  *  as divs, the odd h3 with bespoke classes. Adds the class and the
  *  enter/end contract (see src/lib/knock.ts); callers keep their own type
@@ -202,12 +256,28 @@ type EyebrowProps = {
    * visual job of a section heading ("Two ways in", "The roles", "Who is behind
    * it") with only h3s beneath them, which left an H1-to-H3 jump in the outline.
    * Rendering those as h2 fixes the document structure without changing a pixel.
+   * h4 for the same reason one level down: the blocks inside a role description
+   * ("What you'll do") sit under the role's own h3.
    */
-  as?: "p" | "span" | "div" | "h2" | "h3";
+  as?: "p" | "span" | "div" | "h2" | "h3" | "h4";
   className?: string;
 };
 
-/** Space Mono, 11px, 0.16em tracking, uppercase. Dates, meta and section labels. */
+/* Space Mono, 11px, 0.16em tracking, uppercase. Dates, meta and section labels.
+ *
+ * THE GAP BELOW ONE IS NOT ARBITRARY, and it is the caller's to set because it
+ * depends on what the eyebrow is doing:
+ *
+ *   mb-4  labelling the heading directly beneath it. The two are one unit, so
+ *         the gap is the tighter of the two and binds them together.
+ *   mb-5  standing in for the heading itself (as="h2"), where what follows is a
+ *         grid or a table rather than a line of type. Nothing below it to bind
+ *         to, so it takes the section-heading gap instead.
+ *   none  inside a Card, where the card's own layout already spaces it.
+ *
+ * Every eyebrow on the site follows this. One had drifted to mb-5 over a
+ * heading, which is eight pixels of nothing that only shows up when you put the
+ * pages side by side. */
 export function Eyebrow({
   children,
   inverse = false,

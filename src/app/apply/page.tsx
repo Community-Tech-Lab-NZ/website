@@ -5,7 +5,7 @@ import { ScoringTable, SCORING_APPLY } from "@/components/ScoringTable";
 import { Section } from "@/components/Section";
 import { Reveal } from "@/components/Reveal";
 import { StatusTag } from "@/components/StatusTag";
-import { Body, Eyebrow, Heading } from "@/components/Typography";
+import { Body, Eyebrow, Heading, Note } from "@/components/Typography";
 import { ApplyTabs } from "@/components/form/ApplyTabs";
 import { getWindowState, WINDOW_COPY } from "@/lib/application-window";
 import { APPLICATION_WINDOW_LABEL } from "@/lib/navigation";
@@ -71,7 +71,7 @@ export default function ApplyPage() {
               wrapped around 560px of text is mostly empty card. */}
           {state === "before" ? (
             <Card tone="sunk" className="mt-5 max-w-measure">
-              <p className="font-sans text-body-sm text-body">{copy.body}</p>
+              <Note>{copy.body}</Note>
             </Card>
           ) : null}
 
@@ -87,11 +87,11 @@ export default function ApplyPage() {
 
           {state !== "closed" ? (
             <ScoringTable rows={SCORING_APPLY}>
-              <p className="mt-4 max-w-measure font-sans text-body-sm text-muted">
+              <Note muted className="mt-4">
                 Something that could help several organisations, not just one, is
                 especially welcome. If you are unsure whether your idea fits, apply anyway
                 and we will talk it through.
-              </p>
+              </Note>
             </ScoringTable>
           ) : null}
         </Reveal>

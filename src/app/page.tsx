@@ -10,7 +10,7 @@ import { Reveal } from "@/components/Reveal";
 import { Section } from "@/components/Section";
 import { SectionRule } from "@/components/SectionRule";
 import { StatFigure } from "@/components/StatFigure";
-import { Body, Eyebrow, Heading, Lede } from "@/components/Typography";
+import { Body, Eyebrow, Heading, Lede, Note } from "@/components/Typography";
 
 /* Home. Copy came verbatim from the prototype, then took a plain-language pass:
  * the owner's read was that a reader could finish the fork without learning what
@@ -206,10 +206,10 @@ export default function HomePage() {
         <Reveal>
           <SectionRule variant="hairline" draw={false} className="mb-7" />
           <PartnerRow eyebrow="Delivered with" />
-          <p className="mt-5 max-w-measure font-sans text-body-sm text-muted">
-            Startup Queenstown Lakes is the lead organisation, fund holder, and the
-            entity developers contract to.
-          </p>
+          <Note muted className="mt-5">
+            Startup Queenstown Lakes leads the programme, holds the funding, and is who
+            developers contract to.
+          </Note>
           {/* No FunderCredit here — it sits in the footer of every page,
               which keeps the mandatory credit while avoiding it appearing
               twice within one scroll. */}

@@ -1,5 +1,5 @@
 import { Reveal } from "./Reveal";
-import { Heading } from "./Typography";
+import { Body, Heading } from "./Typography";
 
 /* The numbered long-form shell shared by /terms and /privacy: one
  * hairline-topped row per section, Space Mono number in the left column,
@@ -36,9 +36,7 @@ export function NumberedSections({ sections }: { sections: readonly NumberedSect
             </Heading>
             <div className="mt-4 grid gap-4">
               {section.paragraphs.map((para, i) => (
-                <p key={i} className="max-w-measure font-sans text-body-md text-body">
-                  {para}
-                </p>
+                <Body key={i}>{para}</Body>
               ))}
             </div>
           </div>

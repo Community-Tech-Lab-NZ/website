@@ -4,7 +4,7 @@ import { ClosingCta } from "@/components/ClosingCta";
 import { NumberedSections } from "@/components/NumberedSections";
 import { Section } from "@/components/Section";
 import { SectionRule } from "@/components/SectionRule";
-import { Eyebrow, Heading, Lede } from "@/components/Typography";
+import { Eyebrow, Heading, Lede, Note } from "@/components/Typography";
 import { TERMS_SECTIONS, TERMS_UPDATED } from "@/lib/terms";
 
 /* Programme terms. Reached from the footer only.
@@ -47,7 +47,7 @@ export default function TermsPage() {
             placeholder: the underlying agreements are still drafts. */}
         <Card tone="sunk" className="mt-8 max-w-[var(--terms-measure)]">
           <Eyebrow>Before this goes live</Eyebrow>
-          <p className="mt-3 max-w-measure font-sans text-body-sm text-body">
+          <Note className="mt-3">
             This page is a plain-language summary of the programme&rsquo;s assessment
             criteria, the partner memorandum of understanding, and the Pilot Organisation
             Agreement, all of which are still drafts. The waiver, indemnity and limitation
@@ -56,7 +56,7 @@ export default function TermsPage() {
             Trading Act 1986 depends on the circumstances, so a lawyer needs to review
             both that agreement and this summary before anyone is asked to sign or rely on
             it.
-          </p>
+          </Note>
         </Card>
       </Section>
 

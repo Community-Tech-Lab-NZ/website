@@ -8,7 +8,7 @@ import { PartnerRow } from "@/components/PartnerRow";
 import { Reveal } from "@/components/Reveal";
 import { Section } from "@/components/Section";
 import { SectionRule } from "@/components/SectionRule";
-import { Body, Eyebrow, Heading, Lede, WordKnockText } from "@/components/Typography";
+import { Body, Eyebrow, Heading, Lede, Note } from "@/components/Typography";
 import { breadcrumbSchema, JsonLd, showcaseEventSchema } from "@/lib/structured-data";
 import { PARTNER_URLS } from "@/lib/navigation";
 
@@ -167,12 +167,9 @@ export default function AboutPage() {
                   {person.role}
                 </div>
                 {person.paragraphs.map((para, i) => (
-                  <WordKnockText
-                    key={i}
-                    className="mt-4 max-w-measure font-sans text-body-sm text-body"
-                  >
+                  <Note key={i} className="mt-4">
                     {para}
-                  </WordKnockText>
+                  </Note>
                 ))}
               </Card>
             ))}
@@ -182,7 +179,7 @@ export default function AboutPage() {
 
       <Section flush>
         <Reveal>
-          <Eyebrow className="mb-5">Who is involved</Eyebrow>
+          <Eyebrow className="mb-4">Who is involved</Eyebrow>
           <Heading level={3} as="h2">
             Six organisations deliver Community Tech Lab{" "}
             <span className="ctl-sweep-gold">together</span>

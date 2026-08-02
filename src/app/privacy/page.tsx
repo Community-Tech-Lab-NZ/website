@@ -4,7 +4,7 @@ import { ExternalLink } from "@/components/ExternalLink";
 import { NumberedSections, type NumberedSection } from "@/components/NumberedSections";
 import { Section } from "@/components/Section";
 import { SectionRule } from "@/components/SectionRule";
-import { Eyebrow, Heading, Lede } from "@/components/Typography";
+import { Eyebrow, Heading, Lede, Note } from "@/components/Typography";
 
 /* Privacy notice.
  *
@@ -145,7 +145,7 @@ export default function PrivacyPage() {
 
         <Card tone="sunk" className="mt-8 max-w-[var(--terms-measure)]">
           <Eyebrow>Before this goes live</Eyebrow>
-          <p className="mt-3 max-w-measure font-sans text-body-sm text-body">
+          <Note className="mt-3">
             This notice is a draft and needs sign-off from Startup Queenstown Lakes.
             Three details need confirming: how long applications are actually kept, how
             someone makes an access or correction request given the programme publishes
@@ -153,7 +153,7 @@ export default function PrivacyPage() {
             terms. The Privacy Act requires an access route that works, and the claim
             that submitted text is not used to train anyone&rsquo;s model has to be true
             of whichever provider is chosen.
-          </p>
+          </Note>
         </Card>
       </Section>
     </>

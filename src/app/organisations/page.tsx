@@ -6,7 +6,7 @@ import { Reveal } from "@/components/Reveal";
 import { ScoringTable, SCORING_ORGANISATIONS } from "@/components/ScoringTable";
 import { Section } from "@/components/Section";
 import { SectionRule } from "@/components/SectionRule";
-import { Body, Eyebrow, Heading, Lede, WordKnockText } from "@/components/Typography";
+import { Body, Eyebrow, Heading, Lede, Note } from "@/components/Typography";
 import { breadcrumbSchema, JsonLd } from "@/lib/structured-data";
 
 /* For organisations. Copy transcribed verbatim from the prototype.
@@ -77,12 +77,12 @@ export default function OrganisationsPage() {
             <KeyDatesCard>
               <div className="mt-6 border-t border-solid border-hairline pt-5">
                 <Eyebrow>Who can apply</Eyebrow>
-                <WordKnockText className="mt-3 max-w-measure font-sans text-body-sm text-body">
+                <Note className="mt-3">
                   Not-for-profits, registered charities, marae, sports clubs, community
                   groups and incorporated societies based in the Queenstown Lakes
                   district. Businesses can be eligible where what gets built serves the
                   community rather than commercial gain.
-                </WordKnockText>
+                </Note>
               </div>
             </KeyDatesCard>
           </div>

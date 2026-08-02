@@ -290,6 +290,38 @@
 .ctl-link-grow{display:inline-block;transition:transform 450ms var(--ease-out-soft),color var(--duration-fast) var(--ease-standard),border-color var(--duration-fast) var(--ease-standard),text-decoration-color var(--duration-fast) var(--ease-standard)}
 .ctl-link-grow:hover{transform:scale(1.03)}
 
+/* Disclosure caret (RoleDescription). Caret.tsx sets its rotation as an inline
+   style from the `direction` prop, which a server component cannot flip when
+   the <details> opens — inline styles beat classes, so the open state has to be
+   expressed here instead. Rendered pointing up and rotated down while closed,
+   so the default direction="up" leaves the inline transform unset and this rule
+   has the element to itself. --duration-fast is already zeroed under
+   prefers-reduced-motion, so no separate opt-out. */
+.ctl-disclosure-caret{transform:rotate(180deg);transition:transform var(--duration-fast) var(--ease-standard)}
+details[open] .ctl-disclosure-caret{transform:none}
+
+/* The fold opens rather than snapping. A <details> panel is only reachable
+   from CSS through ::details-content, and block-size:auto is only animatable
+   with interpolate-size — both recent, and both fail closed: a browser without
+   them drops these rules and the panel appears instantly, which is what it did
+   before. content-visibility rides the same transition with allow-discrete so
+   the content is still painted on the way back down; without it, closing
+   snaps. interpolate-size sits on the element rather than :root because it
+   inherits, and nothing else on the site should start interpolating keywords.
+
+   The panels are long — over a viewport for the senior role — so this is
+   --duration-base rather than the 420ms entry: a tall sweep reads as slow
+   twice as fast as a short one. Zeroed under prefers-reduced-motion with
+   everything else. */
+.ctl-disclosure{interpolate-size:allow-keywords}
+.ctl-disclosure::details-content{
+  block-size:0;
+  opacity:0;
+  overflow:clip;
+  transition:block-size var(--duration-base) var(--ease-out-soft),opacity var(--duration-base) var(--ease-out-soft),content-visibility var(--duration-base) allow-discrete;
+}
+.ctl-disclosure[open]::details-content{block-size:auto;opacity:1}
+
 /* The same fold for the two panels that are NOT <details>: SiteHeader's mobile
    nav and StageBar's stage list. Both are hand-rolled disclosures on a plain
    div toggled with the hidden attribute (they have to be — each coordinates

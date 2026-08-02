@@ -1,4 +1,6 @@
 import { applyHref } from "./apply-path";
+import { escapeHtml } from "./html";
+import { ROLES } from "./roles";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "./site";
 
 /* JSON-LD structured data.
@@ -125,32 +127,38 @@ export function breadcrumbSchema(trail: { name: string; path: string }[]) {
  * exactly what JobPosting describes. Being honest in the markup matters: the
  * rate is explicitly a community rate rather than commercial, and the
  * employment type reflects a short contract, not a permanent job.
+ *
+ * The unpaid internship is deliberately absent. It is a voluntary learning
+ * place, not a job, and marking it up as one would be a lie to a job board.
+ *
+ * `description` is assembled from the same role data the page renders rather
+ * than being written out again here — the two drifted once already. Google
+ * wants the full description and accepts HTML, so the duties go in as a list
+ * instead of the two-sentence summary this used to carry.
  */
 export function jobPostingsSchema() {
-  const roles = [
-    {
-      title: "Senior developer and mentor",
-      description:
-        "Lead one team, mentor the junior, guide architecture and keep scope sensible. Roughly 60 hours across a five-week build, contracted to Startup Queenstown Lakes as a sole trader.",
-      seats: 3,
-    },
-    {
-      title: "Junior developer or designer",
-      description:
-        "Do the primary build work with a senior developer alongside you. About 12 hours a week for five weeks, with real users at the other end.",
-      seats: 3,
-    },
-  ];
+  const roles = ROLES.filter((role) => role.paid);
 
   return roles.map((role) => ({
     "@context": "https://schema.org",
     "@type": "JobPosting",
     title: role.title,
-    description: role.description,
+    // Escaped, because this is the one field where transcribed prose becomes
+    // markup. An ampersand in a JD bullet is not a hypothetical — the roles
+    // already say "FLINT, QCC, Technology Queenstown, and QRC" — and a bare one
+    // is invalid HTML in a field job boards render.
+    description: [
+      `<p>${escapeHtml(role.summary)}</p>`,
+      `<p>${escapeHtml(role.lookingFor)}</p>`,
+      "<p>What you'll do:</p>",
+      `<ul>${role.doing.items.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`,
+    ].join(""),
     datePosted: "2026-08-15",
     validThrough: "2026-08-31",
     employmentType: "CONTRACTOR",
-    totalJobOpenings: role.seats,
+    // Dropped from the JSON entirely when a role has no fixed count, rather
+    // than emitted as null.
+    totalJobOpenings: role.seats ?? undefined,
     hiringOrganization: {
       "@type": "Organization",
       name: "Startup Queenstown Lakes",
@@ -201,14 +209,25 @@ export function showcaseEventSchema() {
   };
 }
 
-/** Renders one or more schema objects as a script tag. */
+/* Renders one or more schema objects as a script tag.
+ *
+ * The `<` escape is not defensive against user input — nothing here comes from
+ * a visitor. It is defensive against OURSELVES. This used to carry only prose
+ * written a few lines above it, and said so; it now carries the job
+ * descriptions from lib/roles.ts, marked up as HTML because that is what
+ * JobPosting wants. So there is markup inside a <script> block, which ends at
+ * the first `</script` in the raw text no matter how deep in a JSON string it
+ * sits — and JSON.stringify does not escape `<`.
+ *
+ * Nothing in the roles trips it today. The point is that the failure moved from
+ * impossible to one unlucky sentence in a PDF someone transcribes next year,
+ * and the failure is the whole page, not the markup. `<` is valid JSON and
+ * parses back to `<`, so consumers see exactly what they saw before. */
 export function JsonLd({ data }: { data: object | object[] }) {
   return (
     <script
       type="application/ld+json"
-      // Content is generated from constants in this file, never from user
-      // input, so there is nothing here to escape against.
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(data).replace(/</g, "\\u003c") }}
     />
   );
 }

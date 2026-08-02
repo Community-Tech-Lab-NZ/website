@@ -251,18 +251,22 @@
    common attention patterns are sheens, heartbeat scaling and periodic
    wiggles; the ping wins here because it animates an affordance the brand
    already owns instead of adding a new one, and it asks for the eye without
-   begging. The ::after starts coincident with the static ring (outline width
-   plus its 6px offset puts that edge at -8px). */
+   begging. The ::after starts coincident with the static ring: its containing
+   block is the padding box, so clearing the 2px border and then the ring gap
+   puts its outer edge exactly on the outline. Derived from --ring-gap rather
+   than hardcoded — retuning the gap must move both rings or the ping starts
+   from somewhere the eye has no reason to expect. */
 @keyframes ctl-ping{
   0%{opacity:.9;transform:scale(1)}
   16%{opacity:0;transform:scale(1.12)}
   100%{opacity:0}
 }
-.ctl-cta-ping{position:relative}
-.ctl-cta-ping::after{content:"";position:absolute;inset:-8px;border:var(--border-rule) solid var(--ctl-kowhai);border-radius:calc(var(--radius-card) + 8px);opacity:0;pointer-events:none;animation:ctl-ping 5.5s var(--ease-standard) 2s infinite}
-/* The nav Apply button has no resting detached ring, so its ping starts
-   closer to the edge; the 2.75s offset keeps it alternating with the hero. */
-.ctl-cta-ping--tight::after{inset:-3px;border-radius:calc(var(--radius-card) + 3px);animation-delay:4.75s}
+.ctl-cta-ping{position:relative;--ping-inset:calc(var(--ring-gap) + var(--border-rule))}
+.ctl-cta-ping::after{content:"";position:absolute;inset:calc(-1 * var(--ping-inset));border:var(--border-rule) solid var(--ctl-kowhai);border-radius:calc(var(--radius-card) + var(--ping-inset));opacity:0;pointer-events:none;animation:ctl-ping 5.5s var(--ease-standard) 2s infinite}
+/* The nav Apply button carries the same resting ring, so its ping shares the
+   hero's geometry and only the timing differs; the 2.75s offset keeps the two
+   alternating rather than firing in unison on the home page. */
+.ctl-cta-ping--offbeat::after{animation-delay:4.75s}
 
 /* Text links grow on hover (owner request): a gentle scale that eases both
    in and out, tuned twice — 1.05 about the left edge read as too much, too

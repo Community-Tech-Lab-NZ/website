@@ -129,10 +129,10 @@ export function SiteHeader({
         <div className="ml-auto flex items-center gap-4 md:ml-0">
           {actionLabel ? (
             <Button
-              variant={dark ? "primary" : "secondary"}
+              variant="primary"
               size="sm"
               href={actionHref}
-              className="ctl-cta-ping ctl-cta-ping--tight"
+              className="ctl-cta-ping ctl-cta-ping--offbeat ring-detached"
             >
               {actionLabel}
             </Button>

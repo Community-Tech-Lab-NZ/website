@@ -250,10 +250,23 @@
   display: inline-block;
 }
 
-/* Hero CTA's detached ring: an outline sitting clear of the button edge. */
+/* The detached ring on the two Apply CTAs — the home hero's and the header's:
+   an outline sitting clear of the button edge. */
 @utility ring-detached {
   outline: var(--border-rule) solid var(--ctl-kowhai);
-  outline-offset: 6px;
+  outline-offset: var(--ring-gap);
+}
+
+/* base.css's `:focus-visible` outline cannot reach these buttons: it sits in
+   @layer base and a utility layer beats it whatever the specificity, so a
+   ringed button would keep the same Kowhai outline focused as at rest. Restate
+   focus here, where the extra pseudo-class outranks the utility, and make it
+   read as a state change rather than a colour swap — Fern, one step thicker. */
+@layer utilities {
+  .ring-detached:focus-visible {
+    outline: var(--border-emphasis) solid var(--action-focus-ring);
+    outline-offset: var(--ring-gap);
+  }
 }
 
 /* The roofline tilt on an angled section rule. */

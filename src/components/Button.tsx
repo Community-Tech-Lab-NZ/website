@@ -51,9 +51,10 @@ const button = cva(
         sm: "text-body-sm px-4 py-2",
         md: "text-body-md px-5 py-3",
         lg: "text-body-lg px-6 py-4",
-        // The home hero CTA only. Larger than lg and heavier, and the one place
-        // the detached ring is used — it is the single most important control
-        // on the site, and the one gold thing in that viewport.
+        // The home hero CTA only: larger than lg and heavier, because it is the
+        // single most important control on the site. The detached ring travels
+        // with it — the header's Apply wears the same one at sm — so the two
+        // read as one CTA that follows the visitor rather than two buttons.
         hero: "text-[length:var(--hero-cta-size)] font-extrabold p-[var(--hero-cta-padding)] ring-detached",
       },
       fullWidth: {

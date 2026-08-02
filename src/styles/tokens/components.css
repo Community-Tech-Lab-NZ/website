@@ -125,6 +125,12 @@
   --page-heading-max: 780px;
   --hero-stat-min: 160px;
 
+  /* The gap between an Apply CTA and its detached ring. One value for both the
+     hero's and the header's, so the ring reads as part of the button rather
+     than a box drawn around it — and because the ping's resting ring is derived
+     from it, the two rings can never drift apart. */
+  --ring-gap: 3px;
+
   /* Two-column section grids from the prototype. */
   --col-min-wide: 320px;
   --col-min: 300px;

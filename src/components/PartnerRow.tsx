@@ -21,13 +21,23 @@ import { PARTNER_URLS } from "@/lib/navigation";
  *   Technology Q    navy, designed for light            direct on the cell
  *   Startup QL      lime reversed mark                  chip in SQL deep blue
  *   huddl           white mark, lives on their orange   chip in huddl orange
+ *   QT Coders       pale mark, lives on their navy      chip in QT Coders navy
  *
  * The chip hugs its logo rather than being a fixed plate, and each chip is the
  * PARTNER'S OWN ground colour, supplied by the programme: #182073 for Startup
- * Queenstown Lakes, #F77815 for huddl (their site's hero orange). These two
- * hex values are the only non-palette colours in the codebase, which is why
- * they are inline styles rather than utilities — they are someone else's brand
- * constants, not ours, and the theme lock should keep refusing them.
+ * Queenstown Lakes, #F77815 for huddl (their site's hero orange), #020617 for
+ * QT Coders (their site's background). These three hex values are the only
+ * non-palette colours in the codebase, which is why they are inline styles
+ * rather than utilities — they are someone else's brand constants, not ours,
+ * and the theme lock should keep refusing them.
+ *
+ * QT Coders have never published a logo file: their site draws the mark as a
+ * live icon component (lucide mountain-snow) beside a Geist wordmark, and the
+ * only raster anywhere is a 65px GitHub avatar. qt_coders_logo.svg rebuilds
+ * that lockup at the proportions their own navbar uses, with the wordmark
+ * converted to outlines so it does not depend on Geist being loaded. It is our
+ * reconstruction, not a supplied asset — swap it for the real thing if they
+ * ever produce one.
  *
  * Plain <img> rather than next/image: huddl's mark is an SVG, and next/image
  * refuses SVG unless dangerouslyAllowSVG is enabled for the whole project.
@@ -42,7 +52,11 @@ type Partner = {
   name: string;
   /** Public path. Absent where no usable file exists yet. */
   logo?: string;
-  /** Intrinsic pixel size, so the browser reserves the box and nothing shifts. */
+  /** Intrinsic pixel size, so the browser reserves the box and nothing shifts.
+   *  These are plain <img> with no srcset, so a phone downloads exactly this
+   *  file: the sources are stored at 3x their largest display slot (200px wide
+   *  for a cell mark, 40px tall for a chip) and no larger. Technology
+   *  Queenstown's arrived at 1500px and 85KB to be shown 200px wide. */
   w?: number;
   h?: number;
   /** Chip colour for reversed marks: the partner's own ground. Absent means
@@ -54,16 +68,22 @@ export const CTL_PARTNERS: readonly Partner[] = [
   {
     name: "Startup Queenstown Lakes",
     logo: "/logos/startup_queenstown_lakes_logo.webp",
-    w: 760,
-    h: 300,
+    w: 320,
+    h: 126,
     chip: "#182073",
   },
-  // No website and no logo file supplied.
-  { name: "Queenstown Coders Connect" },
+  // No website: qtcc.co.nz, the domain on their GitHub org, no longer resolves.
+  {
+    name: "Queenstown Coders Connect",
+    logo: "/logos/qt_coders_logo.svg",
+    w: 110,
+    h: 20,
+    chip: "#020617",
+  },
   { name: "FLINT Queenstown", logo: "/logos/flint_logo.png", w: 300, h: 300 },
   { name: "Queenstown Resort College", logo: "/logos/qrc_logo.png", w: 130, h: 130 },
   { name: "huddl", logo: "/logos/huddl_logo.svg", w: 239, h: 100, chip: "#F77815" },
-  { name: "Technology Queenstown", logo: "/logos/tq_logo.webp", w: 1500, h: 291 },
+  { name: "Technology Queenstown", logo: "/logos/tq_logo.webp", w: 600, h: 116 },
 ] as const;
 
 type PartnerRowProps = {
@@ -109,8 +129,14 @@ export function PartnerRow({
                  flags the new tab. */
               <LinkedLogo name={partner.name}>
                 {partner.chip ? (
+                  /* max-w-full on the chip and min(…,100%) on the mark inside
+                     it: a 200px logo in a chip with 16px of padding either
+                     side needs 232px, which is wider than the cell on a phone
+                     below ~370px. The chip used to keep that width and hang
+                     out of the grid, which put every page carrying the
+                     partner wall into horizontal scroll. */
                   <span
-                    className="ctl-grow flex items-center justify-center rounded-card px-4 py-2"
+                    className="ctl-grow flex max-w-full items-center justify-center rounded-card px-4 py-2"
                     style={{ background: partner.chip }}
                   >
                     <img
@@ -119,7 +145,7 @@ export function PartnerRow({
                       width={partner.w}
                       height={partner.h}
                       loading="lazy"
-                      className="block h-[var(--partner-chip-logo-h)] w-auto max-w-[var(--partner-logo-max-w)] object-contain"
+                      className="block h-[var(--partner-chip-logo-h)] w-auto max-w-[min(var(--partner-logo-max-w),100%)] object-contain"
                     />
                   </span>
                 ) : (
@@ -129,7 +155,7 @@ export function PartnerRow({
                     width={partner.w}
                     height={partner.h}
                     loading="lazy"
-                    className="ctl-grow block h-[var(--partner-logo-h)] w-auto max-w-[var(--partner-logo-max-w)] object-contain"
+                    className="ctl-grow block h-[var(--partner-logo-h)] w-auto max-w-[min(var(--partner-logo-max-w),100%)] object-contain"
                   />
                 )}
               </LinkedLogo>
@@ -151,7 +177,12 @@ export function PartnerRow({
               <ExternalLink
                 href={PARTNER_URLS[partner.name]}
                 className={clsx(
-                  "ctl-link-grow underline decoration-transparent hover:decoration-current",
+                  // ctl-hit: these names set a 19px line box, under the 24px
+                  // WCAG 2.2 target minimum (2.5.8). The SAME partner names in
+                  // the footer already carry it; the wall was the copy that got
+                  // missed. The ±6px it adds is spent into the cell's own 16px
+                  // gap, so nothing moves and no two targets meet.
+                  "ctl-hit ctl-link-grow underline decoration-transparent hover:decoration-current",
                   inverse ? "text-heading-inverse" : "text-heading",
                 )}
               >

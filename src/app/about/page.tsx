@@ -157,7 +157,10 @@ export default function AboutPage() {
       <Section flush>
         <Reveal>
           <Eyebrow as="h2" className="mb-5">Who is behind it</Eyebrow>
-          <div className="grid grid-cols-[repeat(auto-fit,minmax(var(--col-min-wide),1fr))] items-start gap-6">
+          {/* min(…,100%) so the 320px track can give on a narrow phone. Without
+              it the card kept its minimum, hung past the gutter and put the
+              page into horizontal scroll. */}
+          <div className="grid grid-fit items-start gap-6">
             {PEOPLE.map((person) => (
               <Card key={person.name} tone="light" accentRule={person.accent}>
                 <Heading level={3} as="h3" className="text-body-lg">

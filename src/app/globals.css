@@ -260,3 +260,42 @@
 @utility rule-angled {
   transform: rotate(-1.4deg);
 }
+
+/* THE TWO SECTION GRIDS. Both were written out at every call site, and both had
+   drifted in the way a copied track list does — quietly, and only visibly with
+   two pages open side by side.
+
+   As many equal columns as fit, wrapping when they no longer do. The min()
+   is the whole reason this is a utility: a bare minmax(320px,1fr) track will
+   NOT shrink below its minimum, so on a viewport narrower than one column plus
+   its gutters the card pushes out of the container and takes the entire page
+   into horizontal scroll — a light strip down the right of every full-width
+   surface. Three grids each had to be found and fixed by hand. A fourth written
+   from memory would have reintroduced it; written as `grid-fit` it cannot.
+
+   One minimum for all of them, where two of the three used --col-min-wide and
+   the third --col-min. Twenty pixels of difference in the width at which a
+   grid reflows is not a decision anybody made, and it meant two sections on
+   the same page dropping to one column at different moments. */
+@utility grid-fit {
+  grid-template-columns: repeat(auto-fit, minmax(min(var(--col-min-wide), 100%), 1fr));
+}
+
+/* Prose on the left, an aside on the right — a key-dates card or a scoring
+   table — stacking to one column below lg. Four sections use it.
+
+   They used it at three different ratios: 1.2/0.8, 1.15/0.85 and 1/0.8. Three
+   of the four put the SAME KeyDatesCard in the right-hand track, so the card a
+   reader met on the home page arrived a little wider on /organisations and a
+   little narrower again on /developers. Nothing chose that; it is what happens
+   when a track list is pasted and then nudged.
+
+   Settled at 1/0.8, the value two of the four already used and the one most
+   generous to the aside, whose content is a date list that must not wrap. At
+   the lg container that is a 569px prose column, comfortably inside the 700px
+   reading measure. Pair with `grid-cols-1` for the stacked case below lg. */
+@utility grid-aside {
+  grid-template-columns:
+    minmax(var(--col-min), 1fr)
+    minmax(var(--col-min-narrow), 0.8fr);
+}

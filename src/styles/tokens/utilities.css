@@ -145,14 +145,16 @@
 .ctl-btn-motion:hover{transform:scale(1.04)}
 .ctl-btn-motion:active{transform:scale(1.04) translateY(1px)}
 
-/* Hover lift and grow (override 4). Transform-only so nothing reflows.
-   On --duration-hover, not --duration-fast: growth should stretch, not
-   twitch. */
-/* Owns border-color too: the audience cards pair the lift with a Fern
-   border highlight, and a Tailwind transition utility alongside would
-   overwrite this shorthand and snap both back to the fast timing. */
-.ctl-lift{transition:transform var(--duration-hover) var(--ease-out-soft),border-color var(--duration-hover) var(--ease-out-soft)}
-.ctl-lift:hover{transform:translateY(-3px)}
+/* Hover grow (override 4). Transform-only so nothing reflows. On
+   --duration-hover, not --duration-fast: growth should stretch, not twitch.
+
+   There was a .ctl-lift beside this — the same timing, translating up 3px —
+   for the two audience cards on the home page. Those cards stopped lifting
+   when it became clear the whole card was not a link target, only the button
+   inside it, and nothing else on the site ever wanted it. The rule is gone
+   rather than parked: a hover affordance kept in the stylesheet is one someone
+   reaches for later without rediscovering why it was dropped. Override 4 still
+   exists in its other two forms, .ctl-grow here and .ctl-btn-motion below. */
 .ctl-grow{transition:transform var(--duration-hover) var(--ease-out-soft)}
 .ctl-grow:hover{transform:scale(1.06)}
 
@@ -234,7 +236,7 @@
   .ctl-word.is-knocked{animation:none}
   .ctl-motion-only{display:none}
   .ctl-still-only{display:inline}
-  .ctl-lift:hover,.ctl-grow:hover{transform:none}
+  .ctl-grow:hover{transform:none}
   .ctl-knock.is-knocked{animation:none}
   .ctl-cta-ping::after{animation:none}
   .ctl-focus-list:hover>li{opacity:1;transform:none}

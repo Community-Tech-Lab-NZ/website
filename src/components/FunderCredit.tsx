@@ -47,14 +47,27 @@ export function FunderCredit({ inverse = false, note = null, className }: Funder
           same behaviour. */}
       <ExternalLink
         href={FUND_URL}
-        className="ctl-grow flex shrink-0 items-center justify-center rounded-card bg-white p-3 no-underline"
+        className="ctl-grow flex max-w-full shrink-0 items-center justify-center rounded-card bg-white p-3 no-underline"
       >
+        {/* Sized by WIDTH, not height, so the plate can give. At 48px tall the
+            lockup is 267px wide, and with the plate's padding that is wider
+            than a phone under ~340px: as a fixed height with w-auto it kept
+            that width, hung past the gutter and took the page into horizontal
+            scroll. Width plus h-auto holds the same 48px everywhere there is
+            room and scales the mark down, in ratio, where there is not. */}
+        {/* sizes, because the CSS width and the width prop disagree. Without it
+            next/image sizes the srcset from width={885} — the file's own
+            dimensions — and a phone was pulling a 1080px variant to fill a slot
+            that is never wider than 267px. The value is that cap, with the
+            narrow-phone case (max-w-full inside the plate) taking the vw
+            branch. */}
         <Image
           src="/logos/economic_futures_logo.jpg"
           alt="Economic Futures, Queenstown Lakes District Council"
           width={885}
           height={159}
-          className="block h-[var(--funder-logo-h)] w-auto"
+          sizes="(max-width: 340px) 90vw, 267px"
+          className="block h-auto w-[var(--funder-logo-w)] max-w-full"
         />
         <span className="sr-only"> QLDC Economic Diversification Fund</span>
       </ExternalLink>

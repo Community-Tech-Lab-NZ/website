@@ -10,9 +10,15 @@ import { cva, type VariantProps } from "class-variance-authority";
  * Tier-three motion: `interactive` steps the hairline toward Fern on hover.
  * That is only ever correct on a card that actually does something when
  * clicked — a hover affordance on static content lies about what will happen.
- */
+ *
+ * PADDING STEPS WITH WIDTH, the same way Section's gutter does (24px, then
+ * 48px from lg). The prototype's flat 32px was a desktop number applied at
+ * every size: on a 320px phone a card spans 272px, and 32px each side left
+ * 208px of usable line — 65% of the screen, with the rest spent on inset. The
+ * card is already inside the page gutter, so its padding is the SECOND inset a
+ * phone pays for, and 24px is enough to keep the border off the text. */
 
-const card = cva("rounded-card border border-solid p-6", {
+const card = cva("rounded-card border border-solid p-5 lg:p-6", {
   variants: {
     tone: {
       light: "bg-surface-card text-body border-hairline",

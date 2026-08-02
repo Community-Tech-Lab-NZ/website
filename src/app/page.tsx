@@ -104,7 +104,11 @@ export default function HomePage() {
           {/* Was "Two ways in", which framed the programme as a pair of doors
               you had to pick between. "Get involved" is an invitation. */}
           <Eyebrow as="h2" className="mb-5">Get involved</Eyebrow>
-          <div className="grid grid-cols-[repeat(auto-fit,minmax(var(--col-min-wide),1fr))] gap-6">
+          {/* min(): a bare minmax(320px,1fr) track does not shrink below its
+              minimum, so on a phone narrower than 320 plus gutters the card
+              pushed out of the container and took the whole page into
+              horizontal scroll with it. min(…,100%) lets the track give. */}
+          <div className="grid grid-fit gap-6">
             <AudiencePath
               audience="community"
               eyebrow="For community organisations"
@@ -146,7 +150,7 @@ export default function HomePage() {
       {/* Why it exists / Built once, used by many */}
       <Section flush>
         <Reveal>
-          <div className="grid grid-cols-[repeat(auto-fit,minmax(var(--col-min),1fr))] gap-8">
+          <div className="grid grid-fit gap-8">
             <div>
               <Eyebrow className="mb-4">Why it exists</Eyebrow>
               <Heading level={3} as="h2">
@@ -178,7 +182,7 @@ export default function HomePage() {
       {/* How it runs */}
       <Section flush>
         <Reveal>
-          <div className="grid grid-cols-1 items-start gap-9 lg:grid-cols-[minmax(var(--col-min-wide),1.2fr)_minmax(var(--col-min-narrow),0.8fr)]">
+          <div className="grid grid-cols-1 items-start gap-9 lg:grid-aside">
             <div>
               <Eyebrow className="mb-4">How it runs</Eyebrow>
               <Heading level={2}>

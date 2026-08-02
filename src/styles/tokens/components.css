@@ -87,10 +87,13 @@
   --partner-logo-max-w: 200px;
   /* Right-hand block of the footer's bottom bar. */
   --footer-note-max: 420px;
-  /* Funder credit. The supplied Economic Futures / QLDC lockup is 885x159, so
-     the rendered height drives the width and only the height is a token.
-     48px matches the partner wall logos. */
-  --funder-logo-h: 48px;
+  /* Funder credit. The supplied Economic Futures / QLDC lockup is 885x159.
+     48px of height matches the partner wall logos, and 267px is that height
+     through the mark's own ratio (48 x 885/159). WIDTH is the token the
+     component sets, not height: as a fixed height with w-auto the plate held
+     267px on a phone too narrow for it and pushed the page sideways, where a
+     width with h-auto simply scales the mark down in ratio. */
+  --funder-logo-w: 267px;
 
   /* CalloutBanner text column, narrower than the standard reading measure so
      the band keeps its title and action on one line at desktop widths. */

@@ -12,12 +12,30 @@
   --space-9:96px;
   --space-10:128px;
 
-  --section-y:96px;      /* vertical rhythm between page sections */
-  --section-y-tight:64px;
+  /* Vertical rhythm between page sections. PHONE VALUES FIRST — the handoff
+     gave one number for every width, and 96px is a number sized for a 900px-tall
+     desktop window. On a phone it is a third of the screen of empty Oat between
+     every block, on a home page that is already 7300px long; in landscape it
+     stacks with the 96px header and takes half the viewport before a word of
+     content. Both step up at md, where the layout stops being a single column.
+
+     Still on the brand scale, and still a real step apart from each other:
+     space-8/space-7 below, space-9/space-8 above. */
+  --section-y:64px;
+  --section-y-tight:48px;
   --gutter:24px;         /* page edge padding, mobile */
   --gutter-lg:48px;      /* page edge padding, desktop */
   --container:1120px;
   --container-wide:1280px;
 
   --logo-clearspace:8px; /* = cursor-block height; scale with the mark */
+}
+
+/* md, matching --breakpoint-md in globals.css: the width where the header nav
+   stops collapsing and the page stops being one column. */
+@media (min-width: 900px){
+  :root{
+    --section-y:96px;
+    --section-y-tight:64px;
+  }
 }

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Archivo, Source_Sans_3, Space_Mono } from "next/font/google";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -37,6 +37,29 @@ const spaceMono = Space_Mono({
   weight: ["400", "700"],
   display: "swap",
 });
+
+/* Phone browser chrome.
+ *
+ * manifest.ts already carries a theme_color, but that one only applies once
+ * someone has installed the site to a home screen. The tag below is what mobile
+ * Safari and Chrome actually read to tint the toolbar around a normal tab, and
+ * without it they pick their own colour — a grey bar over an Oat page.
+ *
+ * Oat, not Ink: the header sits at the top of every route (SiteHeader defaults
+ * to tone="oat" and nothing overrides it), so Oat is the colour the toolbar is
+ * continuous with. The manifest's Ink is for the standalone splash, which is a
+ * different surface.
+ *
+ * colorScheme is declared light because the site has no dark theme. Left unset,
+ * a phone in dark mode is free to render native form controls dark against the
+ * white fills in control.ts — and the application form is 32 controls long.
+ *
+ * Deliberately NO maximumScale or userScalable: locking zoom is a WCAG 1.4.4
+ * failure, and this form is read by people who need to pinch in on it. */
+export const viewport: Viewport = {
+  themeColor: "#F3EFE3", // --ctl-oat, the header surface
+  colorScheme: "light",
+};
 
 export const metadata: Metadata = {
   // Required for Open Graph: social crawlers need absolute URLs, and a relative

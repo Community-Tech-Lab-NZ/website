@@ -17,8 +17,12 @@ import { Eyebrow, KnockText, WordKnockText } from "./Typography";
  * The gold action follows the Ink card, so "one gold thing per viewport" still
  * holds with the two side by side — it has just moved to the community side.
  *
- * The whole card is a link target in practice, so the tier-three hover step on
- * the hairline is legitimate here: something does happen when you click it.
+ * NO HOVER STATE, DELIBERATELY. The card used to rise 3px and take a Fern
+ * border under the pointer, on the reasoning that the whole thing was a link
+ * target in practice. It is not — only the button inside navigates — and a card
+ * that rises and lights up promises a click that never lands. The affordance
+ * now sits where the behaviour is. This was the only caller of the lift, so the
+ * rule went with it; see the note beside .ctl-grow in tokens/utilities.css.
  */
 
 type AudiencePathProps = {
@@ -47,11 +51,12 @@ export function AudiencePath({
   return (
     <div
       className={clsx(
-        // ctl-lift is motion override 4 and owns the whole transition —
-        // border fade included — so the Fern highlight eases in on the same
-        // slow hover timing as everything else. No Tailwind transition
-        // utilities here; one would overwrite the shorthand.
-        "ctl-lift flex flex-col gap-4 rounded-card border border-solid p-7 hover:border-fern",
+        /* p-5 below lg, not the flat p-7 the prototype carried. 48px on both
+           sides of a 272px card at 320px left 176px of line — 55% of the
+           viewport reaching the reader, and the two card titles broke over four
+           lines while the body text beneath them did not. Steps back up to 48px
+           at lg, where the card is half a 1120px container and can afford it. */
+        "flex flex-col gap-4 rounded-card border border-solid p-5 lg:p-7",
         dark
           ? "border-transparent bg-ink text-body-inverse"
           : "border-hairline bg-oat text-body",

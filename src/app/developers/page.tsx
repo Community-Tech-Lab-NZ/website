@@ -138,7 +138,7 @@ export default function DevelopersPage() {
 
       <Section flush>
         <Reveal>
-          <div className="grid grid-cols-1 items-start gap-9 lg:grid-cols-[minmax(var(--col-min),1fr)_minmax(var(--col-min-narrow),0.8fr)]">
+          <div className="grid grid-cols-1 items-start gap-9 lg:grid-aside">
             <div>
               <Heading level={2}>What you get out of it</Heading>
               <div className="mt-5">

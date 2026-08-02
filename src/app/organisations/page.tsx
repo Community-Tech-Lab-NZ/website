@@ -60,7 +60,7 @@ export default function OrganisationsPage() {
 
       <Section>
         <Reveal>
-          <div className="grid grid-cols-1 items-start gap-9 lg:grid-cols-[minmax(var(--col-min-wide),1.15fr)_minmax(var(--col-min-narrow),0.85fr)]">
+          <div className="grid grid-cols-1 items-start gap-9 lg:grid-aside">
             <div>
               <Heading level={2}>What taking part actually involves</Heading>
               <Body className="mt-5">
@@ -91,7 +91,7 @@ export default function OrganisationsPage() {
 
       <Section flush>
         <Reveal>
-          <div className="grid grid-cols-1 items-start gap-9 lg:grid-cols-[minmax(var(--col-min),1fr)_minmax(var(--col-min-narrow),0.8fr)]">
+          <div className="grid grid-cols-1 items-start gap-9 lg:grid-aside">
             <div>
               <Eyebrow className="mb-4">How we choose</Eyebrow>
               <Heading level={3} as="h2">

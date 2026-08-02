@@ -6,25 +6,67 @@ import { CommunityForm } from "./CommunityForm";
 import { DeveloperForm } from "./DeveloperForm";
 import { Body } from "../Typography";
 import { useTabIndicator } from "@/hooks/useTabIndicator";
+import { applyHref, type ApplyPath } from "@/lib/apply-path";
 
 /* The two-tab fork at the top of the apply page.
  *
  * The two audiences never share a form, so this is the last place the site
  * splits them. Tabs are real buttons in a tablist so keyboard and screen reader
  * users get the same fork everyone else does.
+ *
+ * Which tab opens is the page's call, not this component's: developer copy
+ * links to ?for=developer and arrives here already forked. See lib/apply-path.
  */
 
-const TABS = [
+const TABS: { id: ApplyPath; label: string }[] = [
   { id: "community", label: "I am a community organisation" },
   { id: "developer", label: "I am a developer" },
-] as const;
+];
 
-type TabId = (typeof TABS)[number]["id"];
+export function ApplyTabs({
+  canSubmit,
+  initialPath = "community",
+}: {
+  canSubmit: boolean;
+  initialPath?: ApplyPath;
+}) {
+  const [path, setPath] = useState<ApplyPath>(initialPath);
 
-export function ApplyTabs({ canSubmit }: { canSubmit: boolean }) {
-  const [path, setPath] = useState<TabId>("community");
+  /* The URL leads, in both directions.
+   *
+   * `initialPath` seeding useState only covers the first mount, and this
+   * component survives navigations that change the parameter — it stays in the
+   * same position in the tree, so React reconciles rather than remounts and the
+   * state outlives the prop. Landing on ?for=developer and then tapping the
+   * header's Apply now (a bare /apply) left the developer form open under a URL
+   * claiming otherwise: the CTA looked broken, and a refresh would have thrown
+   * the reader onto the other form.
+   *
+   * Adjusted during render rather than in an effect, the same way SiteHeader
+   * closes its panel on a route change: React re-runs this pass before touching
+   * the DOM, so the right form is in the first paint of the new URL. Converges
+   * after one pass — the guard can only fire when the prop actually moves, and
+   * `choose` below changes the URL without re-rendering the page, so a tab
+   * click never trips it. */
+  const [lastFromUrl, setLastFromUrl] = useState(initialPath);
+  if (lastFromUrl !== initialPath) {
+    setLastFromUrl(initialPath);
+    setPath(initialPath);
+  }
+
   // Sliding Fern underline; the per-tab borders stay as the no-JS fallback.
   const { stripRef, barRef } = useTabIndicator<HTMLDivElement>(path);
+
+  function choose(next: ApplyPath) {
+    setPath(next);
+    // Keep the URL honest, so a refresh or a shared link comes back to the form
+    // the reader is actually looking at. replaceState rather than router.replace:
+    // Next syncs it into the router without re-running this force-dynamic page,
+    // which would otherwise remount both forms and lose whatever is typed in
+    // them. Replace, not push, so Back still leaves the page rather than
+    // walking the reader through every tab they tried.
+    window.history.replaceState(null, "", applyHref(next));
+  }
 
   return (
     <div>
@@ -49,7 +91,7 @@ export function ApplyTabs({ canSubmit }: { canSubmit: boolean }) {
             aria-selected={path === tab.id}
             data-tab-active={path === tab.id || undefined}
             aria-controls={`panel-${tab.id}`}
-            onClick={() => setPath(tab.id)}
+            onClick={() => choose(tab.id)}
             className={clsx(
               "ctl-tab-underline -mb-px cursor-pointer border-0 border-b-2 border-solid bg-transparent px-1 py-3",
               "font-heading text-body-md font-extrabold",

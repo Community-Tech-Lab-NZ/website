@@ -7,6 +7,7 @@ import { Reveal } from "@/components/Reveal";
 import { StatusTag } from "@/components/StatusTag";
 import { Body, Eyebrow, Heading, Note } from "@/components/Typography";
 import { ApplyTabs } from "@/components/form/ApplyTabs";
+import { APPLY_PARAM, parseApplyPath } from "@/lib/apply-path";
 import { getWindowState, WINDOW_COPY } from "@/lib/application-window";
 import { APPLICATION_WINDOW_LABEL } from "@/lib/navigation";
 
@@ -21,6 +22,11 @@ import { APPLICATION_WINDOW_LABEL } from "@/lib/navigation";
  * deliberate — letting an organisation see all six sections in advance is a real
  * quality lever on a 50-minute application, and far better than a bare
  * "come back on the 15th".
+ *
+ * ?for=developer opens on the developer form. Chosen on the server rather than
+ * in the client component so the right form is in the first paint — a tab that
+ * flips after hydration reads as a glitch, and on a slow connection the reader
+ * has already started on the wrong one.
  */
 
 export const dynamic = "force-dynamic";
@@ -33,7 +39,12 @@ export const metadata: Metadata = {
   alternates: { canonical: "/apply" },
 };
 
-export default function ApplyPage() {
+export default async function ApplyPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  const path = parseApplyPath((await searchParams)[APPLY_PARAM]);
   const state = getWindowState();
   const copy = WINDOW_COPY[state];
   const canSubmit = state === "open";
@@ -75,7 +86,9 @@ export default function ApplyPage() {
             </Card>
           ) : null}
 
-          {state !== "closed" ? <ApplyTabs canSubmit={canSubmit} /> : null}
+          {state !== "closed" ? (
+            <ApplyTabs canSubmit={canSubmit} initialPath={path} />
+          ) : null}
         </Reveal>
       </Section>
 

@@ -1,3 +1,4 @@
+import { applyHref } from "./apply-path";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "./site";
 
 /* JSON-LD structured data.
@@ -168,7 +169,10 @@ export function jobPostingsSchema() {
       name: "New Zealand",
     },
     directApply: true,
-    url: `${SITE_URL}/apply`,
+    // directApply promises the application itself is at the other end of this
+    // link, so it points at the developer form rather than at a page that opens
+    // on a community application.
+    url: `${SITE_URL}${applyHref("developer")}`,
   }));
 }
 

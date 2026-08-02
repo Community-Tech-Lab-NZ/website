@@ -8,6 +8,7 @@ import { Section } from "@/components/Section";
 import { SectionRule } from "@/components/SectionRule";
 import { StatFigure } from "@/components/StatFigure";
 import { Eyebrow, Heading, Lede, WordKnockText } from "@/components/Typography";
+import { applyHref } from "@/lib/apply-path";
 import { breadcrumbSchema, JsonLd, jobPostingsSchema } from "@/lib/structured-data";
 
 /* For developers. Copy transcribed verbatim from the prototype.
@@ -88,8 +89,10 @@ export default function DevelopersPage() {
           <StatFigure inverse knock labelSize="md" figure="~12 hrs" label="Per week, approximate" />
         </div>
 
+        {/* Every apply link on this page opens the developer form. Nobody who
+            has read this far wants the community application. */}
         <div className="mt-7">
-          <Button variant="primary" size="lg" href="/apply">
+          <Button variant="primary" size="lg" href={applyHref("developer")}>
             Apply now
           </Button>
         </div>
@@ -123,7 +126,7 @@ export default function DevelopersPage() {
                   {role.body}
                 </WordKnockText>
 
-                <Button variant="outline" size="sm" href="/apply">
+                <Button variant="outline" size="sm" href={applyHref("developer")}>
                   Apply
                 </Button>
               </div>
@@ -154,6 +157,7 @@ export default function DevelopersPage() {
       <ClosingCta
         title="Six paid seats this round"
         note="Tell us which seat fits and what you have shipped before."
+        actionHref={applyHref("developer")}
       />
     </>
   );

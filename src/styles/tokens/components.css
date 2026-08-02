@@ -105,6 +105,12 @@
      are easier to scan when the label, control and hint share a short line. */
   --form-measure: 620px;
 
+  /* The application stage rail. 220px holds "Your organisation" — the longest
+     of the six labels — beside its Space Mono number without wrapping, at the
+     same 16px left padding the mobile nav uses. The rail only appears at lg,
+     where the container leaves 1024px: 220 + 48 gap + 620 form = 888. */
+  --stage-nav-w: 220px;
+
   /* Footer link columns, auto-fitting from this minimum. */
   --footer-col-min: 140px;
 

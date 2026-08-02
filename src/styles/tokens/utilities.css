@@ -314,6 +314,15 @@
 .ctl-tab-indicator--fern{background:var(--ctl-fern)}
 .ctl-tabs-live .ctl-tab-underline{border-bottom-color:transparent !important}
 
+/* Vertical variant: the application stage rail, whose spine runs down the left
+   instead of along the bottom. The bar tracks top/height rather than
+   left/width (useTabIndicator's axis: "y"), and the same reduced-motion story
+   holds because the timing still comes from --duration-base.
+   --vertical is a separate class token, so the rule above does not match it and
+   the horizontal strips are untouched. */
+.ctl-tab-indicator--vertical{top:0;bottom:auto;left:-1px;width:var(--border-rule);height:0;transition:top var(--duration-base) var(--ease-standard),height var(--duration-base) var(--ease-standard),opacity var(--duration-fast) var(--ease-standard)}
+.ctl-tabs-live .ctl-tab-underline--vertical{border-left-color:transparent !important}
+
 /* Form select parity. A select displaying its placeholder option shows the
    same muted colour input placeholders do (the :has matches while the empty
    option is chosen, and stops the moment a real value is). The option rules

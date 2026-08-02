@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { clsx } from "clsx";
 import { useElapsed } from "@/hooks/useElapsed";
 import { Button } from "../Button";
 import { CaretList } from "../CaretList";
@@ -14,11 +13,11 @@ import { FormAlert } from "./FormAlert";
 import { Honeypot } from "./Honeypot";
 import { Input } from "./Input";
 import { Select } from "./Select";
+import { StageBar } from "./StageBar";
+import { StageNav, type StageMark } from "./StageNav";
 import { Textarea } from "./Textarea";
 import { emailIssues, postApplication, requiredIssue, type Issue } from "./submit";
 import { useFormDraft } from "@/hooks/useFormDraft";
-import { useTabIndicator } from "@/hooks/useTabIndicator";
-import { Caret } from "../Caret";
 import {
   CTL_GATES,
   DECLARATION_STATEMENTS,
@@ -172,7 +171,6 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
 
   const draft = useFormDraft<Values>("ctl-application-draft-v1", EMPTY);
   const values = draft.value;
-  const { stripRef: tabStripRef, barRef: tabBarRef } = useTabIndicator<HTMLDivElement>(step);
 
   /* Moving between sections replaces the DOM (the keyed fade wrapper), so
      focus is managed: it lands on the new section's heading, which also tells
@@ -204,14 +202,48 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
     [draft],
   );
 
-  /* Per-section completeness, recomputed every render. Cheap: presence checks
-     over a couple of dozen strings. */
-  const completeness = SECTIONS.map(
+  /* Per-section state, recomputed every render. Cheap: presence checks over a
+     couple of dozen strings.
+
+     `resolved` is the validation truth — nothing outstanding in that section —
+     and it is what Next, the submit pass and the declaration shortcut read. */
+  const resolved = SECTIONS.map(
     (_, i) => sectionIssues(i, values, gates, declared).length === 0,
   );
-  const incomplete = SECTIONS.filter((_, i) => !completeness[i]);
-  const onlyDeclarationLeft =
-    incomplete.length === 1 && !completeness[5] && step < 5;
+  const incomplete = SECTIONS.filter((_, i) => !resolved[i]);
+  const onlyDeclarationLeft = incomplete.length === 1 && !resolved[5] && step < 5;
+
+  /* What the rail shows, which is deliberately NOT `resolved`.
+   *
+   * Scope and fit has no required questions, so it is resolved from first
+   * paint. Marking it made a blank form open with a tick on section four and
+   * "1 of 6 complete", which reads as progress nobody made — and, sitting
+   * beside a row, was read as a pointer at the current stage instead.
+   *
+   * So a section says nothing until it has been opened. Walk the guided path
+   * and marks appear behind you; the warning only ever appears on a section
+   * someone opened and left unfinished, because Next validates and will not
+   * let them past one otherwise. It takes jumping about in the rail to earn
+   * one, which is exactly when it is worth saying.
+   *
+   * Trying to submit overrides all of that: at that point every outstanding
+   * section has to be visible, opened or not. */
+  const [visited, setVisited] = useState<number[]>([0]);
+  const [triedSubmit, setTriedSubmit] = useState(false);
+  /* Adjusted during render rather than in an effect, the same way SiteHeader
+     closes its panel on a route change: React re-runs this pass before
+     touching the DOM, so a section never paints unmarked for a frame and then
+     corrects itself. The guard converges — it can only be true once per
+     section. */
+  if (!visited.includes(step)) setVisited([...visited, step]);
+
+  const marks: StageMark[] = SECTIONS.map((_, i) => {
+    if (resolved[i]) return visited.includes(i) ? "done" : "none";
+    if (triedSubmit) return "attention";
+    // Never on the section in view: its own fields carry the message there.
+    return visited.includes(i) && i !== step ? "attention" : "none";
+  });
+  const done = marks.filter((m) => m === "done").length;
 
   /* Next validates the section it is leaving. Errors render inline on the
      fields in view and progression stops until they are dealt with — that is
@@ -228,6 +260,11 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
   }
 
   async function submit() {
+    /* From here on the rail flags every outstanding section, including ones
+       nobody has opened. Before a submit attempt that would be nagging; after
+       one it is the answer to "why can this not send". */
+    setTriedSubmit(true);
+
     /* Client-side pass over the whole form before anything leaves the device.
        On failure, jump to the first section with a problem and show its
        errors there — the same courtesy the server-error path already extends.
@@ -296,383 +333,363 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
 
   return (
     <div>
-      {/* Step nav. The active tab carries the 2px Kowhai underline, and via
-          useTabIndicator it genuinely slides between sections now — the
-          per-tab border classes remain as the no-JS fallback.
-          A three-column grid rather than flex-wrap: six sections wrapped 4 + 2
-          at this width, which reads as an accident. Three and three is even at
-          every breakpoint, and justify-items-start keeps each underline hugging
-          its label instead of stretching to the full column. */}
-      <div
-        ref={tabStripRef}
-        className="ctl-tab-strip mt-6 grid grid-cols-2 justify-items-start gap-x-5 border-b border-solid border-hairline sm:grid-cols-3"
-      >
-        {SECTIONS.map((section, i) => (
-          <button
-            key={section.id}
-            type="button"
-            onClick={() => setStep(i)}
-            aria-current={step === i ? "step" : undefined}
-            data-tab-active={step === i || undefined}
-            className={clsx(
-              "ctl-tab-underline -mb-px flex cursor-pointer items-baseline gap-2 border-0 border-b-2 border-solid bg-transparent px-px py-3",
-              "font-heading text-body-sm font-bold",
-              "transition-[color,border-color] duration-[var(--duration-base)] ease-brand",
-              step === i ? "border-b-kowhai text-ink" : "border-b-transparent text-muted",
-            )}
-          >
-            <span className="font-meta text-label tracking-[var(--tracking-step)]">
-              {String(i + 1).padStart(2, "0")}
-            </span>
-            {section.label}
-            {/* The brand's own glyph as the completeness mark: a Fern caret
-                once a section has everything it requires. Fern is structural
-                here, not text, so the 4.5:1 rule does not apply to it. */}
-            {completeness[i] ? (
-              <>
-                <Caret direction="up" size={7} thickness={2} color="var(--ctl-fern)" />
-                <span className="sr-only">complete</span>
-              </>
-            ) : null}
-          </button>
-        ))}
-        <span ref={tabBarRef} aria-hidden="true" className="ctl-tab-indicator" />
-      </div>
+      {/* Below lg the rail collapses to a sticky bar that expands. */}
+      <StageBar stages={SECTIONS} current={step} marks={marks} onSelect={setStep} />
 
-      {/* Progress hint. Always states what is still needed, so nobody has to
-          hunt for the field holding things up; when only the declaration is
-          left it becomes a shortcut to finishing. */}
-      {incomplete.length ? (
-        onlyDeclarationLeft ? (
-          <div className="mt-4 flex flex-wrap items-center gap-4">
-            <p className="m-0 font-sans text-body-sm text-muted">
-              Everything is answered. Only the declaration is left.
-            </p>
-            <Button variant="secondary" size="sm" onClick={() => setStep(5)}>
-              Go to the declaration
-            </Button>
-          </div>
-        ) : (
-          <p className="mt-4 font-meta text-label uppercase tracking-[var(--tracking-step)] text-muted">
-            Still needed:{" "}
-            {incomplete.map((s) => s.label).join(" · ")}
+      {/* Stage rail beside the form rather than a strip above it. Six sections
+          in a three-by-two grid showed every label but never read as a
+          sequence, and the active underline was easy to lose under the
+          audience tabs, which were another horizontal strip a few pixels
+          higher. Top to bottom fixes the order and frees the other axis.
+          The rail only appears at lg, where the apply page's form now spans the
+          full container: 220 + 48 + 620 fits the 1024px content width. */}
+      <div className="mt-6 lg:grid lg:grid-cols-[var(--stage-nav-w)_minmax(0,1fr)] lg:items-start lg:gap-7">
+        <div className="hidden lg:sticky lg:top-7 lg:block">
+          <StageNav
+            stages={SECTIONS}
+            current={step}
+            marks={marks}
+            onSelect={setStep}
+            indicator
+          />
+          <p className="mt-4 border-t border-solid border-hairline pt-4 font-meta text-label uppercase tracking-[var(--tracking-step)] text-muted">
+            {done} of {SECTIONS.length} complete
           </p>
-        )
-      ) : null}
-
-      {draft.restored ? (
-        <Card tone="sunk" className="mt-6 max-w-[var(--form-measure)]">
-          <p className="font-sans text-body-sm text-body">
-            We restored your progress from this device. Nothing has been sent yet.
-          </p>
-          <div className="mt-4">
-            <Button variant="outline" size="sm" onClick={draft.discard}>
-              Start over
-            </Button>
-          </div>
-        </Card>
-      ) : null}
-
-      {/* Keyed on step: changing section remounts this wrapper, replaying the
-          same 220ms fade-and-rise the routes use, so moving through the form
-          feels like moving through the site. The remount also lets focus be
-          sent to the new section's heading — with a keyed swap the previously
-          focused button is gone, and without managed focus a keyboard user
-          would be dropped back to the top of the document. */}
-      <div key={step} className="ctl-route-fade">
-        <div className="mt-6 max-w-[var(--form-measure)]">
-          {/* h2, not h3: this sits directly under the page h1, and an h3 here
-              skipped a level. Visual size is unchanged. */}
-          <Heading level={3} as="h2">
-            <span ref={headingRef} tabIndex={-1} className="outline-none">
-              {SECTIONS[step].title}
-            </span>
-          </Heading>
-          <Body className="mt-3">{SECTIONS[step].intro}</Body>
         </div>
 
-        <div className="mt-6 grid max-w-[var(--form-measure)] gap-5">
-        {step === 0 ? (
-          <>
-            <Field label="Organisation name" required error={issueFor("orgName")}>
-              <Input
-                value={values.orgName}
-                onChange={set("orgName")}
-                placeholder="Wakatipu Community Trust"
-              />
-            </Field>
-            <Field
-              label="Legal structure"
-              hint="Registered charity, incorporated society, charitable trust, community group, not-for-profit."
-            >
-              <Select
-                placeholder="Select one"
-                options={LEGAL_STRUCTURES}
-                value={values.legalStructure}
-                onChange={set("legalStructure")}
-              />
-            </Field>
-            <Field label="Charities or NZBN number" hint="If you have one.">
-              <Input value={values.registrationNumber} onChange={set("registrationNumber")} />
-            </Field>
-            <div className="grid gap-5 sm:grid-cols-2">
-              <Field label="Main contact name" required error={issueFor("contactName")}>
-                <Input value={values.contactName} onChange={set("contactName")} />
-              </Field>
-              <Field label="Role or position">
-                <Input value={values.contactRole} onChange={set("contactRole")} />
-              </Field>
-            </div>
-            <div className="grid gap-5 sm:grid-cols-2">
-              <Field label="Email" required error={issueFor("contactEmail")}>
-                <Input
-                  type="email"
-                  value={values.contactEmail}
-                  onChange={set("contactEmail")}
-                  placeholder="you@organisation.nz"
-                />
-              </Field>
-              <Field label="Phone">
-                <Input type="tel" value={values.contactPhone} onChange={set("contactPhone")} />
-              </Field>
-            </div>
-            <Field
-              label="Where you are based"
-              hint="Town or area within the Queenstown Lakes district."
-            >
-              <Input value={values.basedIn} onChange={set("basedIn")} placeholder="Wānaka" />
-            </Field>
-            <Field
-              label="Roughly how many people run your organisation"
-              hint="Paid staff and regular volunteers. This helps us understand capacity, not to rule you out."
-            >
-              <Select
-                placeholder="Select one"
-                options={ORG_SIZES}
-                value={values.orgSize}
-                onChange={set("orgSize")}
-              />
-            </Field>
-          </>
-        ) : null}
-
-        {step === 1 ? (
-          <>
-            {CTL_GATES.map((gate, i) => (
-              <Checkbox
-                key={i}
-                checked={gates[i]}
-                onChange={(e) => {
-                  const next = [...gates];
-                  next[i] = e.target.checked;
-                  setGates(next);
-                  if (next.every(Boolean)) {
-                    setIssues((prev) => prev.filter((issue) => issue.field !== "gates"));
-                  }
-                }}
-                label={gate}
-              />
-            ))}
-            {issueFor("gates") ? <FormAlert>{issueFor("gates")}</FormAlert> : null}
-            {!allGates ? (
-              <p className="font-sans text-body-sm text-muted">
-                All six need to be confirmed before you can submit.
+        <div>
+          {/* The rail says which sections are outstanding. This says the one
+              thing it cannot: that the outstanding one is only a signature. */}
+          {onlyDeclarationLeft ? (
+            <div className="mb-6 flex flex-wrap items-center gap-4">
+              <p className="m-0 font-sans text-body-sm text-muted">
+                Everything is answered. Only the declaration is left.
               </p>
-            ) : null}
-
-            {/* Makes the section's own instruction true. The copy says "get in
-                touch before submitting" and, until now, pointed nowhere. */}
-            <EligibilityQuestion gates={CTL_GATES} unticked={gates} />
-          </>
-        ) : null}
-
-        {step === 2 ? (
-          <>
-            <Field
-              label="What is the problem you are hoping a digital solution could help with"
-              required
-              error={issueFor("problem")}
-              hint="A sentence or two. Plain language is perfect. For example: we track volunteer hours on paper and it takes hours to total them each month."
-            >
-              <Textarea rows={3} value={values.problem} onChange={set("problem")} />
-            </Field>
-            <Field
-              label="How do you handle this today, and what does it cost you"
-              hint="Time, money, errors, frustration, or things you cannot do because of it. About 100 to 150 words."
-            >
-              <Textarea rows={5} value={values.problemToday} onChange={set("problemToday")} />
-            </Field>
-            <Field
-              label="Who is affected, and how"
-              hint="Staff, volunteers, the people you serve, your board. Roughly how many, and how often. About 80 to 120 words."
-            >
-              <Textarea rows={4} value={values.problemWho} onChange={set("problemWho")} />
-            </Field>
-            <Field
-              label="What would success look like"
-              hint="Describe it in a way you could later tell whether it happened. About 80 to 120 words."
-            >
-              <Textarea rows={4} value={values.problemSuccess} onChange={set("problemSuccess")} />
-            </Field>
-          </>
-        ) : null}
-
-        {step === 3 ? (
-          <>
-            <Field
-              label="If you have a sense of what it might do, list the few things that matter most"
-              hint="Just the essentials. We work out the details with you later if you are selected."
-            >
-              <Textarea rows={4} value={values.scopeEssentials} onChange={set("scopeEssentials")} />
-            </Field>
-            <Field
-              label="Could something like this help other organisations in the district"
-              hint="Reuse carries real weight in scoring. If you are not sure, say so."
-            >
-              <Textarea rows={3} value={values.scopeReuse} onChange={set("scopeReuse")} />
-            </Field>
-            <Field label="Does it need to connect to, or replace, systems you already use">
-              <Select
-                placeholder="Select one"
-                options={SYSTEM_ANSWERS}
-                value={values.scopeSystems}
-                onChange={set("scopeSystems")}
-              />
-            </Field>
-            <Field
-              label="Which systems"
-              hint="A CRM, spreadsheet, website, payment or membership system."
-            >
-              <Input value={values.scopeSystemsWhich} onChange={set("scopeSystemsWhich")} />
-            </Field>
-            <Field
-              label="Would it handle personal or sensitive information"
-              hint="Client records, health information, children's details, donor or payment data. This does not rule you out, it helps us plan."
-            >
-              <Select
-                placeholder="Select one"
-                options={SENSITIVE_ANSWERS}
-                value={values.scopeSensitive}
-                onChange={set("scopeSensitive")}
-              />
-            </Field>
-            <Field label="Briefly, what kind of information">
-              <Textarea rows={2} value={values.scopeSensitiveWhat} onChange={set("scopeSensitiveWhat")} />
-            </Field>
-          </>
-        ) : null}
-
-        {step === 4 ? (
-          <>
-            <Field
-              label="Who would be the main point of contact during the build, and how much time could they give"
-              required
-              error={issueFor("readinessContact")}
-              hint="A real person and a realistic amount of time, even if small, makes a selected project far more likely to succeed."
-            >
-              <Textarea rows={3} value={values.readinessContact} onChange={set("readinessContact")} />
-            </Field>
-            <Field
-              label="After handover, who would look after it and help your people start using it"
-              hint="It is fine if this is the same person, or if you are not sure yet."
-            >
-              <Textarea rows={3} value={values.readinessOwner} onChange={set("readinessOwner")} />
-            </Field>
-            <Field
-              label="Is there anything time-sensitive about your need"
-              hint="A funding round, a season, an event, or a system being switched off. Optional."
-            >
-              <Textarea rows={2} value={values.readinessTiming} onChange={set("readinessTiming")} />
-            </Field>
-            <Field label="Anything else the selection panel should know" hint="Optional.">
-              <Textarea
-                rows={3}
-                value={values.readinessAnythingElse}
-                onChange={set("readinessAnythingElse")}
-              />
-            </Field>
-          </>
-        ) : null}
-
-        {step === 5 ? (
-          <>
-            <Body className="text-body-sm">By submitting this application, I confirm that:</Body>
-            <CaretList items={DECLARATION_STATEMENTS} />
-            <div className="grid gap-5 sm:grid-cols-2">
-              <Field label="Name" required error={issueFor("declarationName")}>
-                <Input value={values.declarationName} onChange={set("declarationName")} />
-              </Field>
-              <Field label="Role">
-                <Input value={values.declarationRole} onChange={set("declarationRole")} />
-              </Field>
+              <Button variant="secondary" size="sm" onClick={() => setStep(5)}>
+                Go to the declaration
+              </Button>
             </div>
-            <Checkbox
-              checked={declared}
-              onChange={(e) => {
-                setDeclared(e.target.checked);
-                if (e.target.checked) {
-                  setIssues((prev) => prev.filter((issue) => issue.field !== "declared"));
-                }
-              }}
-              label="I confirm the statements above on behalf of my organisation"
-            />
-            {issueFor("declared") ? <FormAlert>{issueFor("declared")}</FormAlert> : null}
-
-            <p className="max-w-measure font-sans text-body-sm text-muted">
-              Startup Queenstown Lakes holds this information on behalf of the programme,
-              and the selection panel reads it to assess applications. It is stored in
-              Google Workspace in the United States. You can ask to see or correct it at
-              any time. See the{" "}
-              <a href="/privacy" className="ctl-link-grow text-ink underline">
-                privacy notice
-              </a>
-              .
-            </p>
-          </>
-        ) : null}
-
-        <Honeypot id="ctl-website" value={honeypot} onChange={setHoneypot} />
-
-        {formError ? <FormAlert>{formError}</FormAlert> : null}
-
-        <div className="mt-3 flex flex-wrap items-center gap-3">
-          {step > 0 ? (
-            <Button variant="outline" onClick={() => setStep((s) => Math.max(s - 1, 0))}>
-              Back
-            </Button>
           ) : null}
 
-          {last ? (
-            /* Not disabled on incomplete answers, deliberately. A dead button
-               explains nothing; clicking this runs the client-side pass, which
-               jumps to the first problem and says what it is. Disabled remains
-               only for states a user cannot fix from here: mid-send, or the
-               window not being open. */
-            <Button
-              variant="primary"
-              size="lg"
-              disabled={sending || !canSubmit}
-              onClick={submit}
-            >
-              {sending ? "Sending" : "Send my application"}
-            </Button>
-          ) : (
-            <Button variant="secondary" onClick={next}>
-              Next: {SECTIONS[step + 1].label.toLowerCase()}
-            </Button>
-          )}
+          {draft.restored ? (
+            <Card tone="sunk" className="mb-6 max-w-[var(--form-measure)]">
+              <p className="font-sans text-body-sm text-body">
+                We restored your progress from this device. Nothing has been sent yet.
+              </p>
+              <div className="mt-4">
+                <Button variant="outline" size="sm" onClick={draft.discard}>
+                  Start over
+                </Button>
+              </div>
+            </Card>
+          ) : null}
 
-          <span className="ml-auto font-meta text-label uppercase tracking-[var(--tracking-step)] text-muted">
-            Section {step + 1} of {SECTIONS.length}
-          </span>
-        </div>
+          {/* Keyed on step: changing section remounts this wrapper, replaying the
+              same 220ms fade-and-rise the routes use, so moving through the form
+              feels like moving through the site. The remount also lets focus be
+              sent to the new section's heading — with a keyed swap the previously
+              focused button is gone, and without managed focus a keyboard user
+              would be dropped back to the top of the document. */}
+          <div key={step} className="ctl-route-fade">
+            <div className="max-w-[var(--form-measure)]">
+              {/* h2, not h3: this sits directly under the page h1, and an h3 here
+                  skipped a level. Visual size is unchanged. */}
+              <Heading level={3} as="h2">
+                {/* scroll-mt clears the sticky stage bar: focusing this scrolls it
+                    into view, and without the margin it lands underneath. */}
+                <span
+                  ref={headingRef}
+                  tabIndex={-1}
+                  className="scroll-mt-8 outline-none lg:scroll-mt-0"
+                >
+                  {SECTIONS[step].title}
+                </span>
+              </Heading>
+              <Body className="mt-3">{SECTIONS[step].intro}</Body>
+            </div>
 
-        {last && !canSubmit ? (
-          <p className="font-sans text-body-sm text-muted">
-            Applications open on 15 August. You can fill this in now and it will be saved
-            on this device.
-          </p>
-        ) : null}
+            <div className="mt-6 grid max-w-[var(--form-measure)] gap-5">
+            {step === 0 ? (
+              <>
+                <Field label="Organisation name" required error={issueFor("orgName")}>
+                  <Input
+                    value={values.orgName}
+                    onChange={set("orgName")}
+                    placeholder="Wakatipu Community Trust"
+                  />
+                </Field>
+                <Field
+                  label="Legal structure"
+                  hint="Registered charity, incorporated society, charitable trust, community group, not-for-profit."
+                >
+                  <Select
+                    placeholder="Select one"
+                    options={LEGAL_STRUCTURES}
+                    value={values.legalStructure}
+                    onChange={set("legalStructure")}
+                  />
+                </Field>
+                <Field label="Charities or NZBN number" hint="If you have one.">
+                  <Input value={values.registrationNumber} onChange={set("registrationNumber")} />
+                </Field>
+                <div className="grid gap-5 sm:grid-cols-2">
+                  <Field label="Main contact name" required error={issueFor("contactName")}>
+                    <Input value={values.contactName} onChange={set("contactName")} />
+                  </Field>
+                  <Field label="Role or position">
+                    <Input value={values.contactRole} onChange={set("contactRole")} />
+                  </Field>
+                </div>
+                <div className="grid gap-5 sm:grid-cols-2">
+                  <Field label="Email" required error={issueFor("contactEmail")}>
+                    <Input
+                      type="email"
+                      value={values.contactEmail}
+                      onChange={set("contactEmail")}
+                      placeholder="you@organisation.nz"
+                    />
+                  </Field>
+                  <Field label="Phone">
+                    <Input type="tel" value={values.contactPhone} onChange={set("contactPhone")} />
+                  </Field>
+                </div>
+                <Field
+                  label="Where you are based"
+                  hint="Town or area within the Queenstown Lakes district."
+                >
+                  <Input value={values.basedIn} onChange={set("basedIn")} placeholder="Wānaka" />
+                </Field>
+                <Field
+                  label="Roughly how many people run your organisation"
+                  hint="Paid staff and regular volunteers. This helps us understand capacity, not to rule you out."
+                >
+                  <Select
+                    placeholder="Select one"
+                    options={ORG_SIZES}
+                    value={values.orgSize}
+                    onChange={set("orgSize")}
+                  />
+                </Field>
+              </>
+            ) : null}
+
+            {step === 1 ? (
+              <>
+                {CTL_GATES.map((gate, i) => (
+                  <Checkbox
+                    key={i}
+                    checked={gates[i]}
+                    onChange={(e) => {
+                      const next = [...gates];
+                      next[i] = e.target.checked;
+                      setGates(next);
+                      if (next.every(Boolean)) {
+                        setIssues((prev) => prev.filter((issue) => issue.field !== "gates"));
+                      }
+                    }}
+                    label={gate}
+                  />
+                ))}
+                {issueFor("gates") ? <FormAlert>{issueFor("gates")}</FormAlert> : null}
+                {!allGates ? (
+                  <p className="font-sans text-body-sm text-muted">
+                    All six need to be confirmed before you can submit.
+                  </p>
+                ) : null}
+
+                {/* Makes the section's own instruction true. The copy says "get in
+                    touch before submitting" and, until now, pointed nowhere. */}
+                <EligibilityQuestion gates={CTL_GATES} unticked={gates} />
+              </>
+            ) : null}
+
+            {step === 2 ? (
+              <>
+                <Field
+                  label="What is the problem you are hoping a digital solution could help with"
+                  required
+                  error={issueFor("problem")}
+                  hint="A sentence or two. Plain language is perfect. For example: we track volunteer hours on paper and it takes hours to total them each month."
+                >
+                  <Textarea rows={3} value={values.problem} onChange={set("problem")} />
+                </Field>
+                <Field
+                  label="How do you handle this today, and what does it cost you"
+                  hint="Time, money, errors, frustration, or things you cannot do because of it. About 100 to 150 words."
+                >
+                  <Textarea rows={5} value={values.problemToday} onChange={set("problemToday")} />
+                </Field>
+                <Field
+                  label="Who is affected, and how"
+                  hint="Staff, volunteers, the people you serve, your board. Roughly how many, and how often. About 80 to 120 words."
+                >
+                  <Textarea rows={4} value={values.problemWho} onChange={set("problemWho")} />
+                </Field>
+                <Field
+                  label="What would success look like"
+                  hint="Describe it in a way you could later tell whether it happened. About 80 to 120 words."
+                >
+                  <Textarea rows={4} value={values.problemSuccess} onChange={set("problemSuccess")} />
+                </Field>
+              </>
+            ) : null}
+
+            {step === 3 ? (
+              <>
+                <Field
+                  label="If you have a sense of what it might do, list the few things that matter most"
+                  hint="Just the essentials. We work out the details with you later if you are selected."
+                >
+                  <Textarea rows={4} value={values.scopeEssentials} onChange={set("scopeEssentials")} />
+                </Field>
+                <Field
+                  label="Could something like this help other organisations in the district"
+                  hint="Reuse carries real weight in scoring. If you are not sure, say so."
+                >
+                  <Textarea rows={3} value={values.scopeReuse} onChange={set("scopeReuse")} />
+                </Field>
+                <Field label="Does it need to connect to, or replace, systems you already use">
+                  <Select
+                    placeholder="Select one"
+                    options={SYSTEM_ANSWERS}
+                    value={values.scopeSystems}
+                    onChange={set("scopeSystems")}
+                  />
+                </Field>
+                <Field
+                  label="Which systems"
+                  hint="A CRM, spreadsheet, website, payment or membership system."
+                >
+                  <Input value={values.scopeSystemsWhich} onChange={set("scopeSystemsWhich")} />
+                </Field>
+                <Field
+                  label="Would it handle personal or sensitive information"
+                  hint="Client records, health information, children's details, donor or payment data. This does not rule you out, it helps us plan."
+                >
+                  <Select
+                    placeholder="Select one"
+                    options={SENSITIVE_ANSWERS}
+                    value={values.scopeSensitive}
+                    onChange={set("scopeSensitive")}
+                  />
+                </Field>
+                <Field label="Briefly, what kind of information">
+                  <Textarea rows={2} value={values.scopeSensitiveWhat} onChange={set("scopeSensitiveWhat")} />
+                </Field>
+              </>
+            ) : null}
+
+            {step === 4 ? (
+              <>
+                <Field
+                  label="Who would be the main point of contact during the build, and how much time could they give"
+                  required
+                  error={issueFor("readinessContact")}
+                  hint="A real person and a realistic amount of time, even if small, makes a selected project far more likely to succeed."
+                >
+                  <Textarea rows={3} value={values.readinessContact} onChange={set("readinessContact")} />
+                </Field>
+                <Field
+                  label="After handover, who would look after it and help your people start using it"
+                  hint="It is fine if this is the same person, or if you are not sure yet."
+                >
+                  <Textarea rows={3} value={values.readinessOwner} onChange={set("readinessOwner")} />
+                </Field>
+                <Field
+                  label="Is there anything time-sensitive about your need"
+                  hint="A funding round, a season, an event, or a system being switched off. Optional."
+                >
+                  <Textarea rows={2} value={values.readinessTiming} onChange={set("readinessTiming")} />
+                </Field>
+                <Field label="Anything else the selection panel should know" hint="Optional.">
+                  <Textarea
+                    rows={3}
+                    value={values.readinessAnythingElse}
+                    onChange={set("readinessAnythingElse")}
+                  />
+                </Field>
+              </>
+            ) : null}
+
+            {step === 5 ? (
+              <>
+                <Body className="text-body-sm">By submitting this application, I confirm that:</Body>
+                <CaretList items={DECLARATION_STATEMENTS} />
+                <div className="grid gap-5 sm:grid-cols-2">
+                  <Field label="Name" required error={issueFor("declarationName")}>
+                    <Input value={values.declarationName} onChange={set("declarationName")} />
+                  </Field>
+                  <Field label="Role">
+                    <Input value={values.declarationRole} onChange={set("declarationRole")} />
+                  </Field>
+                </div>
+                <Checkbox
+                  checked={declared}
+                  onChange={(e) => {
+                    setDeclared(e.target.checked);
+                    if (e.target.checked) {
+                      setIssues((prev) => prev.filter((issue) => issue.field !== "declared"));
+                    }
+                  }}
+                  label="I confirm the statements above on behalf of my organisation"
+                />
+                {issueFor("declared") ? <FormAlert>{issueFor("declared")}</FormAlert> : null}
+
+                <p className="max-w-measure font-sans text-body-sm text-muted">
+                  Startup Queenstown Lakes holds this information on behalf of the programme,
+                  and the selection panel reads it to assess applications. It is stored in
+                  Google Workspace in the United States. You can ask to see or correct it at
+                  any time. See the{" "}
+                  <a href="/privacy" className="ctl-link-grow text-ink underline">
+                    privacy notice
+                  </a>
+                  .
+                </p>
+              </>
+            ) : null}
+
+            <Honeypot id="ctl-website" value={honeypot} onChange={setHoneypot} />
+
+            {formError ? <FormAlert>{formError}</FormAlert> : null}
+
+            <div className="mt-3 flex flex-wrap items-center gap-3">
+              {step > 0 ? (
+                <Button variant="outline" onClick={() => setStep((s) => Math.max(s - 1, 0))}>
+                  Back
+                </Button>
+              ) : null}
+
+              {last ? (
+                /* Not disabled on incomplete answers, deliberately. A dead button
+                   explains nothing; clicking this runs the client-side pass, which
+                   jumps to the first problem and says what it is. Disabled remains
+                   only for states a user cannot fix from here: mid-send, or the
+                   window not being open. */
+                <Button
+                  variant="primary"
+                  size="lg"
+                  disabled={sending || !canSubmit}
+                  onClick={submit}
+                >
+                  {sending ? "Sending" : "Send my application"}
+                </Button>
+              ) : (
+                <Button variant="secondary" onClick={next}>
+                  Next: {SECTIONS[step + 1].label.toLowerCase()}
+                </Button>
+              )}
+              {/* No "Section N of 6" here any more. The rail states it at lg and
+                  the sticky bar states it below, both permanently. */}
+            </div>
+
+            {last && !canSubmit ? (
+              <p className="font-sans text-body-sm text-muted">
+                Applications open on 15 August. You can fill this in now and it will be saved
+                on this device.
+              </p>
+            ) : null}
+            </div>
+          </div>
         </div>
       </div>
     </div>

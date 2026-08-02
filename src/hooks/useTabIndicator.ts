@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useRef } from "react";
 
-/* Shared sliding underline for tab strips: the header nav, the community form
- * step nav and the apply tabs.
+/* Shared sliding indicator: the header nav, the apply tabs and the community
+ * form's stage rail.
  *
  * The comment in CommunityForm always claimed the underline "slides between
  * sections"; until this hook it was actually a colour cross-fade between two
@@ -18,34 +18,47 @@ import { useCallback, useEffect, useRef } from "react";
  *
  * Reduced motion needs no special handling: the bar's transition runs on
  * --duration-base, which the token layer zeroes.
+ *
+ * Both axes are served. The default, "x", is the underline the three tab strips
+ * use. "y" is the application stage rail, where the spine runs down the left and
+ * the bar tracks top/height instead; it pairs with .ctl-tab-indicator--vertical.
  */
 
 export function useTabIndicator<T extends HTMLElement = HTMLElement>(
   activeKey: string | number,
+  axis: "x" | "y" = "x",
 ) {
   const stripRef = useRef<T | null>(null);
   const barRef = useRef<HTMLSpanElement | null>(null);
 
-  const moveTo = useCallback((el: HTMLElement | null) => {
-    const bar = barRef.current;
-    if (!bar) return;
-    if (!el) {
-      bar.style.opacity = "0";
-      return;
-    }
-    // Coming back from hidden, or being placed for the first time: position
-    // instantly rather than gliding in from wherever the bar last was.
-    const instant = bar.style.opacity === "0" || !bar.dataset.placed;
-    if (instant) bar.style.transition = "none";
-    bar.style.opacity = "1";
-    bar.style.left = `${el.offsetLeft}px`;
-    bar.style.width = `${el.offsetWidth}px`;
-    if (instant) {
-      void bar.getBoundingClientRect();
-      bar.style.transition = "";
-      bar.dataset.placed = "1";
-    }
-  }, []);
+  const moveTo = useCallback(
+    (el: HTMLElement | null) => {
+      const bar = barRef.current;
+      if (!bar) return;
+      if (!el) {
+        bar.style.opacity = "0";
+        return;
+      }
+      // Coming back from hidden, or being placed for the first time: position
+      // instantly rather than gliding in from wherever the bar last was.
+      const instant = bar.style.opacity === "0" || !bar.dataset.placed;
+      if (instant) bar.style.transition = "none";
+      bar.style.opacity = "1";
+      if (axis === "y") {
+        bar.style.top = `${el.offsetTop}px`;
+        bar.style.height = `${el.offsetHeight}px`;
+      } else {
+        bar.style.left = `${el.offsetLeft}px`;
+        bar.style.width = `${el.offsetWidth}px`;
+      }
+      if (instant) {
+        void bar.getBoundingClientRect();
+        bar.style.transition = "";
+        bar.dataset.placed = "1";
+      }
+    },
+    [axis],
+  );
 
   /** Return the bar to the active item (or hide it if there is none). */
   const rest = useCallback(() => {

@@ -39,9 +39,19 @@ export default function ApplyPage() {
   const canSubmit = state === "open";
 
   return (
-    <Section drift="hero">
-      <Reveal className="grid grid-cols-1 items-start gap-9 lg:grid-cols-[minmax(var(--col-min-wide),1fr)_minmax(var(--col-min-narrow),0.6fr)]">
-        <div>
+    <>
+      {/* The page runs in one column now, where it used to be a main column with
+          Key dates and How we choose riding beside it.
+          The community application gained a stage rail down its left side, and
+          the old main column had no width for one: inside the 1120px container
+          it measured ~580px, already under the 620px form measure, and
+          rail + form + aside will not share a line at any split. So the form
+          takes the full container and the two reference cards close the page.
+          They are reinforcement here rather than the only copy — the status
+          pill states the window above, and both cards also appear on the home
+          page and /organisations. */}
+      <Section drift="hero">
+        <Reveal>
           <div className="mb-4 flex flex-wrap items-center gap-4">
             <StatusTag tone={copy.tone}>{copy.tag}</StatusTag>
             {/* mb-0 matters here. Eyebrow renders a <p>, base.css gives every
@@ -54,23 +64,22 @@ export default function ApplyPage() {
             {copy.heading}
           </Heading>
 
-          {state === "closed" ? (
-            <Body className="mt-4">{copy.body}</Body>
-          ) : (
-            <>
-              {state === "before" ? (
-                <Card tone="sunk" className="mt-5">
-                  <p className="max-w-measure font-sans text-body-sm text-body">
-                    {copy.body}
-                  </p>
-                </Card>
-              ) : null}
-              <ApplyTabs canSubmit={canSubmit} />
-            </>
-          )}
-        </div>
+          {state === "closed" ? <Body className="mt-4">{copy.body}</Body> : null}
 
-        <div className="grid gap-6">
+          {state === "before" ? (
+            <Card tone="sunk" className="mt-5">
+              <p className="max-w-measure font-sans text-body-sm text-body">{copy.body}</p>
+            </Card>
+          ) : null}
+
+          {state !== "closed" ? <ApplyTabs canSubmit={canSubmit} /> : null}
+        </Reveal>
+      </Section>
+
+      {/* Flush: same Oat surface, so the hero's own bottom padding is the only
+          separation the two need. */}
+      <Section flush tight>
+        <Reveal className="grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
           <KeyDatesCard />
 
           {state !== "closed" ? (
@@ -82,8 +91,8 @@ export default function ApplyPage() {
               </p>
             </ScoringTable>
           ) : null}
-        </div>
-      </Reveal>
-    </Section>
+        </Reveal>
+      </Section>
+    </>
   );
 }

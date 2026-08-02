@@ -7,6 +7,7 @@ import {
 } from "@/lib/application-doc";
 import {
   getEmailConfig,
+  sendApplicationCopy,
   sendCommunityConfirmation,
   sendDeveloperConfirmation,
   sendQuestionAlert,
@@ -246,24 +247,68 @@ export async function POST(request: Request) {
   }
 
   // --- Notify ------------------------------------------------------------
-  if (email) {
+  // Every send is caught on its own. A bounced applicant address must not cost
+  // the programme its copy of the application, and vice versa.
+  const notify = async (step: string, send: () => Promise<void>) => {
     try {
-      if (data.formType === "community") {
-        await sendCommunityConfirmation(email, data.contactEmail, data.orgName, formatted);
-      } else if (data.formType === "developer") {
-        await sendDeveloperConfirmation(email, data.email, data.name, formatted);
-      } else if (process.env.PROGRAMME_INBOX) {
-        await sendQuestionAlert(
+      await send();
+    } catch (error) {
+      log(step, error);
+    }
+  };
+
+  if (email) {
+    // Second home for the application, beside the Sheet. Unset, nothing extra
+    // is sent and the pipeline behaves exactly as it did before.
+    const backupInbox = process.env.APPLICATION_BACKUP_INBOX;
+    const programmeInbox = process.env.PROGRAMME_INBOX;
+    // If formatting fell over above, the raw answers still beat an empty copy:
+    // being the backup is the whole point of this one.
+    const body = formatted || JSON.stringify(data, null, 2);
+
+    if (data.formType === "community") {
+      await notify("confirmation email", () =>
+        sendCommunityConfirmation(email, data.contactEmail, data.orgName, formatted),
+      );
+      if (backupInbox) {
+        await notify("backup copy", () =>
+          sendApplicationCopy(email, backupInbox, {
+            kind: "community",
+            who: data.orgName,
+            applicantEmail: data.contactEmail,
+            docUrl,
+            cvUrl,
+            formatted: body,
+          }),
+        );
+      }
+    } else if (data.formType === "developer") {
+      await notify("confirmation email", () =>
+        sendDeveloperConfirmation(email, data.email, data.name, formatted),
+      );
+      if (backupInbox) {
+        await notify("backup copy", () =>
+          sendApplicationCopy(email, backupInbox, {
+            kind: "developer",
+            who: data.name,
+            applicantEmail: data.email,
+            docUrl,
+            cvUrl,
+            formatted: body,
+          }),
+        );
+      }
+    } else if (programmeInbox) {
+      await notify("question alert", () =>
+        sendQuestionAlert(
           email,
-          process.env.PROGRAMME_INBOX,
+          programmeInbox,
           data.name,
           data.email,
           data.gate ?? "",
           data.question,
-        );
-      }
-    } catch (error) {
-      log("email", error);
+        ),
+      );
     }
   }
 

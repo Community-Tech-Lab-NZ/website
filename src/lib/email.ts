@@ -93,6 +93,56 @@ export async function sendDeveloperConfirmation(
   });
 }
 
+/* A programme-side copy of an application, sent alongside the applicant's own
+ * confirmation.
+ *
+ * The Sheet is the record. This is a second one, landing somewhere a person
+ * actually reads, so that a Sheet nobody opens for a week is not the only place
+ * an application exists. It carries the Doc and CV links, and replies go to the
+ * applicant rather than into the void.
+ *
+ * Sent as its own message rather than a bcc on the confirmation, deliberately: a
+ * typo in the applicant's address must not take the programme's copy down with
+ * it.
+ */
+export async function sendApplicationCopy(
+  config: EmailConfig,
+  to: string,
+  application: {
+    kind: "community" | "developer";
+    who: string;
+    applicantEmail: string;
+    docUrl: string;
+    cvUrl: string;
+    formatted: string;
+  },
+): Promise<void> {
+  if (!config.enabled) return;
+
+  const { kind, who, applicantEmail, docUrl, cvUrl, formatted } = application;
+  const links = [docUrl && `Doc: ${docUrl}`, cvUrl && `CV: ${cvUrl}`].filter(
+    (line): line is string => Boolean(line),
+  );
+
+  const resend = new Resend(config.apiKey);
+  await resend.emails.send({
+    from: config.from,
+    to,
+    replyTo: applicantEmail,
+    subject: `${kind === "community" ? "Organisation" : "Developer"} application · ${who}`,
+    text: [
+      `${who} <${applicantEmail}> applied.`,
+      ...(links.length ? ["", ...links] : []),
+      "",
+      "----------------------------------------",
+      "",
+      formatted,
+      "",
+      "Reply directly to this email to reach them.",
+    ].join("\n"),
+  });
+}
+
 /** Alerts the programme inbox that a question came in during the open window. */
 export async function sendQuestionAlert(
   config: EmailConfig,

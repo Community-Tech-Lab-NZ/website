@@ -99,7 +99,9 @@ cache expires.
 - [ ] End-to-end submission test against the **real** Sheet. Set
       `APPLICATION_WINDOW_OVERRIDE=open` temporarily, submit both forms, and
       confirm the `_raw` row, the structured row, the generated Doc, the CV in
-      Drive and the confirmation email. Delete the test rows afterwards
+      Drive, the confirmation email, and — if `APPLICATION_BACKUP_INBOX` is set
+      — the copy arriving there with working Doc and CV links. Delete the test
+      rows afterwards
 - [ ] **Unset `APPLICATION_WINDOW_OVERRIDE`.** Left set, the form stays in that
       state forever. The server logs a warning on every request while it is
       active

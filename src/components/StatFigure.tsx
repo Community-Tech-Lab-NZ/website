@@ -3,7 +3,7 @@
 import { clsx } from "clsx";
 import { knockEnd, knockEnter } from "@/lib/knock";
 
-/* A plain number that tells the story: three solutions, five-week build.
+/* A plain number that tells the story: three tools, five-week build.
  *
  * There is deliberately NO animated counting here. The brand guide names
  * "counters ticking up" as forbidden and StatFigure's own spec repeats it. A

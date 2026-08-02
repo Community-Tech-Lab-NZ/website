@@ -119,7 +119,7 @@ export default function AboutPage() {
             right={{
               eyebrow: "The other side",
               title: "Organisations running on spreadsheets",
-              body: "Hundreds of community organisations across the district run on spreadsheets, shared inboxes and phone trees. Booking systems that are a whiteboard. Membership records in three places. The budget goes to the mahi, not to software.",
+              body: "Hundreds of community organisations across the district run on spreadsheets, shared inboxes and someone ringing round. Booking systems that are a whiteboard. Membership records in three places. The budget goes to the mahi, not to software.",
             }}
           />
 
@@ -130,9 +130,9 @@ export default function AboutPage() {
               above it. */}
           <div className="mx-auto mt-9 max-w-measure md:text-center">
             <Body className="mx-auto">
-              Queenstown Lakes is a district of about fifty thousand residents carrying
-              several million visitors a year, and the community sector holds a lot of
-              that weight. Hundreds of organisations operate here, most of them small,
+              Queenstown Lakes is a district of about fifty-five thousand residents
+              carrying several million visitors a year, and the community sector holds a
+              lot of that weight. Hundreds of organisations operate here, most of them small,
               most of them run by a handful of people who are already stretched. Where an
               organisation elsewhere might have an operations person, here the same work
               sits on top of someone&rsquo;s actual job.

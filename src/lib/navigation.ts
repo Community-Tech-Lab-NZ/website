@@ -78,9 +78,9 @@ export const TIMELINE: TimelineStep[] = [
   { date: "15 to 31 Aug", label: "Applications open", done: true },
   { date: "1 to 18 Sep", label: "A local panel reads every application" },
   { date: "24 Sep", label: "The three builds are announced" },
-  { date: "28 Sep to 9 Oct", label: "Discovery, agreeing what gets built" },
-  { date: "12 Oct to 13 Nov", label: "Five-week build, in weekly sprints" },
-  { date: "26 Nov", label: "Showcase Hui, the three solutions demonstrated" },
+  { date: "28 Sep to 9 Oct", label: "Working out exactly what gets built" },
+  { date: "12 Oct to 13 Nov", label: "Five-week build, something to try each week" },
+  { date: "26 Nov", label: "Showcase Hui, the three tools demonstrated" },
 ];
 
 /** The application window as copy: the eyebrow on every closing CTA and the

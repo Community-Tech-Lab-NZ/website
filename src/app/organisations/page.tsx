@@ -26,10 +26,10 @@ export const metadata: Metadata = {
 };
 
 const WHAT_IT_INVOLVES = [
-  "Discovery: we sit down with you and agree exactly what is being built",
+  "First: we sit down with you and agree exactly what is being built",
   "During the build: you see working versions each week and say what is wrong",
-  "Handover: training, light documentation and a supported bedding-in period",
-  "For six weeks after handover: bugs fixed free",
+  "When we hand it over: training, written instructions, and help settling in",
+  "For six weeks after that: bugs fixed free",
   "After that: the code is open source, so you are never locked in",
 ];
 
@@ -45,15 +45,14 @@ export default function OrganisationsPage() {
       <Section drift="hero" className="pb-7">
         <Eyebrow className="mb-4">For community organisations</Eyebrow>
         <Heading level={1} fluid className="max-w-[var(--page-heading-max)]">
-          Something useful, built for your organisation.
+          Tell us a problem. We build you the tool to fix it.
         </Heading>
         <Lede className="mt-6">
-          Three solutions are built in parallel, each scoped to serve as many
-          organisations as the problem allows, sometimes several, sometimes one. Each is
-          matched with a small team of local developers working at community rates, well
-          under what they charge commercially. Over a five-week build they work out what
-          would help most, build it, and hand it over. There is no cost to your
-          organisation.
+          Three tools are built at the same time, each one aimed at as many organisations
+          as the problem allows, sometimes several, sometimes one. Each is matched with a
+          small team of local developers working at community rates, well under what they
+          charge commercially. Over five weeks they work out what would help most, build
+          it, and hand it over. There is no cost to your organisation.
         </Lede>
       </Section>
 
@@ -99,7 +98,7 @@ export default function OrganisationsPage() {
                 A panel of local tech and community people reads every application
               </Heading>
               <Body className="mt-4">
-                Reuse carries real weight, because only three solutions get built. If five
+                Reuse carries real weight, because only three tools get built. If five
                 organisations need the same thing, the aim is to build it once so all five
                 can use it, rather than once for one of them.
               </Body>

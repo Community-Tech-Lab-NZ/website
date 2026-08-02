@@ -12,8 +12,19 @@ import { SectionRule } from "@/components/SectionRule";
 import { StatFigure } from "@/components/StatFigure";
 import { Body, Eyebrow, Heading, Lede } from "@/components/Typography";
 
-/* Home. Copy is final and iterated with the programme team — transcribed
- * verbatim from the prototype, not rewritten.
+/* Home. Copy came verbatim from the prototype, then took a plain-language pass:
+ * the owner's read was that a reader could finish the fork without learning what
+ * the programme actually does.
+ *
+ * Two words did most of the damage. "Solutions" is what the sector calls the
+ * thing and what nobody else does — it is now "tools", which is the word the
+ * brand guide itself reaches for when it stops being formal, and the word the
+ * /organisations metadata was already using. "Scoped", "discovery" and "sprints"
+ * are agency vocabulary; a volunteer treasurer does not have to learn them to
+ * find out what five weeks will cost them.
+ *
+ * Left alone deliberately: the terms page, where "solution" is a defined term
+ * carrying legal weight and the review is still outstanding.
  *
  * The page's job: state what the programme is in one line, fork the two
  * audiences, and prove it is real.
@@ -21,21 +32,21 @@ import { Body, Eyebrow, Heading, Lede } from "@/components/Typography";
 
 export const metadata: Metadata = {
   description:
-    "Local developers build something useful for community organisations across the Queenstown Lakes district, at no cost to the organisation.",
+    "Local developers build software for community organisations across the Queenstown Lakes district, at no cost to the organisation.",
 };
 
 const HERO_STATS = [
-  { figure: "3", label: "Solutions to be built" },
+  { figure: "3", label: "Tools to be built" },
   { figure: "6", label: "Paid developer seats" },
-  { figure: "5 weeks", label: "One build, weekly sprints" },
+  { figure: "5 weeks", label: "One build, start to finish" },
   { figure: "Open source", label: "Free to reuse" },
 ];
 
 const HOW_IT_RUNS = [
   "A panel of local tech and community people reads every application",
-  "Discovery happens before the build, so scope is agreed with you",
-  "Five weeks of weekly sprints, then handover with training and documentation",
-  "Bugs fixed free for six weeks after handover, and the code is yours",
+  "We agree exactly what is being built with you, before anyone writes code",
+  "Five weeks of building, with something to try each week, then training when we hand it over",
+  "Bugs fixed free for six weeks after you get it, and the code is yours",
 ];
 
 export default function HomePage() {
@@ -48,13 +59,13 @@ export default function HomePage() {
           is offset as a whole; nothing inside a block cascades. */}
       <Section tone="ink" drift="hero" hero>
         <Heading level={1} fluid inverse className="max-w-[var(--hero-heading-max)]">
-          <TypeOn text="Solutions that get used." loop />
+          <TypeOn text="Tools that get used." loop />
         </Heading>
 
         <Reveal delay={400}>
           <Lede inverse className="mt-6">
-            Local developers build something useful for community organisations across
-            the Queenstown Lakes district, at no cost to the organisation.
+            Local developers build software for community organisations across the
+            Queenstown Lakes district, at no cost to the organisation.
           </Lede>
         </Reveal>
 
@@ -97,25 +108,33 @@ export default function HomePage() {
             <AudiencePath
               audience="community"
               eyebrow="For community organisations"
-              title="Something useful, built for your organisation"
-              blurb="Scoped with you, built for the way you work now, and handed over with training. There is no cost to your organisation."
+              title="Tell us a problem. A local team builds you the tool to fix it."
+              blurb="We work out what to build with you, build it around the way you already work, and train your people to use it. It costs your organisation nothing."
               points={[
                 "No cost to your organisation",
-                "One to two hours a week from one named contact",
-                "Training, documentation and six weeks of free bug fixes",
+                "One to two hours a week, from one person at your end",
+                "Training, written instructions, and six weeks of free fixes",
               ]}
               actionLabel="See what's involved"
               actionHref="/organisations"
             />
+            {/* The title used to lead on the rate, which sold the seat as a
+                contract and nothing more. The thing developers here actually
+                say yes to is the company: a tech community this small and
+                dispersed means the people you would enjoy building with are the
+                people you never get to build with. So the invitation leads, and
+                the money — which the handoff insists comes first for this
+                audience, and which must never read as volunteering — holds the
+                opening words of the blurb and the first point. */}
             <AudiencePath
               audience="developer"
               eyebrow="For developers"
-              title="Paid work at community rates, with real users on the other end"
-              blurb="Six paid seats across three teams, three senior and three junior, plus intern places. Roughly 12 hours a week for five weeks, after the ski season closes."
+              title="Five weeks building a tool a local organisation actually needs"
+              blurb="Six paid seats across three teams, three senior and three junior, plus intern places. You build alongside local developers you rarely get to work with, roughly 12 hours a week after the ski season closes."
               points={[
                 "Paid contract with Startup Queenstown Lakes, at community rates",
-                "A senior developer mentoring every build",
-                "An open source repository you can point at",
+                "A senior developer on the build beside you",
+                "An open repo, and locals using what you built",
               ]}
               actionLabel="See the roles"
               actionHref="/developers"
@@ -131,7 +150,7 @@ export default function HomePage() {
             <div>
               <Eyebrow className="mb-4">Why it exists</Eyebrow>
               <Heading level={3} as="h2">
-                A small, dispersed tech community, working together
+                A small, spread-out tech community, working together
               </Heading>
               <Body className="mt-4">
                 The district has good developers, particularly early in their careers,
@@ -147,7 +166,7 @@ export default function HomePage() {
                 Everything is <span className="ctl-sweep-gold">open source</span>
               </Heading>
               <Body className="mt-4">
-                Only three solutions get built, so each one is chosen partly on how many
+                Only three tools get built, so each one is chosen partly on how many
                 organisations it could serve. If five need the same thing, the aim is to
                 build it once so all five can use it, rather than once for one of them.
               </Body>
@@ -163,12 +182,12 @@ export default function HomePage() {
             <div>
               <Eyebrow className="mb-4">How it runs</Eyebrow>
               <Heading level={2}>
-                Properly scoped and mentored, not a rushed side project
+                Planned properly and led by senior developers, not a rushed side project
               </Heading>
               <Body className="mt-5">
-                Three solutions are chosen through an open application process, each one
-                scoped so it can serve more than one organisation. Each is matched with a
-                small team of local developers, led by a senior developer. The programme
+                Three tools are chosen by open application, each one picked so more than
+                one organisation can use it. Each is matched with a small team of local
+                developers, led by a senior developer. The programme
                 is run by Startup Queenstown Lakes and funded by the Queenstown Lakes
                 District Council Economic Diversification Fund.
               </Body>
@@ -199,7 +218,7 @@ export default function HomePage() {
 
       <ClosingCta
         title="Ready when you are"
-        note="Three solutions get built this round. Applying commits you to nothing."
+        note="Three tools get built this round. Applying commits you to nothing."
       />
     </>
   );

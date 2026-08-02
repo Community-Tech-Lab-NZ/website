@@ -59,7 +59,7 @@ export const CTL_GATES = [
 export const DECLARATION_STATEMENTS = [
   "I am authorised to submit this form on behalf of the organisation named above.",
   "The information provided is accurate to the best of my knowledge.",
-  "I understand applying does not guarantee selection, and only three solutions are built in this round.",
+  "I understand applying does not guarantee selection, and only three tools are built in this round.",
   "I consent to the programme partners using this information to assess and prioritise applications, and to contact us about it.",
   "I understand the code would be published openly, so other organisations can use and adapt it.",
   "I understand that AI tools, including large language models run by other companies, may be used to help summarise, extract from and organise what we submit, and that people make every decision.",

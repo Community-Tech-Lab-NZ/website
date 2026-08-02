@@ -179,7 +179,7 @@ export function showcaseEventSchema() {
     "@type": "Event",
     name: "Community Tech Lab Showcase Hui",
     description:
-      "The three solutions built during the programme are demonstrated publicly, hosted by FLINT Queenstown.",
+      "The three tools built during the programme are demonstrated publicly, hosted by FLINT Queenstown.",
     startDate: "2026-11-26",
     eventStatus: "https://schema.org/EventScheduled",
     eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",

@@ -30,16 +30,56 @@
   /* SiteHeader minimum height and the horizontal lockup size within it.
      The header's logo offset is not a token: it depends on whitespace inside
      the lockup file and so has to scale with the rendered height. Logo.tsx
-     computes it from the artboard geometry via align="optical". */
-  --header-height: 96px;
-  /* Lockup height is responsive: at 68px the header needs ~440px of width
-     (lockup + gaps + Apply now + menu), which overflowed phones and pushed
-     the whole page into horizontal scroll — the Ink sections then looked
-     inset from the right edge. 44px fits a 359px viewport with room; the
-     full 68px returns at md. The clear-space padding and the optical
-     pull-left both derive from the same variable so they track it. */
-  --header-lockup: 44px;
+     computes it from the artboard geometry via align="optical".
+
+     PHONE VALUE FIRST, like the section rhythm in spacing.css, and for the same
+     reason: 96px is a desktop number that was being charged to every width. The
+     row's tallest item on a phone is the 48px menu toggle, so 96 spends a full
+     48px on air — 11% of an 844px phone, and a fifth of it in landscape, before
+     a word of the page. 64px keeps 8px of clear space above and below that
+     toggle, which is the same 8px the lockup already carries as its own clear
+     space, and it is a step on the scale rather than a fitted number.
+
+     It stays 96 from md, where the row also holds the nav and the height is
+     what stops a wide header reading as a toolbar. */
+  --header-height: 64px;
+  /* The height of the VISIBLE WORDMARK, not of the lockup file. AnimatedLockup
+     crops its viewBox to the ink box, so the two are the same thing now.
+
+     They were not, and that is worth recording, because it produced a bug that
+     looked like a sizing problem and was not. The artboard is 520x140 and the
+     ink occupies 297.5x63.5 of it: 43% of the file is empty, a third of that in
+     a band down the right-hand side. Sizing the header by the file meant
+     reserving row width for that band, so the mark rendered 45% smaller than
+     the space allowed and sat a long way left of the Apply button no matter
+     what value went in here. This variable went through a flat 44px, then a
+     32vw ramp, then a 28.9vw one, each fitted to careful measurements of a box
+     that was mostly nothing.
+
+     Cropping removes 43% of the footprint, and with it the reason the ramp
+     existed. A flat value now fits every viewport the wordmark appears on: at
+     360px, the narrowest (below that the header swaps to the mark alone), the
+     row has 189px for a lockup that wants 153. There is nothing left to taper.
+
+     31px is today's desktop mark to within 0.16px — 68px of file was 30.84px of
+     ink — so desktop is unchanged and phones gain 30%. Above ~44px the mark
+     would start crowding a 96px row; if it ever wants to grow, that is the
+     constraint to check, not the width. */
+  --header-lockup: 31px;
   --lockup-pad: max(8px, calc(var(--header-lockup) * 0.14));
+
+  /* The mark that stands in for the wordmark below 360px (see SiteHeader). The
+     mark's own artwork fills 60% of its 100x100 box where the wordmark's caret
+     fills 79% of the ink box, so 1.32 renders the glyph at the size of the one
+     it replaces rather than two thirds of it.
+
+     REGISTERED, below the block, and that is not optional: AnimatedLockup takes
+     a size by setting --header-lockup on the element itself, so an unregistered
+     property would inherit this as the literal calc(), resolve var(--header-
+     lockup) against the value it had just been given, and collapse the mark to
+     nothing through the cycle. A registered <length> computes where it is
+     declared and inherits as a plain px — same reasoning as --type-cursor-em. */
+  --header-mark: calc(var(--header-lockup) * 1.32);
 
   /* Form controls: 12px vertical / 14px horizontal padding. The 14px is off the
      8px scale and is deliberate, giving the control a slightly wider gutter than
@@ -161,8 +201,27 @@
   --link-underline-offset: 3px;
 }
 
-@media (min-width: 768px) {
+/* md, matching --breakpoint-md in globals.css and the section rhythm in
+   spacing.css: the width where the header stops being a bar with a logo and a
+   button on it and starts carrying the nav as well. */
+@media (min-width: 900px) {
   :root {
-    --header-lockup: 68px;
+    --header-height: 96px;
   }
+}
+
+/* No --header-lockup override here any more. It used to step from 44px to 68px
+   of FILE height at 768px, which was 19.9px to 30.8px of actual mark. Now that
+   the value is the mark itself and the crop leaves room for it everywhere, the
+   same 31px serves every width and the step has nothing left to do. Only the
+   ROW around it steps now, above. */
+
+/* Registered so it computes where it is declared. See the note on
+   --header-mark: AnimatedLockup's size prop sets --header-lockup on the
+   element, and an unregistered property would inherit this calc() as tokens
+   and resolve it against that new value — a cycle, and a mark of no height. */
+@property --header-mark {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
 }

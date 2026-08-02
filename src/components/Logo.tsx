@@ -72,7 +72,7 @@ export const INK_LEFT = { horizontal: 44.4, primary: null, icon: 16 } as const;
  * Archivo Black paths rather than <text>, so nothing in them depends on which
  * fonts a machine has installed. Re-measure only if the lockup files change.
  */
-const INK_BOX = {
+export const INK_BOX = {
   horizontal: { x: 44, y: 43, w: 297.5, h: 63.5 },
   primary: { x: 148.5, y: 71.5, w: 224.5, h: 201 },
   icon: { x: 16, y: 26, w: 68, h: 60 },

@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { clsx } from "clsx";
-import { INK_LEFT } from "./Logo";
+import { INK_BOX } from "./Logo";
 
 /* The header lockup, alive.
  *
@@ -26,9 +26,10 @@ import { INK_LEFT } from "./Logo";
  * Construction: the static lockup files are single flat SVGs, so their parts
  * cannot be animated. This inline SVG rebuilds the same 520x140 geometry from
  * three layers — the wordmark-only file (same canvas, so registration is
- * exact), the caret polyline, and a separate <rect> for the block. Everything
- * except the motion matches Logo with align="optical" pixel for pixel: same
- * clear-space padding, same optical margin from INK_LEFT.
+ * exact), the caret polyline, and a separate <rect> for the block. It then
+ * shows only the ink box of that canvas, the way Logo does with crop, and
+ * lines the result up with the text column below it — see the note on the
+ * viewBox further down for why cropping is what makes the alignment simple.
  *
  * The blink is CSS/SMIL; the breathe needs three small handlers so that when
  * the pointer leaves mid-breath, the cycle in progress completes and stops at
@@ -62,15 +63,30 @@ export function AnimatedLockup({
 }: AnimatedLockupProps) {
   const ink = dark ? "var(--ctl-kowhai)" : "var(--ctl-ink)";
 
-  /* Sizing lives in CSS so it can be responsive: --header-lockup is 44px on
-     phones and 68px from md (see components.css — the 68px header overflowed
-     small viewports). Padding is the scaled clear space and the negative
-     margin is the optical pull-left, both derived from the same variable;
-     0.3171 is INK_LEFT.horizontal / 140, kept in JS so the constant stays
-     single-sourced. */
-  const opticalShift = `calc(-1 * (var(--lockup-pad) + var(--header-lockup) * ${(
-    INK_LEFT.horizontal / 140
-  ).toFixed(4)}))`;
+  /* Sizing lives in CSS so it can be responsive, and --header-lockup is the
+     height of the VISIBLE MARK rather than of the file (see components.css).
+
+     That distinction is the whole point. The wordmark artboard is 520x140 and
+     its ink occupies 297.5x63.5 of it, so 43% of the file is empty canvas — a
+     third of it in a band down the right-hand side. Rendering the artboard
+     whole made that band part of the lockup's footprint: the header reserved
+     width for nothing, the mark came out 45% smaller than the row allowed, and
+     there was a permanent gap between the wordmark and the Apply button that no
+     amount of sizing arithmetic could close, because the arithmetic was sizing
+     the emptiness too.
+
+     So the viewBox is the ink box, not the file. Same idea as Logo's `crop`,
+     and INK_BOX is imported from it so this artwork is measured in one place.
+     The <image> below still places the file whole at its own coordinates; the
+     viewBox is simply a narrower window onto it.
+
+     Cropping also retires the optical pull-left. That existed to cancel the
+     file's own left margin so the caret landed on the page's content edge. With
+     the ink box as the viewBox there is no left margin left to cancel, and the
+     only thing displacing the mark is the clear-space padding — so the negative
+     margin is now exactly that, and the alignment is unchanged. */
+  const inkBox = INK_BOX.horizontal;
+  const opticalShift = "calc(-1 * var(--lockup-pad))";
 
   const blockRef = useRef<SVGRectElement>(null);
 
@@ -176,8 +192,14 @@ export function AnimatedLockup({
     >
       <svg
         aria-hidden="true"
-        viewBox="0 0 520 140"
-        className="block w-auto"
+        viewBox={`${inkBox.x} ${inkBox.y} ${inkBox.w} ${inkBox.h}`}
+        // max-w-full is what makes the header's "the lockup is the one element
+        // that gives" contract true (see SiteHeader). Without it this svg holds
+        // its intrinsic width whatever the row does, and the shortfall lands on
+        // a tap target instead. With it, a row that runs short simply renders a
+        // smaller mark. Insurance rather than routine: at every width the
+        // wordmark actually appears at, it has room.
+        className="block w-auto max-w-full"
         style={{ height: "var(--header-lockup)" }}
       >
         <image

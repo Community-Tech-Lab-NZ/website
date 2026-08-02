@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
 import { clsx } from "clsx";
 import { Caret } from "../Caret";
 import { StageNav, type StageMark } from "./StageNav";
+import { useDisclosure } from "@/hooks/useDisclosure";
 
 /* The stage rail below lg, where there is no room for a column.
  *
@@ -14,9 +14,17 @@ import { StageNav, type StageMark } from "./StageNav";
  * needs) — and expands to the full list when someone wants to jump.
  *
  * The construction is SiteHeader's mobile nav, deliberately: a caret toggle
- * because the caret is this brand's only glyph, a panel below rather than an
- * overlay drawer so there is no scrim and no scroll-locking, Oat throughout,
- * and Escape closing it and handing focus back to the toggle.
+ * because the caret is this brand's only glyph, a panel dropping from the bar
+ * rather than a sliding drawer so there is no scrim and no scroll-locking, and
+ * Oat throughout. The two are worth keeping identical — they are the same
+ * control, and an applicant meets both on the same screen — so the behaviour is
+ * literally shared rather than merely matched: useDisclosure holds it, and
+ * .ctl-drop holds the fold.
+ *
+ * Floating earns more here than it does in the header. In flow, expanding the
+ * bar pushed the field you were about to answer down by six rows — on the one
+ * screen where the whole point of opening the list is to look at something
+ * WITHOUT losing your place.
  *
  * Sticky, which the site header is not: on a 50-minute form the section you are
  * in is worth a permanent 56px, and it means the jump list is one tap away from
@@ -31,38 +39,22 @@ type StageBarProps = {
 };
 
 export function StageBar({ stages, current, marks, onSelect }: StageBarProps) {
-  const [open, setOpen] = useState(false);
-  const panelId = useId();
-  const toggleRef = useRef<HTMLButtonElement>(null);
+  // Escape, outside dismiss and the aria wiring are the header's, shared. The
+  // outside dismiss earns the most here: what this panel covers is a form.
+  const { open, close, rootRef, triggerProps, panelProps } =
+    useDisclosure<HTMLDivElement>();
   const done = marks.filter((m) => m === "done").length;
   const attention = marks.filter((m) => m === "attention").length;
-
-  useEffect(() => {
-    if (!open) return;
-
-    function onKeyDown(event: KeyboardEvent) {
-      if (event.key !== "Escape") return;
-      setOpen(false);
-      toggleRef.current?.focus();
-    }
-
-    document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
-  }, [open]);
 
   return (
     /* -mx-gutter reaches past Section's inner padding so the bar spans the
        viewport edge to edge, then puts the padding back inside. */
-    <div className="sticky top-0 z-10 -mx-gutter mt-6 bg-oat lg:hidden">
+    <div ref={rootRef} className="sticky top-0 z-10 -mx-gutter mt-6 bg-oat lg:hidden">
       {/* Two rows rather than one. On a 390px phone the stage name and the
           marks fought for the same line and both wrapped; stacked, the name
           gets the width it needs and the marks read as a progress row. */}
       <button
-        ref={toggleRef}
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        aria-expanded={open}
-        aria-controls={panelId}
+        {...triggerProps}
         className={clsx(
           "flex min-h-[var(--tap-target)] w-full cursor-pointer flex-col justify-center gap-1",
           "border-0 border-b-2 border-solid border-b-kowhai bg-transparent px-gutter py-2 text-left",
@@ -113,17 +105,22 @@ export function StageBar({ stages, current, marks, onSelect }: StageBarProps) {
         </span>
       </button>
 
+      {/* No `relative` needed on the wrapper: position:sticky is already a
+          positioned value, so it is the containing block for this. top-full
+          therefore lands just under the toggle's Kowhai rule. The wrapper's
+          own z-10 is the stacking context the panel's z-20 lives in, which is
+          all it needs — that context as a whole already paints over the
+          fields. */}
       <div
-        id={panelId}
-        hidden={!open}
-        className="border-b border-solid border-hairline bg-oat px-gutter pb-4 pt-2"
+        {...panelProps}
+        className="ctl-drop absolute inset-x-0 top-full z-20 border-b border-solid border-hairline bg-oat px-gutter pb-4 pt-2 shadow-dialog"
       >
         <StageNav
           stages={stages}
           current={current}
           marks={marks}
           onSelect={(i) => {
-            setOpen(false);
+            close();
             onSelect(i);
           }}
         />

@@ -290,6 +290,43 @@
 .ctl-link-grow{display:inline-block;transition:transform 450ms var(--ease-out-soft),color var(--duration-fast) var(--ease-standard),border-color var(--duration-fast) var(--ease-standard),text-decoration-color var(--duration-fast) var(--ease-standard)}
 .ctl-link-grow:hover{transform:scale(1.03)}
 
+/* The same fold for the two panels that are NOT <details>: SiteHeader's mobile
+   nav and StageBar's stage list. Both are hand-rolled disclosures on a plain
+   div toggled with the hidden attribute (they have to be — each coordinates
+   state its trigger also reads), so they cannot borrow ::details-content and
+   need the moving parts spelled out.
+
+   The one part that differs: hidden is display:none, so display is what has to
+   ride allow-discrete here where the fold rides content-visibility. Same
+   bargain — the panel stays painted on the way back up, and without it the
+   close snaps. @starting-style gives the open somewhere to start from, since an
+   element arriving at display:block has no previous style to transition from.
+   Every piece fails closed: a browser missing interpolate-size, allow-discrete
+   or @starting-style drops the rule and the panel appears instantly, which is
+   what both did before.
+
+   --duration-base, matching the fold. These panels are short — three nav rows,
+   six stage rows — and could carry --duration-fast, but they are the same
+   gesture answering the same caret, and a header twice as quick as a fold reads
+   as two systems rather than one. Zeroed under prefers-reduced-motion with
+   everything else.
+
+   overflow-clip-margin is the focus ring's escape hatch: :focus-visible draws
+   2px at a 2px offset, so a row flush with the panel edge would have its ring
+   shaved by the clip. The 4px is only ever visible mid-transition, where the
+   content genuinely overflows; at rest the box is exactly its content and there
+   is nothing out there but the ring. */
+.ctl-drop{
+  interpolate-size:allow-keywords;
+  block-size:0;
+  opacity:0;
+  overflow:clip;
+  overflow-clip-margin:4px;
+  transition:block-size var(--duration-base) var(--ease-out-soft),opacity var(--duration-base) var(--ease-out-soft),display var(--duration-base) allow-discrete;
+}
+.ctl-drop:not([hidden]){block-size:auto;opacity:1}
+@starting-style{.ctl-drop:not([hidden]){block-size:0;opacity:0}}
+
 /* Word knock (see useWordKnock): each word the pointer touches does a
    miniature of the headers' vase wobble on its own baseline and settles.
    inline-block so it can transform. */

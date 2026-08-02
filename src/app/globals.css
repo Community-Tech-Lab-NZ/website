@@ -229,11 +229,18 @@
    * Not defined in the handoff. Set once here and documented, because the
    * programme's junior developers will be extending this later.
    *
+   *   xs   360px  the header wordmark's floor; below it the mark stands alone
    *   sm   600px  phone landscape; two-up grids become viable
    *   md   900px  header nav collapses below this; tablet
    *   lg  1180px  container (1120) plus gutters (2 x 48) fits without clamping
+   *
+   * xs is a measured value, not a device: 31px of wordmark is 153px of header
+   * row, which with the gutters, the gap and the apply cluster needs 344px of
+   * viewport. Under that the lockup is squeezed rather than sized. See
+   * SiteHeader.
    */
   --breakpoint-*: initial;
+  --breakpoint-xs: 360px;
   --breakpoint-sm: 600px;
   --breakpoint-md: 900px;
   --breakpoint-lg: 1180px;

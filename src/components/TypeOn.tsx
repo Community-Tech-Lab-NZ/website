@@ -118,10 +118,14 @@ export function TypeOn({ text, speed = 52, loop = false, className }: TypeOnProp
       <span className="sr-only">{text}</span>
       <span aria-hidden="true">
         {text.slice(0, shown)}
-        {/* Zero-width anchor: the cursor hangs off it without occupying any
+        {/* Zero-size anchor: the cursor hangs off it without occupying any
             inline space, so wrap points stay exactly where the finished
-            headline puts them. */}
-        <span className="relative">
+            headline puts them. It has to be an empty inline-block rather than
+            a plain inline — an inline box's bottom edge is the descender
+            line, so the cursor would hang a full descent (0.21em in Archivo)
+            below the text. An empty zero-height inline-block's box sits on
+            the baseline, which is what the drop token is measured from. */}
+        <span className="relative inline-block h-0 w-0 align-baseline">
           <span
             className={clsx(
               "absolute bottom-[calc(-1*var(--type-cursor-drop))] left-[var(--type-cursor-gap)] h-[var(--type-cursor-h)] w-[var(--type-cursor-w)] bg-current",

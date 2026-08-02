@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
 import { getWindowState } from "@/lib/application-window";
 import {
+  communityApplicationSummary,
+  developerApplicationSummary,
   docName,
-  formatCommunityApplication,
-  formatDeveloperApplication,
+  renderApplicationText,
+  type ApplicationSummary,
 } from "@/lib/application-doc";
 import {
   getEmailConfig,
@@ -169,22 +171,24 @@ export async function POST(request: Request) {
 
   let docUrl = "";
   let cvUrl = "";
-  let formatted = "";
+
+  // Built before the try, not inside it. This is pure string assembly over
+  // already-validated data, so it has no failure mode worth guarding, and
+  // keeping it out here means a Doc that fails to write cannot also cost the
+  // applicant the copy of their answers in the confirmation email.
+  const summary: ApplicationSummary | null =
+    data.formType === "community"
+      ? communityApplicationSummary(data, submittedAtNz)
+      : data.formType === "developer"
+        ? developerApplicationSummary(data, submittedAtNz)
+        : null;
 
   try {
-    if (data.formType === "community") {
-      formatted = formatCommunityApplication(data, submittedAtNz);
+    if (summary) {
       docUrl = await createDoc(
         google,
-        docName(data.orgName, submittedAtIso, data.submissionId),
-        formatted,
-      );
-    } else if (data.formType === "developer") {
-      formatted = formatDeveloperApplication(data, submittedAtNz);
-      docUrl = await createDoc(
-        google,
-        docName(data.name, submittedAtIso, data.submissionId),
-        formatted,
+        docName(summary.subject, submittedAtIso, data.submissionId),
+        renderApplicationText(summary),
       );
     }
   } catch (error) {
@@ -192,7 +196,7 @@ export async function POST(request: Request) {
     // The Doc is a convenience, not a record: everything in it is formatted
     // from the `_raw` row, so it can be rebuilt at any time. Saying so in the
     // cell beats a blank that reads like "no Doc was ever wanted".
-    docUrl = "DOC FAILED — regenerate from _raw";
+    docUrl = "DOC FAILED, regenerate from _raw";
   }
 
   // A failed CV upload must not cost the application. The answers matter more
@@ -215,7 +219,7 @@ export async function POST(request: Request) {
       // the fact that a CV was sent and lost — otherwise an empty cell is
       // indistinguishable from an applicant who simply did not attach one, and
       // nobody thinks to ask them to resend.
-      cvUrl = "CV SUBMITTED — UPLOAD FAILED, ask the applicant to resend";
+      cvUrl = "CV SUBMITTED, UPLOAD FAILED: ask the applicant to resend";
     }
   }
 
@@ -272,43 +276,36 @@ export async function POST(request: Request) {
     // is sent and the pipeline behaves exactly as it did before.
     const backupInbox = process.env.APPLICATION_BACKUP_INBOX;
     const programmeInbox = process.env.PROGRAMME_INBOX;
-    // If formatting fell over above, the raw answers still beat an empty copy:
-    // being the backup is the whole point of this one.
-    const body = formatted || JSON.stringify(data, null, 2);
 
-    if (data.formType === "community") {
+    if (data.formType === "community" && summary) {
       await notify("confirmation email", () =>
-        sendCommunityConfirmation(email, data.contactEmail, data.orgName, formatted),
+        sendCommunityConfirmation(email, data.contactEmail, summary),
       );
       if (backupInbox) {
         await notify("backup copy", () =>
           sendApplicationCopy(email, backupInbox, {
-            kind: "community",
-            who: data.orgName,
+            summary,
             applicantEmail: data.contactEmail,
             docUrl,
             cvUrl,
-            formatted: body,
           }),
         );
       }
-    } else if (data.formType === "developer") {
+    } else if (data.formType === "developer" && summary) {
       await notify("confirmation email", () =>
-        sendDeveloperConfirmation(email, data.email, data.name, formatted),
+        sendDeveloperConfirmation(email, data.email, summary),
       );
       if (backupInbox) {
         await notify("backup copy", () =>
           sendApplicationCopy(email, backupInbox, {
-            kind: "developer",
-            who: data.name,
+            summary,
             applicantEmail: data.email,
             docUrl,
             cvUrl,
-            formatted: body,
           }),
         );
       }
-    } else if (programmeInbox) {
+    } else if (data.formType === "question" && programmeInbox) {
       await notify("question alert", () =>
         sendQuestionAlert(
           email,

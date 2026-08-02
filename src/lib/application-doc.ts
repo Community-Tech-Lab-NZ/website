@@ -6,10 +6,16 @@ import {
   type DeveloperApplication,
 } from "./schemas";
 
-/* Formats an application as readable plain text for the generated Google Doc.
+/* One application, described once.
+ *
+ * The same answers are shown in three places: the Google Doc the panel reads,
+ * the plain-text part of the applicant's confirmation, and the HTML part of it.
+ * All three render from the structure below rather than from each other, so a
+ * question added to the form cannot turn up in one and be missing from another,
+ * and the HTML email is not a monospace dump of the Doc.
  *
  * The panel reads 30-odd applications between 1 and 18 September, most of the
- * content being long prose. This is what they actually read; the Sheet row is
+ * content being long prose. The Doc is what they actually read; the Sheet row is
  * what they score against. Section order matches the form, so a reader who has
  * seen the form knows where they are.
  *
@@ -18,91 +24,197 @@ import {
  * was asked.
  */
 
-const NOT_ANSWERED = "Not answered";
+export const NOT_ANSWERED = "Not answered";
 
-function field(label: string, value: string | undefined | null): string {
-  const answer = (value ?? "").toString().trim();
-  return `${label}\n${answer || NOT_ANSWERED}\n`;
+/** A written answer, or a box the applicant had to tick. */
+export type ApplicationField =
+  | { label: string; value: string }
+  | { label: string; confirmed: boolean };
+
+export type ApplicationSection = { title: string; fields: ApplicationField[] };
+
+export type ApplicationSummary = {
+  kind: "community" | "developer";
+  /** What this document is, above the name. */
+  title: string;
+  /** The organisation's name, or the developer's. */
+  subject: string;
+  submittedAt: string;
+  reference: string;
+  sections: ApplicationSection[];
+};
+
+export function isConfirmation(
+  field: ApplicationField,
+): field is { label: string; confirmed: boolean } {
+  return "confirmed" in field;
 }
 
-function heading(text: string): string {
-  return `\n${text.toUpperCase()}\n${"=".repeat(text.length)}\n\n`;
+/** The answer as it should be read, with the blank case spelled out. */
+export function answerText(field: ApplicationField): string {
+  if (isConfirmation(field)) return field.confirmed ? "Confirmed" : "Not confirmed";
+  return field.value || NOT_ANSWERED;
 }
 
-export function formatCommunityApplication(
+function answer(label: string, value: string | undefined | null): ApplicationField {
+  return { label, value: (value ?? "").toString().trim() };
+}
+
+export function communityApplicationSummary(
   data: CommunityApplication,
   submittedAt: string,
-): string {
+): ApplicationSummary {
   const L = COMMUNITY_LABELS;
 
-  return [
-    `COMMUNITY TECH LAB — APPLICATION`,
-    `${data.orgName}`,
-    `Submitted ${submittedAt}`,
-    `Reference ${data.submissionId}`,
-    "",
-    heading("1. Your organisation"),
-    field(L.orgName, data.orgName),
-    field(L.legalStructure, data.legalStructure),
-    field(L.registrationNumber, data.registrationNumber),
-    field(L.contactName, data.contactName),
-    field(L.contactRole, data.contactRole),
-    field(L.contactEmail, data.contactEmail),
-    field(L.contactPhone, data.contactPhone),
-    field(L.basedIn, data.basedIn),
-    field(L.orgSize, data.orgSize),
-
-    heading("2. Eligibility"),
-    ...CTL_GATES.map((gate, i) => `${data.gates[i] ? "[confirmed]" : "[NOT CONFIRMED]"} ${gate}\n`),
-
-    heading("3. The problem"),
-    field(L.problem, data.problem),
-    field(L.problemToday, data.problemToday),
-    field(L.problemWho, data.problemWho),
-    field(L.problemSuccess, data.problemSuccess),
-
-    heading("4. Scope and fit"),
-    field(L.scopeEssentials, data.scopeEssentials),
-    field(L.scopeReuse, data.scopeReuse),
-    field(L.scopeSystems, data.scopeSystems),
-    field(L.scopeSystemsWhich, data.scopeSystemsWhich),
-    field(L.scopeSensitive, data.scopeSensitive),
-    field(L.scopeSensitiveWhat, data.scopeSensitiveWhat),
-
-    heading("5. Readiness"),
-    field(L.readinessContact, data.readinessContact),
-    field(L.readinessOwner, data.readinessOwner),
-    field(L.readinessTiming, data.readinessTiming),
-    field(L.readinessAnythingElse, data.readinessAnythingElse),
-
-    heading("6. Declaration"),
-    field(L.declarationName, data.declarationName),
-    field(L.declarationRole, data.declarationRole),
-    `Confirmed on behalf of the organisation: ${data.declared ? "yes" : "no"}\n`,
-  ].join("\n");
+  return {
+    kind: "community",
+    title: "Community Tech Lab application",
+    subject: data.orgName,
+    submittedAt,
+    reference: data.submissionId,
+    sections: [
+      {
+        title: "Your organisation",
+        fields: [
+          answer(L.orgName, data.orgName),
+          answer(L.legalStructure, data.legalStructure),
+          answer(L.registrationNumber, data.registrationNumber),
+          answer(L.contactName, data.contactName),
+          answer(L.contactRole, data.contactRole),
+          answer(L.contactEmail, data.contactEmail),
+          answer(L.contactPhone, data.contactPhone),
+          answer(L.basedIn, data.basedIn),
+          answer(L.orgSize, data.orgSize),
+        ],
+      },
+      {
+        title: "Eligibility",
+        fields: CTL_GATES.map((gate, i) => ({
+          label: gate,
+          confirmed: Boolean(data.gates[i]),
+        })),
+      },
+      {
+        title: "The problem",
+        fields: [
+          answer(L.problem, data.problem),
+          answer(L.problemToday, data.problemToday),
+          answer(L.problemWho, data.problemWho),
+          answer(L.problemSuccess, data.problemSuccess),
+        ],
+      },
+      {
+        title: "Scope and fit",
+        fields: [
+          answer(L.scopeEssentials, data.scopeEssentials),
+          answer(L.scopeReuse, data.scopeReuse),
+          answer(L.scopeSystems, data.scopeSystems),
+          answer(L.scopeSystemsWhich, data.scopeSystemsWhich),
+          answer(L.scopeSensitive, data.scopeSensitive),
+          answer(L.scopeSensitiveWhat, data.scopeSensitiveWhat),
+        ],
+      },
+      {
+        title: "Readiness",
+        fields: [
+          answer(L.readinessContact, data.readinessContact),
+          answer(L.readinessOwner, data.readinessOwner),
+          answer(L.readinessTiming, data.readinessTiming),
+          answer(L.readinessAnythingElse, data.readinessAnythingElse),
+        ],
+      },
+      {
+        title: "Declaration",
+        fields: [
+          answer(L.declarationName, data.declarationName),
+          answer(L.declarationRole, data.declarationRole),
+          {
+            label: "Declared on behalf of the organisation",
+            confirmed: Boolean(data.declared),
+          },
+        ],
+      },
+    ],
+  };
 }
 
-export function formatDeveloperApplication(
+export function developerApplicationSummary(
   data: DeveloperApplication,
   submittedAt: string,
-): string {
+): ApplicationSummary {
   const L = DEVELOPER_LABELS;
 
-  return [
-    `COMMUNITY TECH LAB — DEVELOPER APPLICATION`,
-    `${data.name}`,
-    `Submitted ${submittedAt}`,
-    `Reference ${data.submissionId}`,
-    "",
-    field(L.seat, data.seat),
-    field(L.name, data.name),
-    field(L.email, data.email),
-    field(L.basedIn, data.basedIn),
-    field(L.hours, data.hours),
-    field(L.shipped, data.shipped),
-    `Understands the community rate and open source release: ${data.understood ? "yes" : "no"}\n`,
-    `Understands how AI tools are used: ${data.aiUnderstood ? "yes" : "no"}\n`,
-  ].join("\n");
+  return {
+    kind: "developer",
+    title: "Community Tech Lab developer application",
+    subject: data.name,
+    submittedAt,
+    reference: data.submissionId,
+    sections: [
+      {
+        title: "Your application",
+        fields: [
+          answer(L.seat, data.seat),
+          answer(L.name, data.name),
+          answer(L.email, data.email),
+          answer(L.basedIn, data.basedIn),
+          answer(L.hours, data.hours),
+          answer(L.shipped, data.shipped),
+        ],
+      },
+      {
+        title: "Confirmations",
+        fields: [
+          {
+            label: "Understands the community rate and the open source release",
+            confirmed: Boolean(data.understood),
+          },
+          {
+            label: "Understands how AI tools are used",
+            confirmed: Boolean(data.aiUnderstood),
+          },
+        ],
+      },
+    ],
+  };
+}
+
+/** The application as plain text, for the Google Doc and for email clients
+ *  showing the text part. Headings are underlined rather than styled, because
+ *  neither surface can carry weight. */
+export function renderApplicationText(
+  summary: ApplicationSummary,
+  withHeader = true,
+): string {
+  /* Off wherever something above has already said whose application this is
+     and when it arrived — the programme copy leads with a meta block carrying
+     both. The HTML renderer has taken the same flag from the start; the text
+     one did not, so that email printed the reference and the date twice within
+     eight lines and the organisation's name three times. Default on, because
+     the Doc has nothing above it. */
+  const header = withHeader
+    ? [
+        summary.title.toUpperCase(),
+        summary.subject,
+        `Submitted ${summary.submittedAt}`,
+        `Reference ${summary.reference}`,
+      ].join("\n")
+    : "";
+
+  const sections = summary.sections.map((section, i) => {
+    const heading = `${i + 1}. ${section.title}`.toUpperCase();
+    const entries = section.fields.map((field) =>
+      isConfirmation(field)
+        ? // Marker first, so a panel scanning the gates sees the exceptions
+          // without reading the sentence that follows each one.
+          `${field.confirmed ? "[confirmed]" : "[NOT CONFIRMED]"} ${field.label}`
+        : `${field.label}\n${answerText(field)}`,
+    );
+
+    return [`${heading}\n${"=".repeat(heading.length)}`, ...entries].join("\n\n");
+  });
+
+  return [header, ...sections].filter(Boolean).join("\n\n");
 }
 
 /** Filename for the generated Doc. Sorts chronologically in the Drive folder. */

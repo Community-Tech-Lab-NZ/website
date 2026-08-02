@@ -14,7 +14,8 @@
     "start": "next start",
     "lint": "eslint",
     "check:brand": "node scripts/check-brand-tokens.mjs",
-    "check:logic": "node scripts/check-application-logic.mjs"
+    "check:logic": "node scripts/check-application-logic.mjs",
+    "preview:emails": "tsx scripts/preview-emails.ts"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",

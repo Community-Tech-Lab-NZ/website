@@ -414,13 +414,11 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
               {/* h2, not h3: this sits directly under the page h1, and an h3 here
                   skipped a level. Visual size is unchanged. */}
               <Heading level={3} as="h2">
-                {/* scroll-mt clears the sticky stage bar: focusing this scrolls it
-                    into view, and without the margin it lands underneath. */}
-                <span
-                  ref={headingRef}
-                  tabIndex={-1}
-                  className="scroll-mt-8 outline-none lg:scroll-mt-0"
-                >
+                {/* No scroll-mt here. The document's scroll-padding-top in
+                    base.css clears the sticky bar for every scroll target on
+                    the page, this heading included — and the two would not
+                    compose, they would add up to 32px of over-scroll. */}
+                <span ref={headingRef} tabIndex={-1} className="outline-none">
                   {SECTIONS[step].title}
                 </span>
               </Heading>

@@ -190,6 +190,18 @@
   /* Minimum touch target for interactive elements in the mobile nav. */
   --tap-target: 48px;
 
+  /* The apply form's sticky stage bar below lg (StageBar).
+     This is not only a size. The bar is an OBSTRUCTION the document has to
+     scroll clear of, so the number is declared once here and read twice — as
+     the bar's own min-height, and as the document's scroll-padding-top in
+     base.css. Declared rather than measured so the two cannot drift.
+     56px is what the two stacked rows already measure (55.59 rendered): a
+     25.6px name row, the 4px gap, the 8px marks row, 2 x 8px of padding and
+     the 2px Kowhai rule. It used to be set from --tap-target, whose 48px never
+     actually bound, so naming the real number costs nothing and is comfortably
+     past the touch floor. */
+  --stage-bar-h: 56px;
+
   /* The typing headline's block cursor, sized relative to the text so it
      works at the fluid display size. Width and height echo the lockup's
      cursor block proportions. The em they are measured against is

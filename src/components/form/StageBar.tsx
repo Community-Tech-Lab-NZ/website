@@ -29,6 +29,20 @@ import { useDisclosure } from "@/hooks/useDisclosure";
  * Sticky, which the site header is not: on a 50-minute form the section you are
  * in is worth a permanent 56px, and it means the jump list is one tap away from
  * the bottom of a long section rather than a scroll back to the top.
+ *
+ * BEING STICKY MAKES IT AN OBSTRUCTION, and the document scroll-pads against it
+ * — see the note in tokens/base.css. Its height is --stage-bar-h so the bar and
+ * the padding cannot drift apart.
+ *
+ * THE iOS KEYBOARD CASE IS KNOWN AND ACCEPTED; please do not "fix" it. With the
+ * keyboard up, iOS shrinks the visual viewport but leaves the layout viewport
+ * alone, and a sticky element pins to the layout viewport — so the bar scrolls
+ * above what the reader can see and effectively vanishes while they type,
+ * returning when the keyboard closes. That is the right outcome: mid-answer, an
+ * applicant needs the field and the keyboard, not "03 / 06 — The problem". The
+ * only available fix is a visualViewport resize/scroll listener re-anchoring
+ * the bar on every event — scroll-frequency JS on the busiest page on the site,
+ * spent to drag a progress indicator back over the answer being typed.
  */
 
 type StageBarProps = {
@@ -49,14 +63,21 @@ export function StageBar({ stages, current, marks, onSelect }: StageBarProps) {
   return (
     /* -mx-gutter reaches past Section's inner padding so the bar spans the
        viewport edge to edge, then puts the padding back inside. */
-    <div ref={rootRef} className="sticky top-0 z-10 -mx-gutter mt-6 bg-oat lg:hidden">
+    <div
+      ref={rootRef}
+      data-stage-bar
+      className="sticky top-0 z-10 -mx-gutter mt-6 bg-oat lg:hidden"
+    >
       {/* Two rows rather than one. On a 390px phone the stage name and the
           marks fought for the same line and both wrapped; stacked, the name
           gets the width it needs and the marks read as a progress row. */}
       <button
         {...triggerProps}
         className={clsx(
-          "flex min-h-[var(--tap-target)] w-full cursor-pointer flex-col justify-center gap-1",
+          // --stage-bar-h, not --tap-target: this bar is also what the
+          // document scroll-pads against (base.css), so its height has to be
+          // the same declared number in both places.
+          "flex min-h-[var(--stage-bar-h)] w-full cursor-pointer flex-col justify-center gap-1",
           "border-0 border-b-2 border-solid border-b-kowhai bg-transparent px-gutter py-2 text-left",
         )}
       >

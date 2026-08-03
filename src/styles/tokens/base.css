@@ -51,6 +51,41 @@ hr{border:0;border-top:var(--border-hairline) solid var(--rule-hairline);margin:
    Not prose, for the same reason. */
 button,summary{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
 
+/* THE STICKY STAGE BAR IS A SCROLL OBSTRUCTION.
+ *
+ * Below lg the apply form carries a 56px bar pinned to the top of the document
+ * (StageBar), and anything the browser scrolls to the top lands underneath it:
+ * the section heading focus moves to after Next, the next field Tab reaches,
+ * any anchor. A focused control hidden by author content is a WCAG 2.2 2.4.11
+ * failure, so this is conformance rather than polish.
+ *
+ * scroll-padding-top on the SCROLL CONTAINER, not scroll-margin-top on each
+ * field. layout.tsx sets no overflow anywhere, so the document is the only
+ * scroller on the site and the root owns its scrollport — one declaration
+ * covers all thirty-two fields and every future one. Sticky versus fixed does
+ * not matter either: scroll-padding is a geometric inset on the scrollport and
+ * does not care what is painting over that strip.
+ *
+ * Do NOT also put scroll-margin-top on the fields. The two do not compose,
+ * they ADD — the algorithm grows the target rect by the margin and shrinks the
+ * scrollport by the padding — and the result over-scrolls by the margin. A
+ * scroll-mt-8 on the section heading was removed when this landed.
+ *
+ * Plus --space-2, so the field clears the Kowhai rule rather than touching it.
+ *
+ * Scoped twice. The width matches Tailwind's max-lg, because StageBar is
+ * lg:hidden and --breakpoint-lg is 1180px; :has keeps the offset off the five
+ * routes with no bar, where it would otherwise leave 64px of air above #main
+ * every time someone used the skip link.
+ *
+ * Honest limit: this fixes programmatic focus, Tab navigation and fragment
+ * links. It probably does not fix iOS's own tap-to-focus reveal, which WebKit
+ * routes through a UI-process path using the visual viewport, with no CSS
+ * hook. See the note in StageBar about the keyboard. */
+@media (width < 1180px){
+  html:has([data-stage-bar]){scroll-padding-top:calc(var(--stage-bar-h) + var(--space-2))}
+}
+
 /* Deliberately NOT adding touch-action:manipulation. Next emits
    width=device-width, which suppresses the old 300ms tap delay on its own, so
    it would buy nothing measurable — and it disables double-tap zoom on the

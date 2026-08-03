@@ -226,25 +226,8 @@
 .ctl-node-fade{opacity:0;transition:opacity var(--duration-entry) var(--ease-out-soft);transition-delay:var(--duration-entry)}
 .is-in .ctl-node-fade{opacity:1}
 
-@media (prefers-reduced-motion:reduce){
-  .ctl-rise{transition-delay:0s}
-  .ctl-cursor-blink,.ctl-lockup-block.is-breathing{animation:none}
-  .ctl-link-grow:hover{transform:none}
-  .ctl-btn-motion:hover{transform:none}
-  .ctl-btn-motion:active{transform:translateY(1px)}
-  .ctl-drift-slot{transition:none;transform:none !important}
-  .ctl-word.is-knocked{animation:none}
-  .ctl-motion-only{display:none}
-  .ctl-still-only{display:inline}
-  .ctl-grow:hover{transform:none}
-  .ctl-knock.is-knocked{animation:none}
-  .ctl-cta-ping::after{animation:none}
-  .ctl-focus-list:hover>li{opacity:1;transform:none}
-  .ctl-wipe::after{display:none}
-  .ctl-sweep-gold,.is-in .ctl-sweep-gold{animation:none;transition:none;background-size:100% .28em}
-  .ctl-drift-layer{display:none}
-  .ctl-node-fade{transition-delay:0s}
-}
+/* The reduced-motion block used to sit here, and sitting here is what stopped
+   it working. See the end of this file. */
 
 /* The hero CTA's radar ping: the detached Kowhai ring the button already
    wears expands and fades from its resting position every 5.5 seconds. The
@@ -544,4 +527,54 @@ select{appearance:none}
        occupies in the closed box. */
     select option{padding-block:var(--space-3)}
   }
+}
+
+/* THE REDUCED-MOTION OVERRIDES. THIS BLOCK MUST STAY LAST IN THIS FILE.
+ *
+ * It used to sit around line 229, and that is precisely why four of its rules
+ * did nothing. A media query adds no specificity, so `@media (…){.x{a:none}}`
+ * and a plain `.x{a:something}` are an even match and the LATER declaration
+ * wins. Every rule declared below the old position was quietly overriding its
+ * own opt-out:
+ *
+ *   .ctl-cta-ping::after   — the hero CTA's ring kept pulsing every 5.5s, for
+ *                            the one group of readers who had asked it not to
+ *   .ctl-link-grow:hover   — text links kept scaling, over a hardcoded 450ms
+ *                            that the duration tokens do not reach
+ *   .ctl-focus-list        — the timeline kept dimming its other rows to 45%
+ *   .ctl-word.is-knocked   — latent only; the JS guard never adds the class
+ *
+ * Moving the block to the end fixes all four at once and removes the trap for
+ * good: from here it is after everything, so a rule added anywhere above is
+ * covered automatically. Anything appended below this block is not — so do not
+ * append below this block.
+ *
+ * Most motion on the site never reaches here. It is built on the duration
+ * tokens, and motion.css zeroes those under the same query, so transitions
+ * collapse to nothing on their own. What is left is the cases a duration
+ * cannot express: infinite animations, transforms with hardcoded timings, and
+ * the display swaps for SMIL, which cannot hear the media query at all.
+ *
+ * The three `animation:none` rules below are also load-bearing in a second
+ * way, and are NOT dead code. They stop the animation; lib/motion.ts stops the
+ * class being added in the first place. Both are needed: without the JS guard
+ * the class goes on and, with no animation to end, never comes off again. */
+@media (prefers-reduced-motion:reduce){
+  .ctl-rise{transition-delay:0s}
+  .ctl-cursor-blink,.ctl-lockup-block.is-breathing{animation:none}
+  .ctl-link-grow:hover{transform:none}
+  .ctl-btn-motion:hover{transform:none}
+  .ctl-btn-motion:active{transform:translateY(1px)}
+  .ctl-drift-slot{transition:none;transform:none !important}
+  .ctl-word.is-knocked{animation:none}
+  .ctl-motion-only{display:none}
+  .ctl-still-only{display:inline}
+  .ctl-grow:hover{transform:none}
+  .ctl-knock.is-knocked{animation:none}
+  .ctl-cta-ping::after{animation:none}
+  .ctl-focus-list:hover>li{opacity:1;transform:none}
+  .ctl-wipe::after{display:none}
+  .ctl-sweep-gold,.is-in .ctl-sweep-gold{animation:none;transition:none;background-size:100% .28em}
+  .ctl-drift-layer{display:none}
+  .ctl-node-fade{transition-delay:0s}
 }

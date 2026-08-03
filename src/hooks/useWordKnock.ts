@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { hoverCapable, prefersReducedMotion } from "@/lib/motion";
 
 /* Word knock (replaced the pond, which the owner disliked): each word the
  * pointer actually touches does a miniature version of the headers\' vase
@@ -19,8 +20,7 @@ export function useWordKnock<T extends HTMLElement>() {
   useEffect(() => {
     const host = ref.current;
     if (!host) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    if (!window.matchMedia("(hover: hover)").matches) return;
+    if (prefersReducedMotion() || !hoverCapable()) return;
 
     const onMove = (event: PointerEvent) => {
       const t = event.target as HTMLElement;

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { hoverCapable, prefersReducedMotion } from "@/lib/motion";
 
 /* Ambient drift layers: the brand's own glyphs in slow, continuous motion.
  *
@@ -100,7 +101,15 @@ export function Drift({
     const layer = layerRef.current;
     const host = layer?.parentElement;
     if (!layer || !host) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (prefersReducedMotion()) return;
+    /* Hover capability, matching useWordKnock — this handler is the same
+       pointermove shape and had no such check. On touch, pointermove only
+       fires WHILE A FINGER IS DOWN, which is to say during a scroll: so this
+       was running a getBoundingClientRect plus up to twelve transform writes
+       every frame, to repel carets away from a point the reader's own thumb
+       was covering. Cost on the busiest gesture there is, for an effect
+       nobody could see. */
+    if (!hoverCapable()) return;
 
     const slots = [...layer.children] as HTMLElement[];
     let raf = 0;

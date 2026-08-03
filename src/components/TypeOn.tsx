@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { clsx } from "clsx";
+import { prefersReducedMotion } from "@/lib/motion";
 
 /* Typed-on text with a block cursor.
  *
@@ -85,7 +86,7 @@ export function TypeOn({ text, speed = 52, loop = false, className }: TypeOnProp
   const [phase, setPhase] = useState<Phase>("typing");
 
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (prefersReducedMotion()) return;
 
     let c = 0;
     let timer: ReturnType<typeof setTimeout>;

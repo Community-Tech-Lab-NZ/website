@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import { clsx } from "clsx";
 import { INK_BOX } from "./Logo";
+import { hoverCapable, prefersReducedMotion } from "@/lib/motion";
 
 /* The header lockup, alive.
  *
@@ -93,8 +94,24 @@ export function AnimatedLockup({
   /* Graceful breathe: entering starts it; leaving only FLAGS it to stop, and
      the animationiteration handler removes the class at the next cycle
      boundary, where opacity is back at 1 — so a breath in progress always
-     completes instead of snapping. */
+     completes instead of snapping.
+
+     THAT DESIGN IS WHY THIS NEEDS GUARDING, and it is the worst case of it on
+     the site. The animation is infinite, and the only thing that ever removes
+     the class is an animationiteration that follows a real mouseleave. Neither
+     is reliable:
+
+       - On touch, the browser synthesises a mouseenter after touchend for
+         compatibility, so a TAP starts the breathing — but the matching
+         mouseleave may never arrive. The lockup is inside a Link in both the
+         header and the footer, so it is tapped often, and the footer mark is
+         up to 200px. A tapped logo could breathe forever.
+       - Under reduced motion the CSS sets animation:none, so there are no
+         iterations at all and the class, once added, is permanent.
+
+     Both are answered before the class goes on rather than after. */
   function breatheStart() {
+    if (prefersReducedMotion() || !hoverCapable()) return;
     const b = blockRef.current;
     if (!b) return;
     delete b.dataset.stop;
@@ -102,7 +119,15 @@ export function AnimatedLockup({
   }
   function breatheStop() {
     const b = blockRef.current;
-    if (b) b.dataset.stop = "1";
+    if (!b) return;
+    // Belt and braces for the case above: if nothing is actually animating,
+    // there is no iteration coming to clear the flag, so clear it now.
+    if (b.getAnimations().length === 0) {
+      b.classList.remove("is-breathing");
+      delete b.dataset.stop;
+      return;
+    }
+    b.dataset.stop = "1";
   }
   function breatheIteration() {
     const b = blockRef.current;

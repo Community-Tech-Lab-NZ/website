@@ -1,4 +1,5 @@
 import type { AnimationEvent, MouseEvent } from "react";
+import { hoverCapable, prefersReducedMotion } from "./motion";
 
 /* The vase-knock contract (see .ctl-knock in tokens/utilities.css).
  *
@@ -11,6 +12,13 @@ import type { AnimationEvent, MouseEvent } from "react";
  */
 
 export function knockEnter(event: MouseEvent<HTMLElement>) {
+  /* Two bails before the class goes on.
+     Reduced motion: the CSS sets animation:none, so animationend never fires
+     and knockEnd never runs — the class would go on once and stay forever.
+     Hover capability: React's onMouseEnter is a real event on touch, because
+     browsers synthesise mouse events after touchend for compatibility, so
+     without this a tap wobbles a heading nobody pointed at. */
+  if (prefersReducedMotion() || !hoverCapable()) return;
   const zone = event.currentTarget;
   const target = zone.classList.contains("ctl-knock")
     ? zone
@@ -32,7 +40,7 @@ export function knockEnd(event: AnimationEvent<HTMLElement>) {
  * prefers-reduced-motion, so the trigger checks it here. */
 
 export function winkEnter(event: MouseEvent<HTMLElement>) {
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  if (prefersReducedMotion() || !hoverCapable()) return;
   const anim = event.currentTarget.querySelector<SVGAnimateElement>("animate[data-wink]");
   anim?.beginElement();
 }

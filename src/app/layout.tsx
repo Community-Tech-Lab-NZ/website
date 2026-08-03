@@ -59,6 +59,32 @@ const spaceMono = Space_Mono({
 export const viewport: Viewport = {
   themeColor: "#F3EFE3", // --ctl-oat, the header surface
   colorScheme: "light",
+  /* The page paints to the physical screen edges instead of being letterboxed
+     inside the safe area. Two things want it, and one thing depends on it.
+     - Full-bleed Ink is a core device here (Section tone="ink", SiteFooter).
+       Without cover, on a notched phone IN LANDSCAPE those bands stop short and
+       Safari fills the gap with the page background — an Oat bar down each side
+       of a black band. That is the brand device failing in exactly the
+       orientation someone fills a long form in.
+     - manifest.ts is display:standalone, which iOS honours. Installed, the Oat
+       background_color paints a strip below the Ink footer.
+     - Every env(safe-area-inset-*) resolves to 0px until this is set, so the
+       select sheet's bottom padding in utilities.css was inert dead code that
+       read as if it worked.
+
+     Everything that reaches an edge already clears the cutouts, from the
+     previous commit: --gutter and --gutter-lg carry max(..., env(left|right)),
+     the body carries --safe-top, the footer --safe-bottom. A new full-bleed
+     surface goes through those tokens or it goes under a notch.
+
+     Deliberately NOT adding interactiveWidget. iOS ignores it, and on Android
+     resizes-content would shrink the layout viewport when the keyboard opens,
+     which keeps the sticky stage bar pinned inside the shrunken area and
+     COVERING the field — the opposite of what StageBar's comment wants.
+
+     And still no maximumScale or userScalable: locking zoom is a WCAG 1.4.4
+     failure and this form gets pinched into. */
+  viewportFit: "cover",
 };
 
 export const metadata: Metadata = {

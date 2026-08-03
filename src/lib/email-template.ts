@@ -67,6 +67,89 @@ export type EmailMeta = {
   display?: string;
 };
 
+export type EmailCta = { label: string; href: string };
+
+/* One mark in the credit wall.
+ *
+ * PNG only, and always a file from public/logos/email/ rather than the one the
+ * site uses. Half the partner marks are SVG or WebP, which between them are
+ * unreadable in every major client or in Outlook specifically, and three of
+ * them are reversed and need their own ground baked in. scripts/
+ * build-email-logos.mjs explains the whole conversion. */
+export type EmailLogo = {
+  /** Absolute URL, on the production domain. */
+  src: string;
+  /** The organisation's name. This is what most Outlook readers actually see,
+   *  because images are off by default there. */
+  alt: string;
+  /** Display size in CSS pixels. The file itself is stored at 2x. */
+  w: number;
+  h: number;
+};
+
+/* The partner and funder credit at the foot of the message.
+ *
+ * Broadcast mail only. A confirmation is read by someone who has just spent an
+ * hour on the form and knows exactly who this is; a cold email to five hundred
+ * organisations is read by someone deciding whether it is real, and six marks
+ * they recognise from around the district answers that faster than a sentence
+ * can. The sentence is there too, in the outro, because most Outlook readers
+ * will never see these files load. */
+export type EmailLogoWall = {
+  /** Space Mono eyebrow above the grid. */
+  label: string;
+  logos: EmailLogo[];
+  /** Set apart below the partners, under its own eyebrow, because the funder is
+   *  not a partner: the QLDC Economic Diversification Fund pays for the
+   *  programme and must be credited wherever the programme is promoted. */
+  funder?: { label: string; logo: EmailLogo };
+};
+
+/* A labelled run of the body, for messages long enough to need finding your
+ * place in.
+ *
+ * A confirmation is six sentences and wants no furniture. A broadcast is four
+ * hundred words to someone who did not ask for it, and as one column of even
+ * paragraphs it reads as a wall and gets skimmed to death. The label is the
+ * same Space Mono eyebrow the site uses for exactly this (`WHY IT EXISTS`,
+ * `HOW IT RUNS`, `KEY DATES`), so a reader can find the part they care about
+ * without reading the parts they do not.
+ *
+ * `meta` rides inside a section rather than only at the top level so the dates
+ * table can sit under its own heading instead of floating between paragraphs. */
+export type EmailSection = {
+  label: string;
+  paragraphs?: string[];
+  meta?: EmailMeta[];
+};
+
+/* What bulk mail has to carry and transactional mail must not.
+ *
+ * Kept as one object rather than loose optional fields, because the reason and
+ * the unsubscribe are not independent: a way out without a word about how the
+ * address was obtained is still the wrong footer, and the type should not let
+ * someone add the easy one and forget the other. Set it and the footer switches
+ * form; leave it unset and a confirmation email keeps the short footer it has
+ * always had. */
+export type EmailBulk = {
+  /** Where this address came from, in the reader's terms. A list that nobody
+   *  hand-subscribed to has to say why it is in their inbox, and "you signed up"
+   *  would be a lie. */
+  reason: string;
+  /** Optional, and deliberately omitted on the launch broadcast.
+   *
+   *  The Unsolicited Electronic Messages Act 2007 requires accurate information
+   *  about who authorised the message and a working way to contact them. It
+   *  does not require a postal address, which is a US CAN-SPAM habit. A message
+   *  that names the programme, the lead organisation, the site and a monitored
+   *  reply-to has already met the duty, so an address nobody could verify would
+   *  be decoration at best and wrong at worst. */
+  postalAddress?: string;
+  /** In a Resend broadcast this is the literal `{{{RESEND_UNSUBSCRIBE_URL}}}`
+   *  placeholder, substituted per recipient at send time. */
+  unsubscribeUrl: string;
+};
+
 export type EmailContent = {
   /** The inbox preview line. Without one, clients pull the first words of the
    *  body, which is the heading again. */
@@ -74,16 +157,37 @@ export type EmailContent = {
   /** Space Mono label above the heading. */
   eyebrow: string;
   heading: string;
+  /** The supporting line directly under the heading, as the site's `Lede`.
+   *
+   *  Exists because the brand caps hero headlines at five words and puts the
+   *  detail in the line beneath, which is the only way "Tell us a problem" also
+   *  gets to say who does what about it. Set larger and lighter than body copy,
+   *  so heading and lede read as one unit and the letter starts after them. */
+  lede?: string;
   /** Paragraphs between the heading and everything else. */
   intro: string[];
   /** Named facts: who applied, where the Doc is. Rendered as rows, links live. */
   meta?: EmailMeta[];
+  /** Labelled body sections, rendered after `intro`. Long messages only. */
+  sections?: EmailSection[];
   /** Someone else's words, set apart from ours. */
   quote?: string;
   /** A full application, echoed back. */
   summary?: ApplicationSummary;
   /** Paragraphs after the body, before the footer. */
   outro?: string[];
+  /** The one button. Broadcast mail needs somewhere obvious to go; a
+   *  confirmation is not asking for anything and leaves this unset. */
+  cta?: EmailCta;
+  /** Sign-off and name, closing the message after the button. Its own field
+   *  rather than a last `outro` entry, because outro entries are paragraphs and
+   *  a signature is not: it sits tighter, and it has to come after the call to
+   *  action rather than before it. Line breaks are kept. */
+  signoff?: string;
+  /** Partner and funder marks, closing the message. See `EmailLogoWall`. */
+  logos?: EmailLogoWall;
+  /** Set on broadcast mail only. See `EmailBulk`. */
+  bulk?: EmailBulk;
   /** Applicant mail is sent from an address that bounces, and has to say so.
    *  Programme mail has a working reply-to, so it must not. */
   unmonitored: boolean;
@@ -93,7 +197,12 @@ export type EmailContent = {
  *  answers are left exactly as typed: rewrapping someone's prose can break a
  *  pasted URL, and their line breaks are meaningful. */
 function wrap(text: string, width = TEXT_WIDTH): string {
+  // Bold markers are an HTML-part instruction. The text part has no way to
+  // honour them and must not show them, so they come off here. Safe to do in
+  // `wrap` because every caller is passing copy this repo wrote: applicants'
+  // answers are rendered by renderApplicationText, which never calls this.
   return text
+    .replace(/\*\*(.+?)\*\*/g, "$1")
     .split(/\r?\n/)
     .map((line) => {
       const out: string[] = [];
@@ -114,8 +223,41 @@ function wrap(text: string, width = TEXT_WIDTH): string {
 
 // --- HTML ------------------------------------------------------------------
 
+/* The brand name in running copy, marked **like this**, rendered as the site's
+ * gold sweep and linked home.
+ *
+ * The sweep is `.ctl-sweep-gold` in styles/tokens/utilities.css: a Kōwhai bar
+ * under the words, which the site animates across and email cannot. What is
+ * drawn here is that rule's reduced-motion state, the one already written for
+ * readers who asked not to be moved, so this is the same device rather than an
+ * email-only invention of one.
+ *
+ * NOT bold. At 16px, Archivo bold sitting inside Source Sans body copy stopped
+ * reading as a name and started reading as a raised voice.
+ *
+ * Underline rather than a background block, because the site's device is a bar
+ * beneath the words and a filled highlight is a different, heavier thing. A
+ * client that drops `text-decoration-color` still renders an Ink underline,
+ * which is still visibly a link, the same fallback `htmlLink` relies on.
+ *
+ * Applied AFTER escaping, and only on paths carrying copy this repo wrote: the
+ * lede, and htmlParagraph, which serves intro, outro and sections. Applicants'
+ * answers render through htmlSummary and never arrive here, so two asterisks
+ * typed into a form field stay two asterisks. */
+const SWEEP = "#F7CF83"; // Kōwhai at .55 on white, composited: Outlook drops rgba()
+
+function brandMark(escaped: string): string {
+  return escaped.replace(
+    /\*\*(.+?)\*\*/g,
+    // skip-ink off: left on, the bar breaks around the descender in "Community"
+    // and reads as three separate underlines rather than one sweep. The site
+    // paints a background bar, which never breaks, so this is what matches it.
+    `<a href="${PRODUCTION_URL}" style="color:${INK};text-decoration:underline;text-decoration-color:${SWEEP};text-decoration-thickness:4px;text-underline-offset:1px;text-decoration-skip-ink:none;">$1</a>`,
+  );
+}
+
 function htmlParagraph(text: string, top = 20): string {
-  return `<p style="margin:${top}px 0 0;font-family:${BODY};font-size:16px;line-height:1.6;color:${INK_BODY};">${escapeMultiline(text)}</p>`;
+  return `<p style="margin:${top}px 0 0;font-family:${BODY};font-size:16px;line-height:1.6;color:${INK_BODY};">${brandMark(escapeMultiline(text))}</p>`;
 }
 
 function htmlEyebrow(text: string, color = INK_MUTED): string {
@@ -144,6 +286,121 @@ function htmlMeta(meta: EmailMeta[]): string {
     .join("");
 
   return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;margin-top:28px;">${rows}</table>`;
+}
+
+function htmlSection(section: EmailSection): string {
+  // Hairline above, then the label. The rule is what makes this scannable at
+  // arm's length: an eyebrow alone is small enough that the eye slides past it
+  // in a column of body copy, and the line gives it something to sit on.
+  const body = [
+    ...(section.paragraphs ?? []).map((text, i) => htmlParagraph(text, i === 0 ? 14 : 18)),
+    section.meta?.length ? htmlMeta(section.meta) : "",
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;margin-top:36px;">
+      <tr>
+        <td style="padding-top:26px;border-top:1px solid ${HAIRLINE};">
+          ${htmlEyebrow(section.label)}
+          ${body}
+        </td>
+      </tr>
+    </table>`;
+}
+
+function htmlCta(cta: EmailCta): string {
+  // A table cell with a background colour, not a styled <a>. Outlook ignores
+  // padding on inline elements, so a padded link collapses to bare underlined
+  // text on the one client where the button matters most. Flat Ink, Oat label,
+  // near-square corners, no shadow, exactly as the site draws it.
+  return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:32px;">
+      <tr>
+        <td style="background-color:${INK};border-radius:2px;">
+          <a href="${escapeHtml(cta.href)}" style="display:inline-block;padding:15px 30px;font-family:${DISPLAY};font-size:16px;font-weight:700;line-height:1.2;color:${OAT};text-decoration:none;">${escapeHtml(cta.label)}</a>
+        </td>
+      </tr>
+    </table>`;
+}
+
+/* One mark, sized to its slot and free to shrink out of it.
+ *
+ * `width:Wpx;max-width:100%;height:auto` is the whole trick. The attributes are
+ * for Outlook, which ignores the CSS and holds the file at its stated size,
+ * which is fine because Outlook is always 600px wide. Everywhere else the CSS
+ * wins, and on a phone the mark scales down inside its column instead of
+ * pushing the card into horizontal scroll. Baking each chip into its PNG is
+ * what makes that safe: mark and ground are one image and cannot scale apart.
+ *
+ * A mark in the grid is centred twice, by the cell's align attribute and by
+ * auto margins, because different clients honour different halves of that. The
+ * funder mark stands alone under its own eyebrow and sits left, with it. */
+function htmlLogo(logo: EmailLogo, centred = true): string {
+  const margin = centred ? "0 auto" : "0";
+  return `<img src="${escapeHtml(logo.src)}" width="${logo.w}" height="${logo.h}" alt="${escapeHtml(logo.alt)}" style="display:block;margin:${margin};border:0;outline:none;text-decoration:none;width:${logo.w}px;max-width:100%;height:auto;font-family:${BODY};font-size:13px;color:${INK_MUTED};">`;
+}
+
+function htmlLogoWall(wall: EmailLogoWall): string {
+  /* Two columns, not the site's three.
+   *
+   * The card is 536px of usable width on a desktop and about 295px on a phone,
+   * and a table in an email does not reflow: whatever column count is set here
+   * is the column count everywhere. Three columns puts each mark in 98px on a
+   * phone, where "Technology Queenstown" is 25px wide and unreadable. Two gives
+   * every mark 268px on a desktop, which is the site's own 200px cap with room
+   * to spare, and 147px on a phone, which still reads. */
+  /* Hairline cells, as the site's wall has.
+   *
+   * Without them the marks float: six logos at wildly different widths, three
+   * on their own coloured ground and three not, read as a scattering rather
+   * than a set. The rules are what make it one object. Drawn as collapsed
+   * borders rather than the site's 1px-gap-over-a-tinted-background, which
+   * needs a background to show through a gap and is exactly the sort of thing
+   * Outlook renders as six grey blocks. */
+  const cell = `border:1px solid ${HAIRLINE};padding:18px 10px;`;
+  const rows: string[] = [];
+  for (let i = 0; i < wall.logos.length; i += 2) {
+    const pair = wall.logos.slice(i, i + 2);
+    const cells = pair
+      .map(
+        (logo) =>
+          `<td width="50%" align="center" valign="middle" style="${cell}">${htmlLogo(logo)}</td>`,
+      )
+      .join("");
+    // An odd count would otherwise leave the last mark stretched across the
+    // full width instead of sitting in its own column.
+    const filler = pair.length === 1 ? `<td width="50%" style="${cell}">&nbsp;</td>` : "";
+    rows.push(`<tr>${cells}${filler}</tr>`);
+  }
+
+  const funder = wall.funder
+    ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;margin-top:28px;">
+        <tr>
+          <td style="padding-top:24px;border-top:1px solid ${HAIRLINE};">
+            ${htmlEyebrow(wall.funder.label)}
+            <div style="margin-top:14px;">${htmlLogo(wall.funder.logo, false)}</div>
+          </td>
+        </tr>
+      </table>`
+    : "";
+
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;margin-top:40px;">
+      <tr>
+        <td style="padding-top:26px;border-top:1px solid ${HAIRLINE};">
+          ${htmlEyebrow(wall.label)}
+          <!-- table-layout:fixed so the two columns stay exactly half each. On
+               auto layout the columns size to their contents, and these marks
+               range from 56px to 232px wide: the wall comes out lopsided at
+               600px, and in a client that honours max-width and narrows the
+               card, the images keep their natural size and push the whole card
+               into horizontal scroll instead of scaling down. -->
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;margin-top:16px;border-collapse:collapse;table-layout:fixed;">
+            ${rows.join("\n")}
+          </table>
+          ${funder}
+        </td>
+      </tr>
+    </table>`;
 }
 
 function htmlQuote(text: string): string {
@@ -227,11 +484,23 @@ export function renderHtmlEmail(content: EmailContent): string {
   const blocks = [
     htmlEyebrow(content.eyebrow),
     `<h1 class="ctl-heading" style="margin:18px 0 0;font-family:${DISPLAY};font-size:34px;line-height:1.1;font-weight:800;color:${INK};">${escapeHtml(content.heading)}</h1>`,
+    content.lede
+      ? `<p style="margin:14px 0 0;font-family:${BODY};font-size:19px;line-height:1.5;color:${INK_BODY};">${brandMark(escapeMultiline(content.lede))}</p>`
+      : "",
     ...content.intro.map((text) => htmlParagraph(text, 24)),
     content.meta?.length ? htmlMeta(content.meta) : "",
     content.quote ? htmlQuote(content.quote) : "",
+    ...(content.sections ?? []).map(htmlSection),
     content.summary ? htmlSummary(content.summary, summaryNeedsHeader(content)) : "",
     ...(content.outro ?? []).map((text) => htmlParagraph(text, 28)),
+    content.cta ? htmlCta(content.cta) : "",
+    content.signoff
+      ? `<p style="margin:32px 0 0;font-family:${BODY};font-size:16px;line-height:1.6;color:${INK_BODY};">${escapeMultiline(content.signoff)}</p>`
+      : "",
+    // Last thing in the card, after the signature. It is a credential, not part
+    // of the letter: a reader who is already convinced never needs it, and a
+    // reader who is not goes looking for it at the bottom.
+    content.logos ? htmlLogoWall(content.logos) : "",
   ]
     .filter(Boolean)
     .join("\n");
@@ -245,6 +514,12 @@ export function renderHtmlEmail(content: EmailContent): string {
         ${escapeHtml(FOOTER_NOTE)}<br>
         ${htmlLink(PRODUCTION_URL, PRODUCTION_URL.replace(/^https:\/\//, ""))}
       </p>`,
+    content.bulk
+      ? `<p style="margin:16px 0 0;font-family:${BODY};font-size:13px;line-height:1.6;color:${INK_MUTED};">
+        ${content.bulk.postalAddress ? `${escapeHtml(content.bulk.postalAddress)}<br>` : ""}
+        ${escapeHtml(content.bulk.reason)} ${htmlLink(content.bulk.unsubscribeUrl, "Unsubscribe")}
+      </p>`
+      : "",
   ]
     .filter(Boolean)
     .join("\n");
@@ -276,7 +551,7 @@ export function renderHtmlEmail(content: EmailContent): string {
 
         <tr>
           <td class="ctl-pad" style="background-color:${INK};padding:28px 32px;">
-            <img src="${LOGO}" width="208" height="56" alt="Community Tech Lab" style="display:block;border:0;outline:none;text-decoration:none;width:208px;height:56px;font-family:${DISPLAY};font-size:20px;font-weight:800;color:${OAT};">
+            <a href="${PRODUCTION_URL}" style="display:inline-block;text-decoration:none;border:0;"><img src="${LOGO}" width="260" height="70" alt="Community Tech Lab" style="display:block;border:0;outline:none;text-decoration:none;width:260px;height:70px;font-family:${DISPLAY};font-size:20px;font-weight:800;color:${OAT};"></a>
           </td>
         </tr>
 
@@ -308,7 +583,11 @@ export function renderHtmlEmail(content: EmailContent): string {
 // --- Plain text ------------------------------------------------------------
 
 export function renderTextEmail(content: EmailContent): string {
-  const blocks: string[] = [wrap(content.heading), ...content.intro.map((p) => wrap(p))];
+  const blocks: string[] = [
+    wrap(content.heading),
+    ...(content.lede ? [wrap(content.lede)] : []),
+    ...content.intro.map((p) => wrap(p)),
+  ];
 
   if (content.meta?.length) {
     // The value, never the href: the href of an email address is a mailto:,
@@ -317,6 +596,15 @@ export function renderTextEmail(content: EmailContent): string {
   }
   if (content.quote) {
     blocks.push([RULE, content.quote, RULE].join("\n\n"));
+  }
+  for (const section of content.sections ?? []) {
+    // Upper-cased here rather than by CSS, because the plain-text part has no
+    // CSS and the label has to read as a heading on its own.
+    blocks.push(section.label.toUpperCase());
+    for (const paragraph of section.paragraphs ?? []) blocks.push(wrap(paragraph));
+    if (section.meta?.length) {
+      blocks.push(section.meta.map((item) => `${item.label}: ${item.value}`).join("\n"));
+    }
   }
   if (content.summary) {
     // The same rendering the panel's Doc gets, so the applicant's copy and the
@@ -330,12 +618,37 @@ export function renderTextEmail(content: EmailContent): string {
   for (const paragraph of content.outro ?? []) {
     blocks.push(wrap(paragraph));
   }
+  if (content.cta) {
+    // Label then bare URL on its own line. Not wrapped: `wrap` would break a
+    // long link across two lines and the client would stop linkifying it.
+    blocks.push(`${content.cta.label}:\n${content.cta.href}`);
+  }
+  if (content.signoff) {
+    blocks.push(content.signoff);
+  }
+
+  // `content.logos` is deliberately not rendered here. It is a wall of marks,
+  // and the only thing it says in words is the six partner names and the
+  // funder, which the outro already says in a sentence written to be read. A
+  // text part cannot show a logo, so all it could add is that list a second
+  // time, four lines below the first.
+
+  // --- footer ---
 
   const footer = [
     content.unmonitored
       ? wrap("This address is not monitored, so please do not reply to this email.")
       : "",
     ["Community Tech Lab", FOOTER_NOTE, PRODUCTION_URL].join("\n"),
+    content.bulk
+      ? [
+          content.bulk.postalAddress ?? "",
+          wrap(content.bulk.reason),
+          `Unsubscribe: ${content.bulk.unsubscribeUrl}`,
+        ]
+          .filter(Boolean)
+          .join("\n")
+      : "",
   ].filter(Boolean);
 
   return [...blocks, ...footer].join("\n\n");

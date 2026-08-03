@@ -22,6 +22,7 @@ import {
   communityApplicationSummary,
   developerApplicationSummary,
 } from "../src/lib/application-doc";
+import { communityLaunchBroadcast } from "../src/lib/broadcast";
 import { renderHtmlEmail, renderTextEmail } from "../src/lib/email-template";
 import {
   applicationCopy,
@@ -122,6 +123,22 @@ const messages: { name: string; message: Message }[] = [
       gate: "We are based in, or primarily serve, the Queenstown Lakes district.",
       body: "We are registered in Invercargill but two thirds of our programmes run in Wānaka and Hāwea. Does that count as primarily serving the district?",
     }),
+  },
+  // Not a confirmation: the launch broadcast to the Community Connect groups.
+  // Rendered here for the same reason as the rest, and one more besides. It is
+  // the only message that goes to people who did not ask for it, so the footer
+  // it carries is the part most worth looking at before it sends.
+  //
+  // Both variants, because the send date is not locked. Passed explicitly
+  // rather than left to the clock, so the pair can be compared on any date
+  // rather than only whichever one today happens to produce.
+  {
+    name: "06-community-launch-broadcast-before",
+    message: communityLaunchBroadcast("before"),
+  },
+  {
+    name: "07-community-launch-broadcast-open",
+    message: communityLaunchBroadcast("open"),
   },
 ];
 

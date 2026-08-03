@@ -59,13 +59,13 @@ export default function HomePage() {
           is offset as a whole; nothing inside a block cascades. */}
       <Section tone="ink" drift="hero" hero>
         <Heading level={1} fluid inverse className="max-w-[var(--hero-heading-max)]">
-          <TypeOn text="Tools that get used." loop />
+          <TypeOn text="Built by local developers. For local good." loop />
         </Heading>
 
         <Reveal delay={400}>
           <Lede inverse className="mt-6">
-            Local developers build software for community organisations across the
-            Queenstown Lakes district, at no cost to the organisation.
+            Software for community organisations across the Queenstown Lakes
+            district, at no cost to the organisation.
           </Lede>
         </Reveal>
 

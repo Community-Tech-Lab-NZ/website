@@ -76,8 +76,12 @@ export const CTL_PARTNERS: readonly Partner[] = [
   {
     name: "Queenstown Coders Connect",
     logo: "/logos/qt_coders_logo.svg",
-    w: 110,
-    h: 20,
+    // 550x100 intrinsic for a slot that paints it 200px wide. Every other mark
+    // here is downscaled; this reconstruction is the only one a browser has to
+    // scale UP, and an SVG rasterised at its intrinsic box before scaling comes
+    // out soft. Same viewBox, same artwork — only the declared box grew.
+    w: 550,
+    h: 100,
     chip: "#020617",
   },
   { name: "FLINT Queenstown", logo: "/logos/flint_logo.png", w: 300, h: 300 },

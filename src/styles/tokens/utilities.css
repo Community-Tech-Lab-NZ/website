@@ -135,6 +135,13 @@
 }
 .ctl-lockup-block.is-breathing{animation:ctl-cursor-breathe 2.2s var(--ease-standard) infinite}
 
+/* The mark is an <image> inside an <svg> inside the home link, so a long press
+   on the header or footer logo offers to save a decorative wordmark. Home is
+   the one link here whose long-press menu is worth nothing — every page carries
+   the nav — so the callout goes. FunderCredit's image deliberately keeps its
+   own: that one links to the council, where "open in new tab" is useful. */
+.ctl-lockup{-webkit-touch-callout:none}
+
 /* Brushed like a vase (override 4 family): passing the pointer over a stat
    or heading knocks it — it tips on its own base and wobbles back to rest
    through a damped swing. Pivots at the bottom edge, which is what sells
@@ -548,6 +555,14 @@ select{appearance:none}
          the screen. --select-sheet-max-block leaves the field visible above. */
       max-block-size:var(--select-sheet-max-block);
       overflow-y:auto;
+      /* Flicking past the end of a long list otherwise scrolls the page behind
+         the sheet. Android-Chrome-only today, since this whole block sits
+         inside @supports (appearance:base-select) which iOS does not match,
+         but it is one line and becomes correct the day it does.
+         NOT on html or body: that would kill pull-to-refresh and the
+         rubber-band that tells someone they have reached the end of a
+         six-section form. */
+      overscroll-behavior:contain;
       /* Only the top edge is a border now: the other three meet the screen. The
          radius follows, and the bottom pad clears the home indicator. */
       border-width:var(--border-hairline) 0 0;

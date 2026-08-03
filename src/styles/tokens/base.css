@@ -1,5 +1,21 @@
 /* Minimal element defaults so a bare page already reads as Community Tech Lab. */
-html{-webkit-text-size-adjust:100%}
+
+/* -webkit-tap-highlight-color is inherited, so the root is the only place it
+   needs saying. iOS paints a plate over whatever it decided was tapped, for a
+   beat after the touch, and the default is a translucent black: on the Ink
+   surfaces it reads as a smudge, and on the Kowhai and Fern actions it washes
+   the brand colour out at exactly the moment someone is looking at it.
+
+   Tinted rather than transparent. Transparent was the other candidate, but the
+   hover effects that used to answer a tap are now guarded off on touch (see
+   tokens/utilities.css), so removing this as well would leave several controls
+   answering a tap with nothing at all until their route loads. --ctl-ink-08 is
+   an existing token and already translucent — the platform's own gesture, in
+   the brand's colours, which is the same trade ::selection makes below.
+
+   Orthogonal to the focus ring: iOS does not match :focus-visible on touch,
+   and this property does not draw outlines. Keyboard focus is untouched. */
+html{-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:var(--ctl-ink-08)}
 body{margin:0;background:var(--surface-page);color:var(--text-body);font-family:var(--font-body);font-size:var(--size-body);line-height:var(--leading-body);font-weight:var(--weight-body);text-wrap:pretty;-webkit-font-smoothing:antialiased}
 h1,h2,h3,h4{font-family:var(--font-display);color:var(--text-heading);margin:0 0 var(--space-4)}
 h1{font-size:var(--size-display);font-weight:var(--weight-display);line-height:var(--leading-display);letter-spacing:var(--tracking-display)}
@@ -9,9 +25,34 @@ h4{font-size:var(--size-body-lg);font-weight:var(--weight-subhead);line-height:v
 p{margin:0 0 var(--space-4);max-width:var(--measure-body)}
 a{color:var(--text-link);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;text-decoration-color:var(--ctl-kowhai);transition:color var(--duration-base) var(--ease-standard)}
 a:hover{color:var(--ctl-fern);text-decoration-color:var(--ctl-fern)}
+/* The press state, and the reason a:hover above does not need a hover guard.
+   A link's colour step is the one hover on this site worth leaving unguarded —
+   it is confined to the thing you touched — but on touch it latches, so it
+   cannot be the whole story. :active says the same thing and self-clears on
+   release. Invisible on desktop, because hover has already made it Fern. */
+a:active{color:var(--ctl-fern);text-decoration-color:var(--ctl-fern)}
 strong{font-weight:var(--weight-body-strong)}
 small{font-size:var(--size-body-sm)}
 code,kbd{font-family:var(--font-mono);font-size:.9em}
 hr{border:0;border-top:var(--border-hairline) solid var(--rule-hairline);margin:var(--space-6) 0}
 :focus-visible{outline:2px solid var(--action-focus-ring);outline-offset:2px}
 ::selection{background:var(--ctl-kowhai);color:var(--ctl-ink)}
+
+/* A long press on a control is a mis-hold, not a request to select its label.
+   iOS answers it with the magnifier and a callout, and the stray selection
+   that leaves behind then swallows the next tap — on a form people spend 45 to
+   60 minutes in, with a stage bar and six rows they hit repeatedly.
+
+   DELIBERATELY ONLY button AND summary.
+   Not <a>: long press is how iOS offers "open in new tab" and "copy link", and
+   this site sends people to the council and partner sites.
+   Not <label>: the six eligibility gates are legal statements someone may
+   reasonably want to select and copy, and Checkbox renders them in a label.
+   Not prose, for the same reason. */
+button,summary{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+
+/* Deliberately NOT adding touch-action:manipulation. Next emits
+   width=device-width, which suppresses the old 300ms tap delay on its own, so
+   it would buy nothing measurable — and it disables double-tap zoom on the
+   elements it touches, which contradicts the decision in layout.tsx to leave
+   zoom unlocked for WCAG 1.4.4. */

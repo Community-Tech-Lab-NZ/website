@@ -88,6 +88,30 @@
    one media query is the pause mechanism), the typing pauses when the tab is
    hidden, the drift never exceeds 16% opacity, and nothing approaches three
    flashes a second (2.3.1). Zero layout shift throughout.
+
+   HOVER EFFECTS ARE WRITTEN INSIDE @media (hover: hover).
+
+   On a touch screen :hover latches when you tap and stays until you tap
+   something else, so an unguarded hover effect is a stuck state rather than a
+   transient one. The test for whether a rule needs the guard: GUARD ANYTHING
+   THAT CHANGES GEOMETRY, OR THAT CHANGES AN ELEMENT OTHER THAN THE ONE UNDER
+   THE POINTER. A stuck 4% scale reads as a rendering fault, and a hover that
+   dims its siblings leaves them dimmed. A colour or underline confined to the
+   thing you touched reads as a pressed state, which is fine and often useful,
+   so those are left alone — base.css gives links a real :active step as well.
+
+   Tailwind's `hover:` variant ALREADY emits this wrapper in v4, so the ~19
+   hover utilities across the components are guarded for free and none of them
+   needed touching. It is only hand-written CSS that has to say it.
+
+   NEVER write `@custom-variant hover (&:hover)`. It appears in the v4 upgrade
+   guide as the opt-OUT for people who wanted v3's unguarded behaviour back;
+   adding it here would strip the guard from every one of those utilities at
+   once. The mechanism to reach for is the plain media query, as below.
+
+   Not to be confused with the @media (pointer:coarse) block further down,
+   which asks a different question — target size, not hover capability — for
+   the select picker. Two features, two questions; do not unify them.
    ========================================================================= */
 
 /* Continuous blink: the typing headline's rest phase between cycles. */
@@ -142,8 +166,17 @@
    the utilities layer overwrite it. Press keeps the 1px drop, composed with
    the grown scale so pressing never un-grows the button. */
 .ctl-btn-motion{transition:background-color var(--duration-fast) var(--ease-standard),color var(--duration-fast) var(--ease-standard),border-color var(--duration-fast) var(--ease-standard),transform var(--duration-hover) var(--ease-out-soft)}
-.ctl-btn-motion:hover{transform:scale(1.04)}
-.ctl-btn-motion:active{transform:scale(1.04) translateY(1px)}
+/* Guarded. The transition shorthand above is NOT — it carries the colour
+   steps, which every device needs. Only the growth is hover-only. */
+@media (hover:hover){.ctl-btn-motion:hover{transform:scale(1.04)}}
+/* The press splits, because guarding hover inverts what :active meant. The
+   scale here was only ever repeating the hover scale so that pressing did not
+   UN-grow an already-grown button. Left whole on touch, where there is no
+   hover to repeat, it would make a press GROW the button by 4% — the opposite
+   of a press. So touch gets the 1px drop alone, which is the same shape the
+   reduced-motion block uses, and the compensating scale stays with hover. */
+.ctl-btn-motion:active{transform:translateY(1px)}
+@media (hover:hover){.ctl-btn-motion:active{transform:scale(1.04) translateY(1px)}}
 
 /* Hover grow (override 4). Transform-only so nothing reflows. On
    --duration-hover, not --duration-fast: growth should stretch, not twitch.
@@ -156,7 +189,7 @@
    reaches for later without rediscovering why it was dropped. Override 4 still
    exists in its other two forms, .ctl-grow here and .ctl-btn-motion below. */
 .ctl-grow{transition:transform var(--duration-hover) var(--ease-out-soft)}
-.ctl-grow:hover{transform:scale(1.06)}
+@media (hover:hover){.ctl-grow:hover{transform:scale(1.06)}}
 
 /* Stat reveal wipe: an Oat block over the figure slides away to the right,
    reading as a selection un-highlighting. Deliberately NOT a counter; the
@@ -271,7 +304,7 @@
    not resize the raster and headings are large enough not to show the AA
    difference. */
 .ctl-link-grow{display:inline-block;transition:transform 450ms var(--ease-out-soft),color var(--duration-fast) var(--ease-standard),border-color var(--duration-fast) var(--ease-standard),text-decoration-color var(--duration-fast) var(--ease-standard)}
-.ctl-link-grow:hover{transform:scale(1.03)}
+@media (hover:hover){.ctl-link-grow:hover{transform:scale(1.03)}}
 
 /* Disclosure caret (RoleDescription). Caret.tsx sets its rotation as an inline
    style from the `direction` prop, which a server component cannot flip when
@@ -359,8 +392,16 @@ details[open] .ctl-disclosure-caret{transform:none}
 /* Focus list (the timelines): hovering one entry lifts it slightly and pales
    the rest, so the row under the pointer reads as the one in focus. */
 .ctl-focus-list>li{transition:opacity var(--duration-hover) var(--ease-out-soft),transform var(--duration-hover) var(--ease-out-soft);transform-origin:left center}
-.ctl-focus-list:hover>li{opacity:.45}
-.ctl-focus-list:hover>li:hover{opacity:1;transform:scale(1.05)}
+/* Guarded, and this is the one that most needed it. Hovering the LIST dims
+   every row, so on touch a tap left four sibling entries stranded at 45% —
+   which is not only "looks broken", it puts their text under AA contrast, on
+   the key dates card that appears in the aside of four pages. It is also the
+   only rule here where hovering one element restyles others, which is exactly
+   the shape that goes worst when :hover latches. */
+@media (hover:hover){
+  .ctl-focus-list:hover>li{opacity:.45}
+  .ctl-focus-list:hover>li:hover{opacity:1;transform:scale(1.05)}
+}
 
 /* Sliding tab underline (useTabIndicator). The per-item border classes stay
    in the markup as the no-JS fallback; ctl-tabs-live is added by the hook and
@@ -465,6 +506,11 @@ select{appearance:none}
      or arrow key is Oat pressed one step down, the row already chosen is flat
      Oat with the rail. Arrowing through a list whose selected row is already
      tinted has to stay legible. */
+  /* Deliberately NOT wrapped in @media (hover:hover), unlike the hover rules
+     further up. This one is inside an open picker: it is the highlight the
+     platform paints under the pointer or the arrow keys, it cannot latch
+     because it dies with the popover, and on a coarse pointer the picker is a
+     bottom sheet anyway. Leave it. */
   select option:hover,select option:focus-visible{background:var(--ctl-oat-sunk);outline:none}
   select option:checked{background:var(--ctl-oat);border-left-color:var(--ctl-fern)}
   /* The placeholder is disabled and cannot be chosen, so in an in-page panel

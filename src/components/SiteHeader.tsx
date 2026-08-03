@@ -8,6 +8,7 @@ import { AnimatedLockup } from "./AnimatedLockup";
 import { Button } from "./Button";
 import { Caret } from "./Caret";
 import { NAV } from "@/lib/navigation";
+import { hoverCapable } from "@/lib/motion";
 import { useDisclosure } from "@/hooks/useDisclosure";
 import { useTabIndicator } from "@/hooks/useTabIndicator";
 
@@ -162,7 +163,11 @@ export function SiteHeader({
           />
         </Link>
 
-        {/* Desktop nav */}
+        {/* Desktop nav. onMouseLeave is deliberately NOT hover-guarded, where
+            the enter below is: rest() is the corrective call — it puts the
+            indicator back on the active route — so firing it when it was not
+            needed is always harmless, and skipping it could strand the bar
+            somewhere it does not belong. Guard the move, never the recovery. */}
         <nav
           ref={stripRef}
           aria-label="Main"
@@ -175,7 +180,7 @@ export function SiteHeader({
               href={item.href}
               aria-current={isActive(item.href) ? "page" : undefined}
               data-tab-active={isActive(item.href) || undefined}
-              onMouseEnter={(e) => moveTo(e.currentTarget)}
+              onMouseEnter={(e) => { if (hoverCapable()) moveTo(e.currentTarget); }}
               className={clsx(
                 // ctl-hit: the 20px line box is under the 24px target minimum.
                 // ctl-tab-underline: the border is the no-JS fallback; once

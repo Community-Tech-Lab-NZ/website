@@ -16,7 +16,12 @@
    Orthogonal to the focus ring: iOS does not match :focus-visible on touch,
    and this property does not draw outlines. Keyboard focus is untouched. */
 html{-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:var(--ctl-ink-08)}
-body{margin:0;background:var(--surface-page);color:var(--text-body);font-family:var(--font-body);font-size:var(--size-body);line-height:var(--leading-body);font-weight:var(--weight-body);text-wrap:pretty;-webkit-font-smoothing:antialiased}
+/* padding-block-start on the BODY rather than on SiteHeader, for two reasons.
+   The skip link is a body-level sibling ABOVE the header, so a header-side
+   inset would leave it under the status bar in an installed app. And the header
+   is Oat on every route, as is the page, so a body inset looks identical to
+   letting the header bleed. Zero in a browser tab. */
+body{margin:0;padding-block-start:var(--safe-top);background:var(--surface-page);color:var(--text-body);font-family:var(--font-body);font-size:var(--size-body);line-height:var(--leading-body);font-weight:var(--weight-body);text-wrap:pretty;-webkit-font-smoothing:antialiased}
 h1,h2,h3,h4{font-family:var(--font-display);color:var(--text-heading);margin:0 0 var(--space-4)}
 h1{font-size:var(--size-display);font-weight:var(--weight-display);line-height:var(--leading-display);letter-spacing:var(--tracking-display)}
 h2{font-size:var(--size-headline);font-weight:var(--weight-headline);line-height:var(--leading-headline);letter-spacing:var(--tracking-headline)}

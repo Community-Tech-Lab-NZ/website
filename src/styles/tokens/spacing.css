@@ -23,8 +23,38 @@
      space-8/space-7 below, space-9/space-8 above. */
   --section-y:64px;
   --section-y-tight:48px;
-  --gutter:24px;         /* page edge padding, mobile */
-  --gutter-lg:48px;      /* page edge padding, desktop */
+  /* Page edge padding, mobile then desktop. The max() is the display-cutout
+     guard.
+
+     On a notched phone held sideways, env(safe-area-inset-left|right) is around
+     50px of screen the browser will paint under once layout.tsx sets
+     viewport-fit=cover — and EVERY full-bleed surface here reaches the viewport
+     edge through these two tokens: Section, SiteHeader, SiteFooter, and
+     StageBar's -mx-gutter. Folding the inset in HERE rather than at the four
+     call sites means px-gutter, px-gutter-lg and that negative margin all learn
+     it at once, so the bar still spans exactly the padding it cancels. It works
+     because --spacing-gutter in globals.css is `@theme inline`, so the negative
+     utility compiles to calc(var(--gutter) * -1) and calc() takes a max().
+
+     One value for both sides, taking whichever inset is larger: padding-inline
+     is a single value, and a symmetric gutter keeps the column centred rather
+     than sliding it away from the notch.
+
+     THE `, 0px` FALLBACKS ARE LOAD-BEARING. Without them a browser that does
+     not know env() invalidates the whole custom property, and every gutter on
+     the site collapses to zero. With them, and without viewport-fit=cover,
+     env() resolves to 0px and max() collapses to the plain 24/48 — so this is
+     inert everywhere except a notched phone. */
+  --gutter:max(24px, env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));
+  --gutter-lg:max(48px, env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));
+
+  /* The vertical cutout insets, named here so no component reaches for a bare
+     env() and so they read as part of the spacing system rather than a platform
+     hack. Both are 0 in a browser tab — Safari's own chrome already clears the
+     notch and the home indicator — and non-zero only in an installed
+     home-screen app, where the page owns the whole screen. */
+  --safe-top:env(safe-area-inset-top, 0px);
+  --safe-bottom:env(safe-area-inset-bottom, 0px);
   --container:1120px;
   --container-wide:1280px;
 

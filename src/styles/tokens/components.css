@@ -131,6 +131,14 @@
   --partner-logo-max-w: 200px;
   /* Right-hand block of the footer's bottom bar. */
   --footer-note-max: 420px;
+  /* The footer is the last thing on the page and full-bleed Ink, so under
+     viewport-fit=cover its bottom padding is also what keeps the funder credit
+     and the meta lines clear of the home indicator. Handled HERE rather than on
+     the body, unlike --safe-top: an inset body would leave an Oat strip under
+     the Ink footer, which is the exact blemish cover is being taken for.
+     Composed rather than hardcoded — the 32px is the same --space-6 the top of
+     the footer already uses. */
+  --footer-pad-block-end: calc(var(--space-6) + var(--safe-bottom));
   /* Funder credit. The supplied Economic Futures / QLDC lockup is 885x159.
      48px of height matches the partner wall logos, and 267px is that height
      through the mark's own ratio (48 x 885/159). WIDTH is the token the

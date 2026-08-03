@@ -20,7 +20,7 @@ export function SiteFooter() {
   return (
     /* py-6, not py-8. The 8 step is 64px, so the old padding alone was 128px of
        the footer's 700. Same reasoning for the mt-6 gaps below. */
-    <footer className="relative bg-ink py-6 text-body-inverse">
+    <footer className="relative bg-ink pt-6 pb-[var(--footer-pad-block-end)] text-body-inverse">
       {/* The footer's ambient layer is the OTHER half of the mark: cursor
           blocks floating, where the hero has carets rising. */}
       <Drift preset="footer" />

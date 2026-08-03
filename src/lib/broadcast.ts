@@ -265,8 +265,20 @@ export function communityLaunchBroadcast(state: WindowState = getWindowState()):
         // sender information and a way to make contact: the footer names the
         // programme and the lead organisation, the signature names a person,
         // and replies reach a real inbox. Do not reinstate a guess.
-        // Resend substitutes this per recipient when the broadcast sends. Left
-        // as the literal placeholder so the preview shows exactly what ships.
+        // TWO WAYS OUT, because the good one only exists in one context.
+        //
+        // Resend swaps this placeholder for a hosted unsubscribe page at send
+        // time and adds the address to the audience's suppression list, so it
+        // never receives anything again. That is one click for the reader and
+        // no admin at all. But the substitution only happens in a BROADCAST:
+        // send this same content through the transactional API, which is what
+        // every test send does, and the placeholder goes out as literal text.
+        //
+        // Hence the second sentence. Replies reach a real person, so "reply
+        // and say so" is a functional unsubscribe facility under the
+        // Unsolicited Electronic Messages Act 2007 regardless of how the
+        // message was sent, and it costs a reader nothing to find. It is the
+        // one that cannot break.
         unsubscribeUrl: "{{{RESEND_UNSUBSCRIBE_URL}}}",
       },
       // There is a reply-to now, so the "do not reply" line must not appear:

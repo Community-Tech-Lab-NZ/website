@@ -125,12 +125,8 @@ export type EmailSection = {
 
 /* What bulk mail has to carry and transactional mail must not.
  *
- * Kept as one object rather than loose optional fields, because the reason and
- * the unsubscribe are not independent: a way out without a word about how the
- * address was obtained is still the wrong footer, and the type should not let
- * someone add the easy one and forget the other. Set it and the footer switches
- * form; leave it unset and a confirmation email keeps the short footer it has
- * always had. */
+ * Set it and the footer switches form; leave it unset and a confirmation email
+ * keeps the short footer it has always had. */
 export type EmailBulk = {
   /** Where this address came from, in the reader's terms. A list that nobody
    *  hand-subscribed to has to say why it is in their inbox, and "you signed up"
@@ -146,8 +142,14 @@ export type EmailBulk = {
    *  be decoration at best and wrong at worst. */
   postalAddress?: string;
   /** In a Resend broadcast this is the literal `{{{RESEND_UNSUBSCRIBE_URL}}}`
-   *  placeholder, substituted per recipient at send time. */
-  unsubscribeUrl: string;
+   *  placeholder, substituted per recipient at send time.
+   *
+   *  OPTIONAL, AND CURRENTLY UNSET ON THE LAUNCH BROADCAST. Resend does not
+   *  require the placeholder; it substitutes one only where it finds one. See
+   *  the note in broadcast.ts for why it is off and what has to be true for
+   *  that to stay defensible. Setting it again is the only change needed to
+   *  put the link back. */
+  unsubscribeUrl?: string;
 };
 
 export type EmailContent = {
@@ -517,7 +519,12 @@ export function renderHtmlEmail(content: EmailContent): string {
     content.bulk
       ? `<p style="margin:16px 0 0;font-family:${BODY};font-size:13px;line-height:1.6;color:${INK_MUTED};">
         ${content.bulk.postalAddress ? `${escapeHtml(content.bulk.postalAddress)}<br>` : ""}
-        ${escapeHtml(content.bulk.reason)} ${htmlLink(content.bulk.unsubscribeUrl, "Unsubscribe")}
+        ${escapeHtml(content.bulk.reason)}<br>
+        ${
+          content.bulk.unsubscribeUrl
+            ? `${htmlLink(content.bulk.unsubscribeUrl, "Unsubscribe")}, or reply and say so.`
+            : `To stop hearing from us, reply and say so.`
+        }
       </p>`
       : "",
   ]
@@ -644,7 +651,9 @@ export function renderTextEmail(content: EmailContent): string {
       ? [
           content.bulk.postalAddress ?? "",
           wrap(content.bulk.reason),
-          `Unsubscribe: ${content.bulk.unsubscribeUrl}`,
+          content.bulk.unsubscribeUrl
+            ? `To stop hearing from us, reply and say so, or unsubscribe:\n${content.bulk.unsubscribeUrl}`
+            : "To stop hearing from us, reply and say so.",
         ]
           .filter(Boolean)
           .join("\n")

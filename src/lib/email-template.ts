@@ -272,13 +272,22 @@ function htmlLink(href: string, label: string): string {
   return `<a href="${escapeHtml(href)}" style="color:${INK};text-decoration:underline;text-decoration-color:${KOWHAI};">${escapeHtml(label)}</a>`;
 }
 
+/* Label and value side by side, until there is no room for side by side.
+ *
+ * Two columns at 34% and 66% is right on a desktop and wrong on a phone: at
+ * 390px the label column is 99px, so "The three chosen problems are announced"
+ * breaks over four lines next to a date sitting on one, and the key dates read
+ * as a ragged column of fragments. The stacking rule in the <style> block puts
+ * the label on its own line above the value at narrow widths, which is what the
+ * classes here are for. A client that drops the <style> block keeps the two
+ * columns, which is the same layout it has always had rather than a broken one. */
 function htmlMeta(meta: EmailMeta[]): string {
   const rows = meta
     .map(
       (item) => `
         <tr>
-          <td style="padding:12px 0;border-top:1px solid ${HAIRLINE};font-family:${BODY};font-size:14px;line-height:1.5;color:${INK_MUTED};" width="34%" valign="top">${escapeHtml(item.label)}</td>
-          <td style="padding:12px 0;border-top:1px solid ${HAIRLINE};font-family:${BODY};font-size:14px;line-height:1.5;color:${INK};word-break:break-word;" valign="top">${
+          <td class="ctl-meta-l" style="padding:12px 0;border-top:1px solid ${HAIRLINE};font-family:${BODY};font-size:14px;line-height:1.5;color:${INK_MUTED};" width="34%" valign="top">${escapeHtml(item.label)}</td>
+          <td class="ctl-meta-v" style="padding:12px 0;border-top:1px solid ${HAIRLINE};font-family:${BODY};font-size:14px;line-height:1.5;color:${INK};word-break:break-word;" valign="top">${
             item.href
               ? htmlLink(item.href, item.display ?? item.value)
               : escapeHtml(item.display ?? item.value)
@@ -541,11 +550,17 @@ export function renderHtmlEmail(content: EmailContent): string {
 <meta name="supported-color-schemes" content="light">
 <title>${escapeHtml(content.heading)}</title>
 <style>
-  /* The one rule that cannot be inlined. Everything else is, so a client that
+  /* The rules that cannot be inlined. Everything else is, so a client that
      drops this block still gets the full layout, just at a fixed measure. */
   @media only screen and (max-width:620px){
     .ctl-pad{padding-left:24px!important;padding-right:24px!important}
     .ctl-heading{font-size:26px!important}
+    /* Key dates stack: label on its own line, value under it. The hairline
+       moves to the label, which is now the top of each pair, so the rule still
+       separates rows rather than splitting one in half. */
+    .ctl-meta-l,.ctl-meta-v{display:block!important;width:auto!important}
+    .ctl-meta-l{padding:14px 0 0!important}
+    .ctl-meta-v{padding:2px 0 14px!important;border-top:0!important;font-size:15px!important}
   }
 </style>
 </head>
@@ -554,11 +569,26 @@ export function renderHtmlEmail(content: EmailContent): string {
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;background-color:${OAT};">
   <tr>
     <td align="center" style="padding:32px 16px 48px;">
-      <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:100%;">
+      <!--[if mso | IE]><table role="presentation" width="600" align="center" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->
+      <!-- FLUID, NOT FIXED. This was width="600" style="width:600px;max-width:100%"
+           and it did not shrink. A table cannot go below its own min-content
+           width, and a 600px table inside a shrink-to-fit cell makes that cell
+           600px wide, so max-width:100% resolved against 600 and meant nothing.
+           On a 390px phone the card stayed 600 and the whole message needed
+           sideways scrolling to read.
+
+           width:100% with a max-width does shrink, because the width now comes
+           from the parent rather than from the contents. Outlook ignores
+           max-width entirely and would run the card to the full window, so the
+           mso conditional above wraps it in a 600px table that only Outlook
+           and IE can see. Everything else ignores the comment. -->
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;margin:0 auto;">
 
         <tr>
           <td class="ctl-pad" style="background-color:${INK};padding:28px 32px;">
-            <a href="${PRODUCTION_URL}" style="display:inline-block;text-decoration:none;border:0;"><img src="${LOGO}" width="260" height="70" alt="Community Tech Lab" style="display:block;border:0;outline:none;text-decoration:none;width:260px;height:70px;font-family:${DISPLAY};font-size:20px;font-weight:800;color:${OAT};"></a>
+            <!-- max-width on the mark too: at 260px fixed it was wider than the
+                 content column on a 320px screen and pushed the header out. -->
+            <a href="${PRODUCTION_URL}" style="display:inline-block;text-decoration:none;border:0;"><img src="${LOGO}" width="260" height="70" alt="Community Tech Lab" style="display:block;border:0;outline:none;text-decoration:none;width:260px;max-width:100%;height:auto;font-family:${DISPLAY};font-size:20px;font-weight:800;color:${OAT};"></a>
           </td>
         </tr>
 
@@ -580,6 +610,7 @@ export function renderHtmlEmail(content: EmailContent): string {
         </tr>
 
       </table>
+      <!--[if mso | IE]></td></tr></table><![endif]-->
     </td>
   </tr>
 </table>

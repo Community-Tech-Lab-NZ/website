@@ -18,25 +18,36 @@
  * code. Deleting this comment and adding `send: true` is not a shortcut, it is
  * a decision, and it should look like one in the diff.
  *
- * WHY IT IS SAFE TO RUN TWICE. Every step checks for its own output first: a
- * segment with the right name is reused rather than duplicated, a contact
- * already in a segment is left alone, and a draft that already exists is
- * skipped. If it fails halfway through, fix the cause and run it again. The
- * alternative is unpicking half-built segments by hand in a dashboard.
+ * WHY IT IS SAFE TO RUN AGAIN, AND WHY IT SHOULD BE RUN AGAIN. A segment with
+ * the right name is reused rather than duplicated, and an existing draft has
+ * its content REPLACED rather than being left alone. That second part matters:
+ * the copy and the template keep changing, and a draft is a snapshot of the day
+ * it was written. Skipping it would ship a fix to days one and two but not to
+ * three, four and five. Membership is SYNCED rather than topped up,
+ * so rebatching the list — dropping an address, pulling 25 out for the canary —
+ * leaves no stragglers behind to be sent to twice. If it fails halfway, fix the
+ * cause and run it again. The alternative is unpicking half-built segments by
+ * hand in a dashboard.
  *
- * WHY THE LIST IS SPLIT ACROSS DAYS. The free plan allows 100 emails a day and
- * the list is 448. The day-N.csv files are batched round-robin by domain rather
- * than sliced alphabetically, so no single receiver gets the whole list at once
- * and the ramp doubles as domain warming. See the batching note in the list
- * folder's README.
+ * It will not touch the membership of a segment whose broadcast has already
+ * sent. That mail has gone; the segment is now a record of who received it, and
+ * quietly editing it would destroy the only account of what actually happened.
  *
- * WHY IT RECYCLES SEGMENTS. The same plan allows three segments and the send
- * needs five. A segment whose broadcast has already gone is finished work, so
- * once day one has sent, its segment is emptied and refilled with day four.
- * That means this script cannot build all five in one run and is not meant to:
- * run it now for as many days as there is room for, send one, run it again.
- * It only ever recycles a segment whose broadcast reports `sent`, so a draft
- * waiting to go out can never have its recipients pulled out from under it.
+ * WHY THE LIST IS SPLIT ACROSS DAYS, STILL. It began as the free plan's 100 a
+ * day. The plan has since been upgraded and the split stays, for the better
+ * reason: this domain has never sent bulk mail, and a steady ramp is how a
+ * sender builds a reputation instead of announcing itself with 448 messages in
+ * one minute. Batches are round-robin by domain rather than sliced
+ * alphabetically, so no single receiver gets the whole list at once, and every
+ * address carrying a doubt rides in the last batch, behind four days of
+ * delivered mail.
+ *
+ * WHY IT CAN RECYCLE A SEGMENT. Plans cap how many segments exist at once. When
+ * the cap is hit, a segment whose broadcast has already gone is finished work,
+ * so it is emptied and refilled with the next day's contacts. It only ever
+ * recycles one reporting `sent`, so a draft waiting to go out can never have
+ * its recipients pulled out from under it. Not needed on the current plan, kept
+ * because plans change.
  */
 
 import { readFileSync, readdirSync } from "node:fs";
@@ -47,16 +58,44 @@ import { communityLaunchBroadcast } from "../src/lib/broadcast";
 import { renderHtmlEmail, renderTextEmail } from "../src/lib/email-template";
 
 const BATCH_DIR = process.argv[2];
-const SEGMENT_NAME = (day: number, of: number) => `Community Connect, day ${day} of ${of}`;
 
-/** Resend allows 10 requests a second. Adding 448 contacts to segments is 448
- *  requests, so they go out in small waves with a pause between: fast enough to
- *  finish in under a minute, slow enough never to see a 429. */
-async function throttled<T, R>(items: T[], size: number, fn: (item: T) => Promise<R>): Promise<R[]> {
+/* day-0.csv is the canary: a small, provider-diverse batch of the addresses
+ * least likely to bounce, sent first so a person can open a real inbox and see
+ * whether it landed in Promotions or junk. That is the one thing no dashboard
+ * reports — a message filed under Promotions looks identical to a delivered one
+ * in every metric Resend has. It is named rather than numbered so nobody sends
+ * it thinking it is the first real batch. */
+const SEGMENT_NAME = (day: number, sendingDays: number) =>
+  day === 0 ? "Community Connect, canary" : `Community Connect, day ${day} of ${sendingDays}`;
+
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/* Resend allows 10 requests a second, and syncing a segment is one request per
+ * contact plus the paging needed to read the segment first. Waves alone are not
+ * enough: the paging and the writes share the same budget, so a wave sized to
+ * fit on its own still overruns when it lands behind a page fetch. Hence both a
+ * conservative wave and a retry.
+ *
+ * The retry matters more than the pacing. A rate limit is a "come back in a
+ * moment", not a failure, and treating it as one aborted a sync a third of the
+ * way through and left a segment holding a partial list. */
+async function withRetry<R>(fn: () => Promise<R & { error?: { name?: string } | null }>): Promise<R> {
+  for (let attempt = 0; ; attempt++) {
+    const result = await fn();
+    if (result.error?.name !== "rate_limit_exceeded" || attempt >= 5) return result;
+    await sleep(1500 * (attempt + 1));
+  }
+}
+
+async function throttled<T, R extends { error?: { name?: string } | null }>(
+  items: T[],
+  size: number,
+  fn: (item: T) => Promise<R>,
+): Promise<R[]> {
   const out: R[] = [];
   for (let i = 0; i < items.length; i += size) {
-    out.push(...(await Promise.all(items.slice(i, i + size).map(fn))));
-    if (i + size < items.length) await new Promise((r) => setTimeout(r, 1100));
+    out.push(...(await Promise.all(items.slice(i, i + size).map((item) => withRetry(() => fn(item))))));
+    if (i + size < items.length) await sleep(1200);
   }
   return out;
 }
@@ -91,6 +130,7 @@ async function main() {
   if (!apiKey || !from) throw new Error("RESEND_API_KEY or EMAIL_FROM missing from .env");
 
   const batches = readBatches(BATCH_DIR);
+  const sendingDays = batches.filter((b) => b.day > 0).length;
   const total = batches.reduce((n, b) => n + b.emails.length, 0);
   console.log(`${batches.length} batches, ${total} addresses\n`);
 
@@ -124,7 +164,7 @@ async function main() {
     const emails: string[] = [];
     let after: string | undefined;
     for (let page = 0; page < 30; page++) {
-      const res = await resend.contacts.list({ segmentId, limit: 100, ...(after ? { after } : {}) } as never);
+      const res = await withRetry(() => resend.contacts.list({ segmentId, limit: 100, ...(after ? { after } : {}) } as never));
       const rows = res.data?.data ?? [];
       emails.push(...rows.map((c) => c.email.toLowerCase()));
       if (!res.data?.has_more || !rows.length) break;
@@ -136,7 +176,7 @@ async function main() {
   const deferred: number[] = [];
 
   for (const { day, emails } of batches) {
-    const name = SEGMENT_NAME(day, batches.length);
+    const name = SEGMENT_NAME(day, sendingDays);
     let segment = segments.find((s) => s.name === name);
 
     if (!segment) {
@@ -156,7 +196,7 @@ async function main() {
         }
         console.log(`Day ${day}  recycling "${spent.name}" (its broadcast has sent)`);
         const old = await membersOf(spent.id);
-        await throttled(old, 8, (email) => resend.contacts.segments.remove({ email, segmentId: spent.id }));
+        await throttled(old, 5, (email) => resend.contacts.segments.remove({ email, segmentId: spent.id }));
         // The API has no rename, so the segment keeps the label it was born
         // with while now holding a different day's contacts. Logged loudly,
         // because a dashboard that says "day 1 of 5" over day four's people is
@@ -176,16 +216,65 @@ async function main() {
 
     const segmentId = segment.id;
     const already = new Set(await membersOf(segmentId));
+    const wanted = new Set(emails);
     const toAdd = emails.filter((e) => !already.has(e));
+    // Membership is SYNCED, not just topped up. Rebatching the list is a normal
+    // thing to do — an address gets dropped, the canary takes 25 out of the
+    // middle — and a script that only ever adds would leave the old membership
+    // behind and send to people twice.
+    const toRemove = [...already].filter((e) => !wanted.has(e));
+
+    const sent = broadcasts.some((b) => b.segment_id === segmentId && b.status === "sent");
+    if (sent && (toAdd.length || toRemove.length)) {
+      console.log(`         broadcast already sent, leaving membership alone\n`);
+      continue;
+    }
+
     if (toAdd.length) {
-      const results = await throttled(toAdd, 8, (email) => resend.contacts.segments.add({ email, segmentId }));
+      const results = await throttled(toAdd, 5, (email) => resend.contacts.segments.add({ email, segmentId }));
       const failed = results.filter((r) => r.error);
       if (failed.length) throw new Error(`Day ${day}: ${failed.length} adds failed, first: ${failed[0].error?.message}`);
     }
-    console.log(`         ${emails.length} contacts (${toAdd.length} added, ${already.size} already there)`);
+    if (toRemove.length) {
+      const results = await throttled(toRemove, 5, (email) => resend.contacts.segments.remove({ email, segmentId }));
+      const failed = results.filter((r) => r.error);
+      if (failed.length) throw new Error(`Day ${day}: ${failed.length} removals failed, first: ${failed[0].error?.message}`);
+    }
+    console.log(`         ${emails.length} contacts (+${toAdd.length} -${toRemove.length}, ${already.size} were there)`);
 
-    if (broadcasts.some((b) => b.name === name)) {
-      console.log(`         draft already exists, skipping\n`);
+    // A draft that already exists is UPDATED, not skipped. The copy and the
+    // template both keep changing, and a draft written on Tuesday is a
+    // snapshot: skipping it means the fix made on Wednesday ships to days one
+    // and two and not to three, four and five, which is the sort of bug nobody
+    // finds until a recipient mentions it. Content is pushed every run so the
+    // drafts and this repo cannot drift apart.
+    // Matched on the segment, not the name. One segment has one broadcast, so
+    // the segment is the stable identity; the name is display text that an
+    // update can change. Matching on the name meant that the moment an update
+    // renamed a draft, the next run stopped recognising it and made a second
+    // one pointed at the same people.
+    const existing =
+      broadcasts.find((b) => b.segment_id === segmentId) ?? broadcasts.find((b) => b.name === name);
+    if (existing) {
+      if (existing.status === "sent") {
+        console.log(`         broadcast already sent, leaving it alone\n`);
+        continue;
+      }
+      const updated = await withRetry(() =>
+        resend.broadcasts.update(existing.id, {
+          // `name` has to be resent. The update is a replace, not a merge: the
+          // first version of this call omitted it and turned all six drafts
+          // into "Untitled", which is precisely the state the names exist to
+          // prevent when five of them share one subject line.
+          name,
+          subject: message.subject,
+          replyTo: [message.replyTo!],
+          html,
+          text,
+        }),
+      );
+      if (updated.error) throw new Error(`Day ${day} update: ${updated.error.message}`);
+      console.log(`         draft ${existing.id} updated with the current content\n`);
       continue;
     }
     const draft = await resend.broadcasts.create({

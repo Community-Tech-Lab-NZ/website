@@ -27,7 +27,13 @@ const sourceSans = Source_Sans_3({
   variable: "--ff-source-sans",
   subsets: ["latin"],
   weight: ["400", "600", "700"],
-  style: ["normal", "italic"],
+  /* Normal only. The italic face was declared, downloaded and PRELOADED on
+     every route, and nothing rendered it: no <em>, no <i>, no font-style rule,
+     no italic utility anywhere in src. That is a preloaded font file on the
+     critical path of every page for a face the site never draws.
+     Re-add the moment something genuinely needs italics — but a real <em>
+     should land in the markup in the same commit. */
+  style: ["normal"],
   display: "swap",
 });
 
@@ -123,12 +129,22 @@ export const metadata: Metadata = {
     title: SITE_NAME,
     description: SITE_DESCRIPTION,
   },
+  /* Two different surfaces, two different assets — the transparent mark is only
+     correct on one of them.
+     - icon: the browser tab and Google's result list. Both composite a
+       transparent PNG onto white, so the Ink-on-transparent mark is right here.
+       src/app/favicon.ico is picked up by file convention alongside these and
+       carries 16/32/48/256 for anything that wants an .ico.
+     - apple: the iOS home screen, which composites onto BLACK and does not
+       round or pad for you. The transparent Ink mark was invisible there —
+       a near-black chevron on a black tile. The darkbg asset is the opaque Ink
+       tile with the kowhai mark, which is what a home-screen icon needs. */
   icons: {
     icon: [
       { url: "/favicons/favicon-32.png", sizes: "32x32", type: "image/png" },
       { url: "/favicons/favicon-192.png", sizes: "192x192", type: "image/png" },
     ],
-    apple: [{ url: "/favicons/favicon-192.png", sizes: "192x192" }],
+    apple: [{ url: "/favicons/favicon-darkbg-192.png", sizes: "192x192" }],
   },
 };
 

@@ -11,7 +11,24 @@
  * nobody notices until the site is not ranking.
  */
 
-export const PRODUCTION_URL = "https://communitytechlab.co.nz";
+/* www, not the apex.
+ *
+ * The apex 308-redirects to www at the edge, so www is the host that actually
+ * serves the site and the one Google has indexed. This constant feeds every
+ * URL the site says about itself — canonical, og:url, sitemap <loc>, the
+ * robots.txt Host line, the @id values in structured data — and pointing all of
+ * them at the apex made every one of those a redirect, including a canonical on
+ * the www page claiming a URL that bounces straight back to www.
+ *
+ * That contradiction is worth clearing on its own, and it matters for the
+ * favicon in particular: Google resolves favicons per host, from the home page
+ * of the host it indexed. Mixed signals about which host that is are exactly
+ * what you do not want while it is still working the site out.
+ *
+ * If the apex is ever made primary instead, flip the redirect on Vercel FIRST
+ * and change this line second — never leave the two disagreeing.
+ */
+export const PRODUCTION_URL = "https://www.communitytechlab.co.nz";
 
 type Environment = "production" | "preview" | "development";
 

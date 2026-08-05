@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import { Archivo, Source_Sans_3, Space_Mono } from "next/font/google";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -181,6 +182,7 @@ export default function RootLayout({
           <RouteFade>{children}</RouteFade>
         </main>
         <SiteFooter />
+        <Analytics />
       </body>
     </html>
   );

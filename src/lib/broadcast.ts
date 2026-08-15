@@ -156,6 +156,21 @@ const CREDIT_WALL = {
       h: 64,
       href: FUNDER_URL,
     },
+    /* The funder's own words, at the funder's request.
+     *
+     * QLDC asked for a line in our comms pointing at the fund, and suggested
+     * wording. This is that wording with its first sentence removed: it opened
+     * "This project is supported by QLDC's Economic Diversification Fund",
+     * which the outro two paragraphs above already says and which the mark
+     * directly overhead says a third time. The two substantive parts, what the
+     * fund is for and that its round is open, are kept as written. Jen's email
+     * said "something like", so this is an edit rather than a liberty, but if
+     * the exact wording is ever a condition of the grant, put the sentence
+     * back and let it repeat.
+     *
+     * The date is theirs and unverified by us. If this line outlives the
+     * 2026/27 round it becomes wrong, so it comes out when that round closes. */
+    note: `The Economic Diversification Fund backs groups working together to diversify the local economy. [Applications for 2026/27 are open now](${FUNDER_URL}).`,
   },
 } satisfies EmailLogoWall;
 

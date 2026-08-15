@@ -109,7 +109,19 @@ export type EmailLogoWall = {
   /** Set apart below the partners, under its own eyebrow, because the funder is
    *  not a partner: the QLDC Economic Diversification Fund pays for the
    *  programme and must be credited wherever the programme is promoted. */
-  funder?: { label: string; logo: EmailLogo };
+  funder?: {
+    label: string;
+    logo: EmailLogo;
+    /** A line of small print under the funder's mark, for what the funder asks
+     *  to have said about itself. Takes `[label](url)`.
+     *
+     *  Kept to the funder block, at the very bottom, on purpose. It is the one
+     *  thing in a broadcast that is not the sender's own ask, and anywhere
+     *  higher it is a second call to action competing with the first. Down
+     *  here the reader is past the button and the signature, and small grey
+     *  type under a funder's logo is a place people already understand. */
+    note?: string;
+  };
 };
 
 /* A labelled run of the body, for messages long enough to need finding your
@@ -201,6 +213,34 @@ export type EmailContent = {
    *  Programme mail has a working reply-to, so it must not. */
   unmonitored: boolean;
 };
+
+/** The funder's note for the plain-text part, KEEPING the URL.
+ *
+ *  Everywhere else in the text part an inline link comes down to its label,
+ *  because a credit sentence naming five organisations would otherwise be
+ *  unreadable. Here the address is the entire point: the funder asked for its
+ *  fund to be findable, and a note that says applications are open without
+ *  saying where is not the thing that was asked for.
+ *
+ *  The URL goes on its own line rather than inline, for the same reason the
+ *  call to action does — wrapped across two lines, a client stops recognising
+ *  it as a link and it becomes untappable text. */
+function funderNoteText(note: string): string {
+  const urls: string[] = [];
+  // The trailing full stop is consumed with the link, not left behind. The
+  // label ends in a colon introducing the URL on the next line, so a period
+  // surviving from the HTML sentence renders as "open now:." — which is how
+  // this was first written and exactly the sort of thing nobody reads closely
+  // enough to catch in a footer.
+  const prose = note.replace(
+    /\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)\.?/g,
+    (_match, label: string, url: string) => {
+      urls.push(url);
+      return `${label}:`;
+    },
+  );
+  return [wrap(prose), ...urls].join("\n");
+}
 
 /** Wraps our own copy to a readable measure for the plain-text part. Applicants'
  *  answers are left exactly as typed: rewrapping someone's prose can break a
@@ -439,6 +479,11 @@ function htmlLogoWall(wall: EmailLogoWall): string {
           <td style="padding-top:24px;border-top:1px solid ${HAIRLINE};">
             ${htmlEyebrow(wall.funder.label)}
             <div style="margin-top:14px;">${htmlLogo(wall.funder.logo, false)}</div>
+            ${
+              wall.funder.note
+                ? `<p style="margin:14px 0 0;font-family:${BODY};font-size:13px;line-height:1.5;color:${INK_MUTED};">${inlineLinks(escapeMultiline(wall.funder.note))}</p>`
+                : ""
+            }
           </td>
         </tr>
       </table>`
@@ -719,10 +764,17 @@ export function renderTextEmail(content: EmailContent): string {
   // funder, which the outro already says in a sentence written to be read. A
   // text part cannot show a logo, so all it could add is that list a second
   // time, four lines below the first.
+  //
+  // The funder's note is the exception, and reaching past that rule for it is
+  // the point rather than an oversight. What the text part cannot show is the
+  // IMAGES; the note is words, it is the one thing in the wall the outro does
+  // not already say, and it is there because the funder asked for it to be. A
+  // reader on the text part is a reader the funder was promised too.
 
   // --- footer ---
 
   const footer = [
+    content.logos?.funder?.note ? funderNoteText(content.logos.funder.note) : "",
     content.unmonitored
       ? wrap("This address is not monitored, so please do not reply to this email.")
       : "",

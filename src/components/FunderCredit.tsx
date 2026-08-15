@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { clsx } from "clsx";
 import { ExternalLink } from "./ExternalLink";
+import { FUNDER_URL } from "@/lib/navigation";
 import { Eyebrow } from "./Typography";
 
 /* Funder credit.
@@ -26,10 +27,6 @@ import { Eyebrow } from "./Typography";
  * JPEG, which does.
  */
 
-/* The fund's page on the council site, verified live 28 July 2026. */
-const FUND_URL =
-  "https://www.qldc.govt.nz/community/community-funding/economic-diversification-fund/";
-
 type FunderCreditProps = {
   inverse?: boolean;
   note?: string | null;
@@ -46,7 +43,7 @@ export function FunderCredit({ inverse = false, note = null, className }: Funder
           and the plate grows on hover like the partner logos — same promise,
           same behaviour. */}
       <ExternalLink
-        href={FUND_URL}
+        href={FUNDER_URL}
         className="ctl-grow flex max-w-full shrink-0 items-center justify-center rounded-card bg-white p-3 no-underline"
       >
         {/* Sized by WIDTH, not height, so the plate can give. At 48px tall the
@@ -75,7 +72,7 @@ export function FunderCredit({ inverse = false, note = null, className }: Funder
       <div>
         <Eyebrow inverse={inverse}>Funded by</Eyebrow>
         <ExternalLink
-          href={FUND_URL}
+          href={FUNDER_URL}
           className={clsx(
             "ctl-link-grow mt-2 block font-heading text-body-md font-bold no-underline",
             "underline decoration-transparent hover:decoration-current",

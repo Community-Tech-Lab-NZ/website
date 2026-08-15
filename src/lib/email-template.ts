@@ -85,6 +85,13 @@ export type EmailLogo = {
   /** Display size in CSS pixels. The file itself is stored at 2x. */
   w: number;
   h: number;
+  /** Wraps the mark in a link to the organisation's own site.
+   *
+   *  Optional because one of the six partners has no website to point at, and a
+   *  mark that is a link when the one beside it is not has to be the normal
+   *  case rather than a bug. Leave it unset and the image renders exactly as it
+   *  did before. */
+  href?: string;
 };
 
 /* The partner and funder credit at the foot of the message.
@@ -205,6 +212,14 @@ function wrap(text: string, width = TEXT_WIDTH): string {
   // answers are rendered by renderApplicationText, which never calls this.
   return text
     .replace(/\*\*(.+?)\*\*/g, "$1")
+    // Inline links come down to their label, and the URL is dropped rather than
+    // printed beside it. The credit line names six organisations: spelling out
+    // five URLs mid-sentence turns one readable sentence into forty words of
+    // punctuation, and the plain-text part exists for the reader whose client
+    // cannot render the HTML, not as a reference sheet. The names are proper
+    // nouns and findable; the one URL that has to survive, the site's own, is in
+    // the footer of every part.
+    .replace(/\[([^\]]+)\]\((?:https?:\/\/[^)\s]+)\)/g, "$1")
     .split(/\r?\n/)
     .map((line) => {
       const out: string[] = [];
@@ -258,8 +273,34 @@ function brandMark(escaped: string): string {
   );
 }
 
+/* `[label](https://…)` inside a paragraph, for the few places a name in a
+ * sentence has to be the link.
+ *
+ * The credit line naming six partner organisations is the case this exists for:
+ * they are named in running prose, and a meta row underneath repeating each name
+ * beside its URL would be the same six names twice.
+ *
+ * DELIBERATELY NOT A MARKDOWN RENDERER. Two syntaxes now, this and the brand
+ * mark, both applied after escaping and both on paths carrying copy this repo
+ * wrote. Applicants' answers render through htmlSummary and never arrive here,
+ * so a reader who types brackets into a form field gets brackets back.
+ *
+ * Only http(s) is matched. A `javascript:` or `data:` URL cannot reach this from
+ * anywhere in the codebase today, and the restriction means it still cannot if
+ * some later caller passes text it did not write.
+ *
+ * The label is NOT re-escaped: it arrives already escaped, and running it
+ * through escapeHtml again turns an ampersand into `&amp;amp;`. That is why this
+ * cannot simply call htmlLink. */
+function inlineLinks(escaped: string): string {
+  return escaped.replace(
+    /\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,
+    `<a href="$2" style="color:${INK};text-decoration:underline;text-decoration-color:${KOWHAI};">$1</a>`,
+  );
+}
+
 function htmlParagraph(text: string, top = 20): string {
-  return `<p style="margin:${top}px 0 0;font-family:${BODY};font-size:16px;line-height:1.6;color:${INK_BODY};">${brandMark(escapeMultiline(text))}</p>`;
+  return `<p style="margin:${top}px 0 0;font-family:${BODY};font-size:16px;line-height:1.6;color:${INK_BODY};">${inlineLinks(brandMark(escapeMultiline(text)))}</p>`;
 }
 
 function htmlEyebrow(text: string, color = INK_MUTED): string {
@@ -348,7 +389,15 @@ function htmlCta(cta: EmailCta): string {
  * funder mark stands alone under its own eyebrow and sits left, with it. */
 function htmlLogo(logo: EmailLogo, centred = true): string {
   const margin = centred ? "0 auto" : "0";
-  return `<img src="${escapeHtml(logo.src)}" width="${logo.w}" height="${logo.h}" alt="${escapeHtml(logo.alt)}" style="display:block;margin:${margin};border:0;outline:none;text-decoration:none;width:${logo.w}px;max-width:100%;height:auto;font-family:${BODY};font-size:13px;color:${INK_MUTED};">`;
+  const img = `<img src="${escapeHtml(logo.src)}" width="${logo.w}" height="${logo.h}" alt="${escapeHtml(logo.alt)}" style="display:block;margin:${margin};border:0;outline:none;text-decoration:none;width:${logo.w}px;max-width:100%;height:auto;font-family:${BODY};font-size:13px;color:${INK_MUTED};">`;
+  // `border:0` on the anchor as well as the image. Older Outlook draws a blue
+  // rule around a linked image from the anchor rather than the img, so setting
+  // it in one place only leaves the box that setting it at all was meant to
+  // remove. `display:block` keeps the anchor from adding descender space under
+  // the mark and pushing it off-centre in its cell.
+  return logo.href
+    ? `<a href="${escapeHtml(logo.href)}" style="display:block;border:0;outline:none;text-decoration:none;">${img}</a>`
+    : img;
 }
 
 function htmlLogoWall(wall: EmailLogoWall): string {

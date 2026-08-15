@@ -42,6 +42,14 @@ export const PARTNER_URLS: Record<string, string> = {
   "Technology Queenstown": "https://www.technologyqueenstown.com",
 };
 
+/** The fund's page on the council site, verified live 28 July 2026.
+ *
+ *  Here rather than beside the component that first used it, because the email's
+ *  credit wall now links its marks too and a second copy of a council URL is a
+ *  second thing to re-verify when the council reorganises its site. */
+export const FUNDER_URL =
+  "https://www.qldc.govt.nz/community/community-funding/economic-diversification-fund/";
+
 export const FOOTER_COLUMNS: FooterColumn[] = [
   {
     title: "Take part",

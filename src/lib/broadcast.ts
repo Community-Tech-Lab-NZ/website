@@ -82,9 +82,28 @@ const LOGOS = `${PRODUCTION_URL}/logos/email`;
  *
  * Not "you subscribed", because they did not, and a footer that opens with a
  * lie is what turns a deletion into a spam complaint. Naming the actual route
- * lets a reader place the email in about four words. */
-const LIST_REASON =
-  "You are receiving this because your organisation is listed with a Community Connect group in the Queenstown Lakes district.";
+ * lets a reader place the email in about four words.
+ *
+ * THERE IS ONE PER LIST, AND THE RIGHT ONE IS NOT OPTIONAL. The same message
+ * now goes to two audiences reached by completely different routes, and the
+ * sentence that is true of one is a lie about the other. Community Connect
+ * addresses came off a public listing. The personal contacts came out of an
+ * inherited mailbox, so nothing about a listing applies to them and the line
+ * has to say correspondence instead. Passing the wrong one is not a wording
+ * slip, it is the footer misstating how the sender got the address, which is
+ * the specific thing this footer exists to get right. */
+export const LIST_REASON = {
+  /** Listed with a Community Connect group. The original launch audience. */
+  communityConnect:
+    "You are receiving this because your organisation is listed with a Community Connect group in the Queenstown Lakes district.",
+  /* Deliberately does not name whose mailbox or which organisation. The route
+   * is real and the reader can place it, and a more specific line would put
+   * the provenance of an inherited mailbox in four hundred inboxes to buy
+   * precision the reader does not need. */
+  /** Prior correspondence, from the inherited contact records. */
+  personalContacts:
+    "You are receiving this because you have previously corresponded with someone involved in community work in the Queenstown Lakes district, and your address is in the contact records Community Tech Lab now holds.",
+} as const;
 
 /* The partner and funder marks, closing the message.
  *
@@ -138,8 +157,18 @@ const CREDIT_WALL = {
  * either side of 15 August, and the difference is not cosmetic: before the
  * 15th the only honest instruction is to read the questions, and on the 15th it
  * becomes apply. Hard-coding either one means the day it slips is the day 500
- * organisations get a button that cannot do what it says. */
-export function communityLaunchBroadcast(state: WindowState = getWindowState()): Message {
+ * organisations get a button that cannot do what it says.
+ *
+ * Takes the list reason for the same kind of reason: the body is identical for
+ * both audiences and only the provenance line differs, so one function with a
+ * parameter keeps them from drifting. Two copies of this message would mean
+ * every later fix landing in one of them. It defaults to Community Connect
+ * because that is the audience it was written for; a caller mailing anyone else
+ * has to say so. */
+export function communityLaunchBroadcast(
+  state: WindowState = getWindowState(),
+  listReason: string = LIST_REASON.communityConnect,
+): Message {
   const open = state === "open";
 
   if (state === "closed") {
@@ -257,7 +286,7 @@ export function communityLaunchBroadcast(state: WindowState = getWindowState()):
         ? { label: "Apply now", href: `${PRODUCTION_URL}/apply` }
         : { label: "See what's involved", href: `${PRODUCTION_URL}/organisations` },
       bulk: {
-        reason: LIST_REASON,
+        reason: listReason,
         // No postal address, by decision. Startup Queenstown Lakes does not
         // publish one, and it is on neither the Charities Register nor the
         // Companies Register under that name, so nothing here could be verified

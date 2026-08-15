@@ -10,7 +10,7 @@ import { FileUpload } from "./FileUpload";
 import { FormAlert } from "./FormAlert";
 import { Honeypot } from "./Honeypot";
 import { Input } from "./Input";
-import { Select } from "./Select";
+import { RadioGroup } from "./RadioGroup";
 import { Textarea } from "./Textarea";
 import { emailIssues, postApplication, requiredIssue, type Issue } from "./submit";
 import {
@@ -117,9 +117,8 @@ export function DeveloperForm({ canSubmit }: { canSubmit: boolean }) {
 
   return (
     <div className="mt-6 grid max-w-[var(--form-measure)] gap-5">
-      <Field label={ASK.seat} required error={issueFor("seat")}>
-        <Select
-          placeholder="Select one"
+      <Field label={ASK.seat} group required error={issueFor("seat")}>
+        <RadioGroup
           options={DEVELOPER_SEATS}
           value={seat}
           onChange={(e) => setSeat(e.target.value)}
@@ -155,10 +154,11 @@ export function DeveloperForm({ canSubmit }: { canSubmit: boolean }) {
 
       <Field
         label={ASK.hours}
+        group
         hint="The build assumes about 12 hours a week for five weeks, evenings and weekends."
       >
-        <Select
-          placeholder="Select one"
+        <RadioGroup
+          columns={2}
           options={DEVELOPER_HOURS}
           value={hours}
           onChange={(e) => setHours(e.target.value)}

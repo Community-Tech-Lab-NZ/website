@@ -466,6 +466,25 @@ select option{font-family:var(--font-body);font-size:var(--size-body);color:var(
  * picker and lose nothing: appearance:none below is the same flat control they
  * render now, and the closed box is identical either way.
  *
+ * WHO ACTUALLY SEES ANY OF THIS, as at August 2026:
+ *
+ *   Chrome / Edge 135+          yes        Safari desktop 27+   yes
+ *   Chrome for Android 151+     yes        Safari on iOS        NO, through 26.5
+ *   Samsung Internet 29+        yes        Firefox, anywhere    NO
+ *
+ * So the touch sheet below is ANDROID ONLY today. Every iPhone gets the flat
+ * box and the native wheel picker, including Chrome on iOS, which is WebKit and
+ * reports as Chrome in analytics — "most of our traffic is Chrome" is not the
+ * same claim as "most of our traffic sees this". iOS arrives with Safari 27.
+ *
+ * That is the intended state, not a gap to be closed. The iOS wheel picker is
+ * already modal, already dims the page and already carries a Done button, which
+ * is the whole of what the sheet below is trying to add. Rebuilding it as a JS
+ * listbox would spend roving tabindex, typeahead, focus restoration, scroll
+ * locking and two screen readers' worth of risk to arrive back where iOS
+ * already is. Do not "fix" iOS here. The fix for everyone else was having fewer
+ * dropdowns: see RadioGroup.tsx.
+ *
  * The appearance declarations sit here rather than in controlClasses because a
  * Tailwind `appearance-none` lives in the utilities layer, above this one, and
  * would win over the base-select opt-in. */
@@ -526,6 +545,16 @@ select{appearance:none}
      a <selectedcontent> copy, which this does not touch. */
   select option[value=""]{display:none}
 
+  /* The optgroup exists to carry the touch sheet's title (see "The sheet's
+     title" below). It is not a real grouping, so it must not indent its rows or
+     add a band of its own. */
+  select optgroup{padding:0;font-weight:inherit;font-style:normal}
+  /* The title is off by default. On a pointer the panel opens directly under
+     the field, which is still on screen, so naming it would be repeating what
+     the reader can already see. The coarse-pointer block turns it back on,
+     where the field is usually covered. */
+  select optgroup legend{display:none}
+
   /* The touch sheet.
    *
    * A panel anchored to the field is a pointer idea: it assumes a cursor is
@@ -582,6 +611,77 @@ select{appearance:none}
     }
     select:open::picker(select){translate:0 0}
     @starting-style{select:open::picker(select){opacity:0;translate:0 100%}}
+
+    /* THE SCRIM.
+     *
+     * A brand exception, chosen by the brand owner on 16 August 2026, and the
+     * fifth after the four motion deviations recorded near the top of this
+     * file. The guide says flat colour only, and alpha for text and rule tints
+     * only. A scrim is neither.
+     *
+     * The reason it is worth an exception: this sheet is MODAL, and there is no
+     * flat way to say so. Reported symptom was tapping a field and losing track
+     * of which question the list belonged to, for a beat or two. A sheet that
+     * rises at the bottom of a page which stays fully lit reads as "something
+     * appeared", not "this field opened". The scrim is what makes it the
+     * second, and it is also the only thing that makes tap-to-dismiss
+     * discoverable, since light dismiss already works but is invisible.
+     *
+     * Not without precedent: --shadow-sheet, on the line above, is already an
+     * Ink wash at 22% thrown across the page from this very sheet. This is that
+     * same idea taken to the whole screen rather than a soft edge.
+     *
+     * A SPREAD SHADOW RATHER THAN ::backdrop, and not by preference.
+     * ::picker(select)::backdrop is the obvious way to write this and it does
+     * not survive the build: Lightning CSS (1.32.0, via @tailwindcss/postcss)
+     * fails on ANY pseudo-element chained onto ::picker() — ::backdrop,
+     * ::before and ::after all raise "Invalid state" and take the whole
+     * stylesheet down with them. Verified directly against the parser, not
+     * inferred. So the scrim is painted by the picker itself, as a shadow with
+     * a spread big enough to cover any viewport. It rides in the top layer with
+     * the sheet, so it covers the page without an element of its own.
+     *
+     * Retest ::backdrop when Lightning CSS updates; it is the better mechanism
+     * and this comment is the reason it is not being used. */
+    select:open::picker(select){
+      box-shadow:var(--shadow-sheet),0 0 0 100vmax var(--ctl-ink-scrim);
+    }
+
+    /* THE SHEET'S TITLE.
+     *
+     * This is the actual complaint. --select-sheet-max-block leaves 40% of the
+     * page above the sheet, which keeps the field visible ONLY if the field
+     * happened to be in that top 40% when it was tapped. Most of a six-section
+     * form is not. Tap a field low on the screen and the question it is asking
+     * sits behind the sheet, with nothing on screen naming it.
+     *
+     * The title is an <optgroup> wrapping the options, which Select.tsx builds
+     * from the Field's own label. Generated content would have been lighter and
+     * is not available: see the note on Lightning CSS above, which rules out
+     * ::before here for the same reason it rules out ::backdrop.
+     *
+     * An optgroup carries the title TWICE, because the two rendering modes read
+     * different things. Browsers on the fallback path (iOS, Firefox) render the
+     * `label` attribute, so the wheel picker gets a group heading naming the
+     * field, which is a small bonus rather than a regression. Browsers in
+     * base-select mode do not render `label` at all, and read a <legend> child
+     * instead — which is what this rule styles.
+     *
+     * Sticky, so a long list scrolls under the title rather than past it. */
+    select optgroup legend{
+      position:sticky;
+      inset-block-start:0;
+      z-index:1;
+      display:block;
+      padding:var(--space-3) var(--control-padding-x);
+      border-block-end:var(--border-hairline) solid var(--ctl-ink-16);
+      background:var(--ctl-white);
+      font-family:var(--font-display);
+      font-size:var(--size-body-sm);
+      font-weight:var(--weight-subhead);
+      line-height:var(--leading-tight);
+      color:var(--text-heading);
+    }
 
     /* 12px against a 22.4px line is a 46px row, over the 44px touch floor. The
        horizontal inset is left alone so the text still lands on the column it

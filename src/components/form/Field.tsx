@@ -23,6 +23,15 @@ import { clsx } from "clsx";
 
 type FieldContextValue = {
   id: string;
+  /* Set only in group mode: the id of the label span, for aria-labelledby.
+     A <label htmlFor> cannot name a radiogroup — htmlFor only binds to
+     labelable elements, so pointing it at a group drops the association
+     silently and a screen reader user hears no question at all. */
+  labelId?: string;
+  /* The label as a plain string, when it is one. Select reads this for the
+     touch sheet's title, so the sheet names the question it is answering
+     without every call site having to repeat it. */
+  labelText?: string;
   describedBy?: string;
   invalid: boolean;
   required: boolean;
@@ -42,6 +51,8 @@ type FieldProps = {
   error?: React.ReactNode;
   required?: boolean;
   inverse?: boolean;
+  /** The control is a group of inputs rather than one, as RadioGroup is. */
+  group?: boolean;
   /** Override the generated id when the control needs a stable, known id. */
   id?: string;
   className?: string;
@@ -54,6 +65,7 @@ export function Field({
   error,
   required = false,
   inverse = false,
+  group = false,
   id,
   className,
 }: FieldProps) {
@@ -61,37 +73,57 @@ export function Field({
   const fieldId = id ?? generated;
   const hintId = `${fieldId}-hint`;
   const errorId = `${fieldId}-error`;
+  const labelId = `${fieldId}-label`;
 
   const showHint = Boolean(hint) && !error;
   const describedBy =
     [showHint ? hintId : null, error ? errorId : null].filter(Boolean).join(" ") || undefined;
 
+  /* Identical in both branches, so it is written once rather than twice.
+     Darker Fern: --ctl-fern on Oat is 3.58:1, and this asterisk is 14px bold,
+     which WCAG does not count as large text. The screen reader gets the word
+     regardless, but the mark is the only visual cue that a field is required,
+     so it has to clear 4.5:1. 4.74:1 here, the same substitution StatusTag
+     makes. */
+  const requiredMark = required ? (
+    <span className="text-action-tertiary-hover">
+      {" *"}
+      <span className="sr-only">required</span>
+    </span>
+  ) : null;
+
+  const labelClass = clsx(
+    "font-heading text-body-sm font-bold",
+    inverse ? "text-heading-inverse" : "text-heading",
+  );
+
   return (
     <FieldContext.Provider
-      value={{ id: fieldId, describedBy, invalid: Boolean(error), required, inverse }}
+      value={{
+        id: fieldId,
+        labelId: group ? labelId : undefined,
+        labelText: typeof label === "string" ? label : undefined,
+        describedBy,
+        invalid: Boolean(error),
+        required,
+        inverse,
+      }}
     >
       <div className={clsx("grid gap-2", className)}>
         {label ? (
-          <label
-            htmlFor={fieldId}
-            className={clsx(
-              "font-heading text-body-sm font-bold",
-              inverse ? "text-heading-inverse" : "text-heading",
-            )}
-          >
-            {label}
-            {required ? (
-              /* Darker Fern: --ctl-fern on Oat is 3.58:1, and this asterisk is
-                 14px bold, which WCAG does not count as large text. The screen
-                 reader gets the word regardless, but the mark is the only
-                 visual cue that a field is required, so it has to clear 4.5:1.
-                 4.74:1 here, the same substitution StatusTag makes. */
-              <span className="text-action-tertiary-hover">
-                {" *"}
-                <span className="sr-only">required</span>
-              </span>
-            ) : null}
-          </label>
+          /* A group is named through aria-labelledby, not htmlFor, so in that
+             mode this is a span carrying an id rather than a real label. */
+          group ? (
+            <span id={labelId} className={labelClass}>
+              {label}
+              {requiredMark}
+            </span>
+          ) : (
+            <label htmlFor={fieldId} className={labelClass}>
+              {label}
+              {requiredMark}
+            </label>
+          )
         ) : null}
 
         {children}

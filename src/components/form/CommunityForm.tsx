@@ -12,6 +12,7 @@ import { Field } from "./Field";
 import { FormAlert } from "./FormAlert";
 import { Honeypot } from "./Honeypot";
 import { Input } from "./Input";
+import { RadioGroup } from "./RadioGroup";
 import { Select } from "./Select";
 import { StageBar } from "./StageBar";
 import { StageNav, type StageMark } from "./StageNav";
@@ -505,10 +506,11 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
                 </Field>
                 <Field
                   label={ASK.orgSize}
+                  group
                   hint="Paid staff and regular volunteers. This helps us understand capacity, not to rule you out."
                 >
-                  <Select
-                    placeholder="Select one"
+                  <RadioGroup
+                    columns={2}
                     options={ORG_SIZES}
                     value={values.orgSize}
                     onChange={set("orgSize")}
@@ -541,7 +543,7 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
 
                 {/* Makes the section's own instruction true. The copy says "get in
                     touch before submitting" and, until now, pointed nowhere. */}
-                <EligibilityQuestion gates={CTL_GATES} unticked={gates} />
+                <EligibilityQuestion gates={CTL_GATES} ticked={gates} />
               </>
             ) : null}
 
@@ -590,9 +592,8 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
                 >
                   <Textarea rows={3} value={values.scopeReuse} onChange={set("scopeReuse")} />
                 </Field>
-                <Field label={ASK.scopeSystems}>
-                  <Select
-                    placeholder="Select one"
+                <Field label={ASK.scopeSystems} group>
+                  <RadioGroup
                     options={SYSTEM_ANSWERS}
                     value={values.scopeSystems}
                     onChange={set("scopeSystems")}
@@ -606,10 +607,10 @@ export function CommunityForm({ canSubmit }: { canSubmit: boolean }) {
                 </Field>
                 <Field
                   label={ASK.scopeSensitive}
+                  group
                   hint="Client records, health information, children's details, donor or payment data. This does not rule you out, it helps us plan."
                 >
-                  <Select
-                    placeholder="Select one"
+                  <RadioGroup
                     options={SENSITIVE_ANSWERS}
                     value={values.scopeSensitive}
                     onChange={set("scopeSensitive")}

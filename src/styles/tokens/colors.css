@@ -12,6 +12,9 @@
   --ctl-ink-70:rgba(20,33,26,.70);
   --ctl-ink-55:rgba(20,33,26,.55);
   --ctl-ink-16:rgba(20,33,26,.16);
+  /* Behind the touch sheet only. See "The scrim" in utilities.css for the
+     brand exception this carries. */
+  --ctl-ink-scrim:rgba(20,33,26,.55);
   --ctl-ink-08:rgba(20,33,26,.08);
   --ctl-oat-90:rgba(243,239,227,.90);
   --ctl-oat-70:rgba(243,239,227,.70);

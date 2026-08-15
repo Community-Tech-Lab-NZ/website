@@ -8,7 +8,7 @@ import { Eyebrow, Note } from "../Typography";
 import { Field } from "./Field";
 import { FormAlert } from "./FormAlert";
 import { Input } from "./Input";
-import { Select } from "./Select";
+import { RadioGroup } from "./RadioGroup";
 import { Textarea } from "./Textarea";
 import { postApplication } from "./submit";
 
@@ -30,10 +30,11 @@ import { postApplication } from "./submit";
 
 export function EligibilityQuestion({
   gates,
-  unticked,
+  ticked,
 }: {
   gates: readonly string[];
-  unticked: boolean[];
+  /** Parallel to `gates`: true means that gate has been confirmed. */
+  ticked: boolean[];
 }) {
   const [open, setOpen] = useState(false);
   const [sent, setSent] = useState(false);
@@ -45,13 +46,21 @@ export function EligibilityQuestion({
   const [gate, setGate] = useState("");
   const elapsed = useElapsed();
 
-  // Offer the ones they have left unticked first: those are the ones they are
-  // most likely asking about.
-  const candidates = gates.filter((_, i) => !unticked[i]);
-  const options = (candidates.length ? candidates : gates).map((g, i) => ({
-    value: g,
-    label: `${i + 1}. ${g.slice(0, 70)}${g.length > 70 ? "..." : ""}`,
-  }));
+  // Offer the ones they have left unconfirmed first: those are the ones they
+  // are most likely asking about.
+  //
+  // These used to be cut at 70 characters with an ellipsis, because a select's
+  // row is one line and six full gate sentences do not fit in one. That made
+  // the question "which one is the problem" unanswerable from the options
+  // themselves. Radio rows wrap, so the sentences are whole now.
+  //
+  // The numbers went with the truncation. They were derived from the position
+  // in the FILTERED list rather than in CTL_GATES, so "1." could point at the
+  // fourth gate, and they matched nothing on screen either way: the checkboxes
+  // above render the bare sentence with no number at all. The sentences
+  // identify themselves.
+  const unconfirmed = gates.filter((_, i) => !ticked[i]);
+  const options = unconfirmed.length ? unconfirmed : gates;
 
   async function submit() {
     setSending(true);
@@ -115,9 +124,8 @@ export function EligibilityQuestion({
       </Note>
 
       <div className="mt-5 grid gap-5">
-        <Field label="Which one is the problem">
-          <Select
-            placeholder="Select one"
+        <Field label="Which one is the problem" group>
+          <RadioGroup
             options={options}
             value={gate}
             onChange={(e) => setGate(e.target.value)}

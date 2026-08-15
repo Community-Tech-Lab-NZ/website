@@ -22,7 +22,7 @@ import {
   communityApplicationSummary,
   developerApplicationSummary,
 } from "../src/lib/application-doc";
-import { communityLaunchBroadcast } from "../src/lib/broadcast";
+import { applicationsOpenBroadcast, communityLaunchBroadcast, LIST_REASON } from "../src/lib/broadcast";
 import { renderHtmlEmail, renderTextEmail } from "../src/lib/email-template";
 import {
   applicationCopy,
@@ -139,6 +139,19 @@ const messages: { name: string; message: Message }[] = [
   {
     name: "07-community-launch-broadcast-open",
     message: communityLaunchBroadcast("open"),
+  },
+  // The applications-open nudge, rendered once per list. The bodies are
+  // identical apart from one sentence in the footer, and that sentence is the
+  // whole reason both are here: it states how the sender got the address, it is
+  // different for each list, and it is the one line in bulk mail that has to be
+  // true. Reading them side by side is the check.
+  {
+    name: "08-applications-open-broadcast-community",
+    message: applicationsOpenBroadcast("open", LIST_REASON.communityConnect),
+  },
+  {
+    name: "09-applications-open-broadcast-friends",
+    message: applicationsOpenBroadcast("open", LIST_REASON.personalContacts),
   },
 ];
 

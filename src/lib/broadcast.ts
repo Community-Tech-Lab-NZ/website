@@ -150,6 +150,29 @@ const CREDIT_WALL = {
   },
 } satisfies EmailLogoWall;
 
+/* The programme timeline, as the emails print it.
+ *
+ * DELIBERATELY NOT `TIMELINE` FROM navigation.ts, which is the same six dates in
+ * the site's own words. That version says "The three builds are announced" and
+ * "Five-week build", and this file spends thirty lines above explaining why the
+ * thing being made is never a countable noun in mail to this audience. Importing
+ * the site's wording to avoid retyping the dates would quietly undo that, which
+ * is a worse outcome than the duplication it saves. It also abbreviates months,
+ * which reads fine in a card on a page and clipped in a sentence.
+ *
+ * What the shared constant IS for is the two broadcasts agreeing with each
+ * other. They go to the same people a fortnight apart, and a reader who notices
+ * one date moved between them has been given a reason to doubt the rest. If a
+ * date really does move, it moves here once. */
+const KEY_DATES = [
+  { label: "Applications open", value: "15 to 31 August" },
+  { label: "A local panel reads every application", value: "1 to 18 September" },
+  { label: "The three chosen problems are announced", value: "24 September" },
+  { label: "Working out exactly what gets made", value: "28 September to 9 October" },
+  { label: "Building it, with something to try each week", value: "12 October to 13 November" },
+  { label: "Showcase Hui", value: "26 November" },
+];
+
 /* The launch broadcast.
  *
  * Takes the window state rather than assuming one. The send date is not fixed
@@ -255,14 +278,7 @@ export function communityLaunchBroadcast(
               ? "Applications are open now and close on 31 August. The form is long, so give yourself a decent run at it rather than starting on the last night."
               : "Applications open on 15 August and close on 31 August. The form is long, and you can read every question today. Looking through it before the 15th makes a real difference.",
           ],
-          meta: [
-            { label: "Applications open", value: "15 to 31 August" },
-            { label: "A local panel reads every application", value: "1 to 18 September" },
-            { label: "The three chosen problems are announced", value: "24 September" },
-            { label: "Working out exactly what gets made", value: "28 September to 9 October" },
-            { label: "Building it, with something to try each week", value: "12 October to 13 November" },
-            { label: "Showcase Hui", value: "26 November" },
-          ],
+          meta: KEY_DATES,
         },
         {
           label: "Who can apply",
@@ -312,6 +328,177 @@ export function communityLaunchBroadcast(
       },
       // There is a reply-to now, so the "do not reply" line must not appear:
       // this email asks a question and invites an answer.
+      unmonitored: false,
+    },
+  };
+}
+
+/* The second broadcast: applications are open, to the same two lists.
+ *
+ * IT IS A NUDGE, NOT A RE-SEND. Everyone who gets this had fifteen hundred words
+ * from us in the first week of August explaining what the programme is. Sending
+ * that again with the button swapped is how a list learns to delete on sight.
+ * They already know what this is; the only new fact is that the window is open
+ * and there are fifteen days of it left, so the email is about four hundred
+ * words and says that. Every explanatory section from the launch is gone, and
+ * the two pages that carry the detail are linked instead.
+ *
+ * IT CARRIES BOTH PATHS, WHICH THE LAUNCH DID NOT. The launch went out before
+ * the developer roles were the live ask; this goes out with both forms open, and
+ * a reader who runs a netball club is also someone who might know a developer.
+ * The two doors get a section each, in that order, because this list is a
+ * community list and the developer section is the one being carried by it rather
+ * than aimed at it.
+ *
+ * THE MONEY RULE STILL HOLDS, BY CONTAINMENT RATHER THAN OMISSION. The comment
+ * at the top of this file explains why the community message never mentions what
+ * developers are paid: the reader is deciding whether there is a catch, and an
+ * unprompted mention of who is being paid what invents one. That reason does not
+ * expire because the developer roles are now in the same email. But the site's
+ * own rule for the other audience is that the work must never read as
+ * volunteering, so the rate cannot be dropped either.
+ *
+ * Both hold if it stays inside one section. What anyone is paid FOR THE WORK is
+ * named in "If you write software" and nowhere else: not in the lede, not in the
+ * intro, not in the community section, not in the outro. A reader who stops
+ * after the section addressed to them has been told the cost is nil and has seen
+ * no figure for anybody. A reader who keeps going has self-selected into the
+ * section where the rate is the opening move. Do not move it out of that section
+ * to tighten a sentence somewhere else.
+ *
+ * The outro's "paid for by a grant" is not an exception to this and must not be
+ * edited into one. It is the funder credit, which is a condition of the money
+ * and appears on the launch broadcast too; it says an institution funds the
+ * programme, not that a person is being paid a rate. The distinction is the
+ * whole rule.
+ *
+ * IT IS ONLY TRUE WHILE THE WINDOW IS OPEN, so unlike the launch it throws
+ * rather than warns. The launch had an honest form on both sides of 15 August
+ * and only needed a different button. This one has no honest form on the far
+ * side of the 31st: every line of it, subject included, says come and apply, and
+ * the ones that do would land on a closed form. A refusal to render is the right
+ * failure, because the alternative is a draft that looks fine in the dashboard. */
+export function applicationsOpenBroadcast(
+  state: WindowState = getWindowState(),
+  listReason: string = LIST_REASON.communityConnect,
+): Message {
+  if (state !== "open") {
+    throw new Error(
+      `[broadcast] The applications-open broadcast is only true while applications are open, and the window state is "${state}". Send communityLaunchBroadcast before the 15th; after the close there is no version of this message to send.`,
+    );
+  }
+
+  return {
+    // States the one new fact and the deadline, and nothing else. The launch
+    // subject was an open question because it was introducing a stranger; this
+    // is a reminder to people who already know, and a reminder that makes them
+    // work out what it is about has wasted the only line it gets.
+    subject: "Applications are open until 31 August",
+    replyTo: "stephens.giovanni@gmail.com",
+    content: {
+      // Says "two ways in" before the reader opens anything, because half of
+      // them are on this list for a reason that has nothing to do with running
+      // an organisation, and the subject alone reads as though it is only for
+      // the other half.
+      preheader: "Two ways in: tell us a problem to fix, or take one of the six developer seats.",
+      eyebrow: "Applications close 31 August",
+      heading: "Applications are open.",
+      lede: "**Community Tech Lab** pairs local software developers with community organisations across the Queenstown Lakes district. Both sides can apply now.",
+      intro: [
+        "Kia ora koutou,",
+        // Names the earlier email rather than repeating it. It tells a reader
+        // who deleted it that they have not missed anything they cannot get
+        // back, and it is why this one is allowed to be short.
+        //
+        // "Earlier this month", not "a fortnight ago": the send date is not
+        // locked, and the launch went to one list on the 4th and the other on
+        // the 7th, so anything more precise is wrong for somebody.
+        "You will have had a longer note from us earlier this month about what this is. The short version today: applications are open, they close on 31 August, and there are two ways in.",
+      ],
+      sections: [
+        {
+          label: "If you run a community organisation",
+          paragraphs: [
+            "Tell us a problem. Anything that gets in the way of the work you do, whether it eats hours every week or is something you cannot do at all. You do not need to know what the answer looks like.",
+            "Three problems get chosen, and a small team of local developers spends five weeks building something to fix each one. It costs your organisation nothing, and asks one person for one to two hours a week while it is being made.",
+            "The form runs to six sections and takes most people three quarters of an hour. It is worth a decent run at it rather than the last night.",
+          ],
+          // A section link has to ride in `meta`, because paragraphs render
+          // through htmlParagraph, which understands the brand mark and nothing
+          // else. The full host is in `value` rather than a bare path: the text
+          // part has nowhere but this to put a URL, and half a URL is not one.
+          meta: [
+            {
+              label: "What taking part involves",
+              value: "www.communitytechlab.co.nz/organisations",
+              href: `${PRODUCTION_URL}/organisations`,
+            },
+          ],
+        },
+        {
+          label: "If you write software",
+          paragraphs: [
+            "There are six paid seats across three teams, three senior and three junior, alongside unpaid intern places for people starting out.",
+            // NO FIGURE, DELIBERATELY, AND NOT BECAUSE THE NUMBER IS SECRET.
+            // The programme budget is not final, and an email cannot be edited
+            // after it has gone to seven hundred and eighty people. A rate
+            // published here and revised down in October is a broken promise to
+            // an audience whose good opinion is the whole recruiting channel;
+            // the same rate published on /developers can be corrected in a
+            // commit. So the volatile fact lives on the page, which this section
+            // links to, and the email carries only what will still be true when
+            // the budget lands.
+            //
+            // What it carries is the part that actually does the work. Money
+            // reads as volunteering when it is vague about whether there is any
+            // and whether it is settled, not when a figure is missing: "a fixed
+            // fee, agreed in writing before you start" answers both. It is also
+            // the honest description of the deal, which is a fixed price for a
+            // defined piece of work rather than an hourly rate that happens to
+            // be multiplied out — those are different contracts, and describing
+            // it as the second one is what produces an argument in November.
+            "Each paid seat is a fixed fee, agreed in writing before you start, for around 12 hours a week across the five-week build, which runs once the ski season closes. It is a community rate, well under commercial, and the contract is with Startup Queenstown Lakes.",
+            "That application takes a few minutes. Say which seat fits and point us at something you have shipped.",
+          ],
+          meta: [
+            {
+              label: "The three roles",
+              value: "www.communitytechlab.co.nz/developers",
+              href: `${PRODUCTION_URL}/developers`,
+            },
+          ],
+        },
+        {
+          // No paragraph. The intro has already given the only date that needs
+          // a sentence, and the six rows are here for the reader working out
+          // whether October is survivable, not to be read in order.
+          label: "Key dates",
+          meta: KEY_DATES,
+        },
+        {
+          label: "Pass it on",
+          paragraphs: [
+            "If you know a developer in the district, or another organisation sitting on a problem worth fixing, send this on to them. Most of the people who should see it are not on this list.",
+          ],
+        },
+      ],
+      outro: [
+        // Covers both doors, because the reader who is unsure is as likely to
+        // be a junior developer wondering whether they are good enough as an
+        // organisation wondering whether it counts.
+        "Applying commits you to nothing. If you are not sure whether your organisation fits, or which seat would be yours, reply to this email and ask.",
+        "**Community Tech Lab** is run by six local organisations working together: Startup Queenstown Lakes, Queenstown Coders Connect, FLINT Queenstown, Queenstown Resort College, huddl and Technology Queenstown. It is paid for by a grant from the Queenstown Lakes District Council Economic Diversification Fund.",
+      ],
+      signoff: "Ngā mihi\nGiovanni Stephens\nChair, Community Tech Lab",
+      logos: CREDIT_WALL,
+      // One button, to the form that carries both tabs. The two audience-
+      // specific links are up in their own sections, where the reader has just
+      // decided which of them they are.
+      cta: { label: "Apply now", href: `${PRODUCTION_URL}/apply` },
+      bulk: {
+        reason: listReason,
+        unsubscribeUrl: "{{{RESEND_UNSUBSCRIBE_URL}}}",
+      },
       unmonitored: false,
     },
   };

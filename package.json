@@ -16,6 +16,7 @@
     "check:brand": "node scripts/check-brand-tokens.mjs",
     "check:logic": "node scripts/check-application-logic.mjs",
     "preview:emails": "tsx scripts/preview-emails.ts",
+    "broadcast:open": "tsx scripts/create-applications-open-broadcast.ts",
     "check:mobile": "node scripts/mobile-check.mjs"
   },
   "dependencies": {

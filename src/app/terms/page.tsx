@@ -43,19 +43,25 @@ export default function TermsPage() {
       <Section>
         <NumberedSections sections={TERMS_SECTIONS} />
 
-        {/* Carried over from the prototype. This is a real caveat, not a
-            placeholder: the underlying agreements are still drafts. */}
+        {/* A real caveat, not a launch artifact, and it outlived the launch.
+            It used to be headed "Before this goes live" and said all three
+            underlying documents were drafts. The site is live and the
+            memorandum of understanding is settled, so both of those had to go;
+            the Pilot Organisation Agreement is still being finalised and still
+            going to legal review, which is the part a reader relying on this
+            summary genuinely needs to know. Retitled rather than removed.
+            Remove it once that agreement is signed off. */}
         <Card tone="sunk" className="mt-8 max-w-[var(--terms-measure)]">
-          <Eyebrow>Before this goes live</Eyebrow>
+          <Eyebrow>About these terms</Eyebrow>
           <Note className="mt-3">
             This page is a plain-language summary of the programme&rsquo;s assessment
             criteria, the partner memorandum of understanding, and the Pilot Organisation
-            Agreement, all of which are still drafts. The waiver, indemnity and limitation
-            of liability in the Pilot Organisation Agreement are legally operative and how
-            far liability can be limited under the Consumer Guarantees Act 1993 and Fair
-            Trading Act 1986 depends on the circumstances, so a lawyer needs to review
-            both that agreement and this summary before anyone is asked to sign or rely on
-            it.
+            Agreement. Only selected organisations sign that agreement, and it is still
+            being finalised and going to legal review. Where this summary and the signed
+            agreement differ, the agreement is the one that counts. Its waiver, indemnity
+            and limitation of liability are legally operative, and how far liability can
+            be limited under the Consumer Guarantees Act 1993 and Fair Trading Act 1986
+            depends on the circumstances, so read the agreement itself before signing it.
           </Note>
         </Card>
       </Section>

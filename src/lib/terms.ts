@@ -4,7 +4,10 @@
  * legally-adjacent copy is exactly where a transcription slip would do real
  * damage, and this text is destined for a lawyer's review.
  *
- * NOT YET LEGALLY REVIEWED. See the notice at the foot of /terms.
+ * NOT YET LEGALLY REVIEWED. The Pilot Organisation Agreement this summarises
+ * is still being finalised and is going to a lawyer; this text goes with it.
+ * Disclosed to readers in the "About these terms" card at the foot of /terms,
+ * which comes out when that review is done.
  */
 
 export type TermsSection = {

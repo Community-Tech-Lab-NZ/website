@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
-import { Card } from "@/components/Card";
 import { ExternalLink } from "@/components/ExternalLink";
 import { NumberedSections, type NumberedSection } from "@/components/NumberedSections";
 import { Section } from "@/components/Section";
 import { SectionRule } from "@/components/SectionRule";
-import { Eyebrow, Heading, Lede, Note } from "@/components/Typography";
+import { Eyebrow, Heading, Lede } from "@/components/Typography";
 
 /* Privacy notice.
  *
@@ -16,15 +15,21 @@ import { Eyebrow, Heading, Lede, Note } from "@/components/Typography";
  * language. The audience is a volunteer treasurer at a sports club, not a
  * privacy officer.
  *
- * NEEDS REVIEW by Giovanni and Startup Queenstown Lakes before launch, and
- * ideally by whoever reviews the Pilot Organisation Agreement. Three things in
- * particular need confirming, all flagged on the page itself:
- *   1. How someone exercises access and correction rights. The Privacy Act
- *      requires a workable route, and the site publishes no address by design.
- *   2. How long applications are actually kept.
- *   3. Which AI providers section 05 refers to, and on what terms. That section
- *      states submitted text is not used to train anyone's model, which has to
- *      be true of whichever provider is actually used.
+ * REVIEWED AND SIGNED OFF by Startup Queenstown Lakes, 16 August 2026. The
+ * "Before this goes live" card that used to sit at the foot of the page has
+ * gone with the sign-off, and the site is live.
+ *
+ * That card flagged three things. Two are now settled as the page states them:
+ * applications are kept until the end of 2027 (section 07), and access and
+ * correction requests come through the question form on the apply page, since
+ * the site publishes no address by design (section 07).
+ *
+ * The third is not a question that stays answered. Section 05 states that what
+ * is sent to an AI provider is not used to train their models. That is a claim
+ * about a third party under a particular set of business terms, so it is true
+ * of the provider in use rather than true in general. CHANGING PROVIDER, OR
+ * CHANGING PLAN WITH THE SAME PROVIDER, MEANS RECHECKING SECTION 05 BEFORE THE
+ * SWITCH, not after. It is a published privacy commitment now, not a draft.
  *
  * SQL's own policy lives at /privacy-policy on their site and is linked from
  * section 03. It is genuine but brief, and says nothing about AI, so this
@@ -161,19 +166,6 @@ export default function PrivacyPage() {
 
       <Section>
         <NumberedSections sections={SECTIONS} />
-
-        <Card tone="sunk" className="mt-8 max-w-[var(--terms-measure)]">
-          <Eyebrow>Before this goes live</Eyebrow>
-          <Note className="mt-3">
-            This notice is a draft and needs sign-off from Startup Queenstown Lakes.
-            Three details need confirming: how long applications are actually kept, how
-            someone makes an access or correction request given the programme publishes
-            no email address, and which AI providers are used in section 05 and on what
-            terms. The Privacy Act requires an access route that works, and the claim
-            that submitted text is not used to train anyone&rsquo;s model has to be true
-            of whichever provider is chosen.
-          </Note>
-        </Card>
       </Section>
     </>
   );

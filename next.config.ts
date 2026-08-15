@@ -20,10 +20,23 @@ const nextConfig: NextConfig = {
         source: "/:path*",
         headers: [
           // The site loads nothing from anywhere else: fonts are self-hosted by
-          // next/font, there is no analytics, no tracking and no third-party
-          // embeds. That makes a strict policy cheap to hold, and it is worth
-          // holding on a page where community organisations type out details
-          // about the people they serve.
+          // next/font and there are no third-party embeds. That makes a strict
+          // policy cheap to hold, and it is worth holding on a page where
+          // community organisations type out details about the people they
+          // serve.
+          //
+          // Vercel Web Analytics is the one exception, and it costs this policy
+          // nothing because it is not third-party at run time: in production the
+          // script is served from /_vercel/insights/script.js and beacons to
+          // /_vercel/insights/view, both same-origin, so 'self' already covers
+          // them on script-src and connect-src.
+          //
+          // In DEV ONLY it loads script.debug.js from va.vercel-scripts.com,
+          // which this policy blocks and which shows up as a console error on
+          // localhost. That is the policy working, not a fault. Do not add the
+          // host to script-src to quieten it: production does not need it, and
+          // adding it would widen the policy for every visitor to fix a message
+          // only developers ever see.
           //
           // KNOWN TRADE-OFF. 'unsafe-inline' on script-src keeps Chrome's Issues
           // panel unhappy (Lighthouse Best Practices 96 rather than 100). The

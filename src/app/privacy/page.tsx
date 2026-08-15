@@ -29,6 +29,12 @@ import { Eyebrow, Heading, Lede, Note } from "@/components/Typography";
  * SQL's own policy lives at /privacy-policy on their site and is linked from
  * section 03. It is genuine but brief, and says nothing about AI, so this
  * notice is the more detailed of the two rather than a restatement.
+ *
+ * SECTION 08 REWRITTEN 16 August 2026. It used to say the site "runs no
+ * analytics or tracking", which stopped being true the moment @vercel/analytics
+ * went into layout.tsx. Section 08 is a statement of fact about the site, so it
+ * has to be rechecked whenever anything is added to the page shell, not only
+ * when the privacy notice itself is being reviewed.
  */
 
 export const metadata: Metadata = {
@@ -116,7 +122,20 @@ const SECTIONS: NumberedSection[] = [
     number: "08",
     title: "Cookies and analytics",
     paragraphs: [
-      "This site sets no cookies and runs no analytics or tracking. Fonts are served from this site rather than from Google, so visiting these pages does not tell anyone else you were here.",
+      "This site sets no cookies. It does count visits, using Vercel Web Analytics, so we can see which pages people actually read and whether the application form is being finished or abandoned. It is cookieless, it stores nothing on your device, and it does not follow you to other sites.",
+      "What it records is the page you looked at, the site you arrived from if there was one, and your rough location, device type and browser. It does not record your name, your IP address, or anything you type into a form. To tell one visit from another it works out a temporary identifier from your connection, and that identifier is rebuilt daily rather than kept, so you cannot be recognised from one day to the next.",
+      <>
+        The counting is done by Vercel, who also host this site, which means it is
+        processed on servers outside New Zealand. Their{" "}
+        <ExternalLink
+          href="https://vercel.com/legal/privacy-policy"
+          className="ctl-link-grow text-ink underline"
+        >
+          privacy policy
+        </ExternalLink>{" "}
+        covers what they do with it. Nothing you enter in an application is sent to it.
+      </>,
+      "Fonts are served from this site rather than from Google, and there is no advertising, no social media buttons and nothing else embedded from anywhere else.",
     ],
   },
 ];
@@ -134,7 +153,7 @@ export default function PrivacyPage() {
           you serve. This is what happens to it.
         </Lede>
         <div className="mt-5">
-          <Eyebrow>Last updated 27 July 2026 · applies to the 2026 round</Eyebrow>
+          <Eyebrow>Last updated 16 August 2026 · applies to the 2026 round</Eyebrow>
         </div>
       </Section>
 

@@ -10,7 +10,7 @@ import { SectionRule } from "@/components/SectionRule";
 import { StatFigure } from "@/components/StatFigure";
 import { Body, Eyebrow, Heading, Lede, Note } from "@/components/Typography";
 import { applyHref } from "@/lib/apply-path";
-import { ROLES } from "@/lib/roles";
+import { FEE_NOTE, ROLES } from "@/lib/roles";
 import { breadcrumbSchema, JsonLd, jobPostingsSchema } from "@/lib/structured-data";
 
 /* For developers. Copy transcribed verbatim from the prototype.
@@ -116,6 +116,15 @@ export default function DevelopersPage() {
                     <div className="mt-2 font-meta text-label uppercase leading-tight text-muted">
                       {role.pay}
                     </div>
+                    {/* Ink rather than muted, and on its own line. It is the
+                        one thing on this row a developer is scanning for, and
+                        set in the same grey as the contract-and-hours line it
+                        would be read as more of the same small print. */}
+                    {role.fee ? (
+                      <div className="mt-1 font-meta text-label uppercase leading-tight">
+                        {role.fee}
+                      </div>
+                    ) : null}
                   </div>
 
                   <Note>{role.summary}</Note>
@@ -131,7 +140,7 @@ export default function DevelopersPage() {
           </div>
 
           <Note muted className="mt-5">
-            Open to developers based in the Queenstown Lakes district.
+            {FEE_NOTE} Open to developers based in the Queenstown Lakes district.
           </Note>
         </Reveal>
       </Section>

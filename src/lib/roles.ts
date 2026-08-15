@@ -36,6 +36,23 @@ export type Role = {
   title: string;
   /** The meta line under the title. */
   pay: string;
+  /** The indicative fee, under the meta line. Paid seats only.
+   *
+   *  NOT TRANSCRIBED FROM THE PDF, unlike everything long on this type. The
+   *  signed-off job descriptions carry no figure at all, so this is the first
+   *  place the programme has named one and the PDFs do not yet agree with it.
+   *  Reissue them, or expect a candidate to notice.
+   *
+   *  It is INDICATIVE while the budget firms up, which `FEE_NOTE` says once
+   *  below the table rather than three times inside it. Do not drop that note
+   *  and leave the numbers: on their own they read as an offer.
+   *
+   *  A fee, not a rate, and the wording matters. The seats are a fixed price for
+   *  the build, sized on an assumption of about 12 hours a week across five
+   *  weeks. Publishing the hourly figure it was derived from would invite the
+   *  reasonable question of what happens at eighty hours, which is a question
+   *  the contract answers and an advertisement should not raise. */
+  fee?: string;
   /** The one-paragraph version, shown in the collapsed row. */
   summary: string;
   /** Paid contract seats are real job postings; the unpaid internship is not,
@@ -56,6 +73,7 @@ export const ROLES: readonly Role[] = [
     id: "senior-developer-mentor",
     title: "Senior developer and mentor",
     pay: "Paid contract · 3 seats · about 12 hours a week",
+    fee: "About $2,100 for the five weeks",
     summary:
       "Lead one team, mentor the junior, guide architecture and keep scope sensible. Roughly 60 hours across the build, contracted to Startup Queenstown Lakes as a sole trader.",
     paid: true,
@@ -95,6 +113,7 @@ export const ROLES: readonly Role[] = [
     id: "junior-developer",
     title: "Junior developer or designer",
     pay: "Paid contract · 3 seats · about 12 hours a week",
+    fee: "About $1,500 for the five weeks",
     summary:
       "Do the primary build work with a senior developer alongside you. Same contract structure, same hours, real users at the other end.",
     paid: true,
@@ -171,3 +190,12 @@ export const ROLES: readonly Role[] = [
     pdf: { href: "/roles/programme-intern.pdf", bytes: 25607 },
   },
 ];
+
+/** The qualifier the `fee` figures cannot go out without.
+ *
+ *  Said once under the table rather than on each row, because three hedges
+ *  stacked in a column stop reading as care and start reading as doubt. It has
+ *  to survive alongside the numbers though: a bare figure on a job advertisement
+ *  is an offer, and this is not one yet. */
+export const FEE_NOTE =
+  "Fees are indicative while the programme budget is confirmed, and are fixed in writing before any work starts.";

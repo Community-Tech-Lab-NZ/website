@@ -1,6 +1,7 @@
 import { getWindowState, type WindowState } from "./application-window";
 import type { Message } from "./email";
 import type { EmailLogoWall } from "./email-template";
+import { FUNDER_URL, PARTNER_URLS } from "./navigation";
 import { PRODUCTION_URL } from "./site";
 
 /* Always the production domain, never SITE_URL. An email is read in someone
@@ -118,9 +119,16 @@ export const LIST_REASON = {
  * first, but the handoff is explicit that this may be said in words and must
  * never be shown as a bigger logo. Every mark here is sized on the same rules.
  *
- * NOT LINKED, unlike the site's wall. This message has one thing it wants a
- * reader to do, and six outbound links to other organisations sitting under
- * the signature compete with it. Their sites are one search away.
+ * LINKED, as the site's wall is. This was the other way for the launch send, on
+ * the argument that a message with one thing it wants a reader to do should not
+ * put six outbound links under the signature to compete with it. That worry was
+ * real and it lost to a plainer one: these six organisations are lending their
+ * names to a cold email, the marks are the credit they get for it, and a
+ * credit that cannot be followed is a weaker thank-you than one that can. By
+ * the time a reader reaches the wall they are past the call to action anyway.
+ *
+ * Queenstown Coders Connect has no href because it has no website, which
+ * PARTNER_URLS explains. One unlinked mark among six is the intended state.
  *
  * The files are built by scripts/build-email-logos.mjs, which is also where the
  * widths and heights below come from. Do not hand-edit them: they are the
@@ -129,12 +137,12 @@ export const LIST_REASON = {
 const CREDIT_WALL = {
   label: "Delivered with",
   logos: [
-    { src: `${LOGOS}/partner-startup-queenstown-lakes.png`, alt: "Startup Queenstown Lakes", w: 134, h: 56 },
+    { src: `${LOGOS}/partner-startup-queenstown-lakes.png`, alt: "Startup Queenstown Lakes", w: 134, h: 56, href: PARTNER_URLS["Startup Queenstown Lakes"] },
     { src: `${LOGOS}/partner-queenstown-coders-connect.png`, alt: "Queenstown Coders Connect", w: 232, h: 56 },
-    { src: `${LOGOS}/partner-flint-queenstown.png`, alt: "FLINT Queenstown", w: 56, h: 56 },
-    { src: `${LOGOS}/partner-queenstown-resort-college.png`, alt: "Queenstown Resort College", w: 56, h: 56 },
-    { src: `${LOGOS}/partner-huddl.png`, alt: "huddl", w: 128, h: 56 },
-    { src: `${LOGOS}/partner-technology-queenstown.png`, alt: "Technology Queenstown", w: 200, h: 39 },
+    { src: `${LOGOS}/partner-flint-queenstown.png`, alt: "FLINT Queenstown", w: 56, h: 56, href: PARTNER_URLS["FLINT Queenstown"] },
+    { src: `${LOGOS}/partner-queenstown-resort-college.png`, alt: "Queenstown Resort College", w: 56, h: 56, href: PARTNER_URLS["Queenstown Resort College"] },
+    { src: `${LOGOS}/partner-huddl.png`, alt: "huddl", w: 128, h: 56, href: PARTNER_URLS.huddl },
+    { src: `${LOGOS}/partner-technology-queenstown.png`, alt: "Technology Queenstown", w: 200, h: 39, href: PARTNER_URLS["Technology Queenstown"] },
   ],
   funder: {
     label: "Funded by",
@@ -146,6 +154,7 @@ const CREDIT_WALL = {
       alt: "Economic Futures, Queenstown Lakes District Council: the QLDC Economic Diversification Fund",
       w: 299,
       h: 64,
+      href: FUNDER_URL,
     },
   },
 } satisfies EmailLogoWall;
@@ -164,6 +173,43 @@ const CREDIT_WALL = {
  * other. They go to the same people a fortnight apart, and a reader who notices
  * one date moved between them has been given a reason to doubt the rest. If a
  * date really does move, it moves here once. */
+/* A partner's name as a link, or as plain text when there is nothing to link to.
+ *
+ * Reads PARTNER_URLS rather than carrying its own copy of six addresses, so the
+ * email and the site's footer cannot end up pointing at different places. The
+ * fallback is not defensive: Queenstown Coders Connect has no website and is
+ * deliberately absent from that map, so the unlinked branch is a real partner's
+ * normal rendering and not an error path. */
+const partnerLink = (name: string) => {
+  const href = PARTNER_URLS[name];
+  return href ? `[${name}](${href})` : name;
+};
+
+/* Who runs it and who pays for it, closing both broadcasts.
+ *
+ * Shared because it was two identical string literals in this file, which is
+ * two places for a partner to be added, dropped or renamed and one of them to
+ * be missed. Built from the URL map rather than written out, for the same
+ * reason: a hand-written list of six names and five links is a list that goes
+ * stale silently.
+ *
+ * The names carry the links even though the marks below them now do too. The
+ * wall is images, and images are off by default in Outlook and stripped by some
+ * corporate gateways entirely, so for a real share of readers the sentence is
+ * the only place the credit exists at all. */
+const CREDIT_SENTENCE = [
+  "**Community Tech Lab** is run by six local organisations working together:",
+  [
+    partnerLink("Startup Queenstown Lakes"),
+    partnerLink("Queenstown Coders Connect"),
+    partnerLink("FLINT Queenstown"),
+    partnerLink("Queenstown Resort College"),
+    partnerLink("huddl"),
+  ].join(", "),
+  `and ${partnerLink("Technology Queenstown")}. It is paid for by a grant from the`,
+  `[Queenstown Lakes District Council Economic Diversification Fund](${FUNDER_URL}).`,
+].join(" ");
+
 const KEY_DATES = [
   { label: "Applications open", value: "15 to 31 August" },
   { label: "A local panel reads every application", value: "1 to 18 September" },
@@ -292,7 +338,7 @@ export function communityLaunchBroadcast(
         // Two sentences, not one. As a single sentence this ran to 45 words and
         // was the hardest thing in the email to read, six proper nouns deep
         // before the funder even arrives.
-        "**Community Tech Lab** is run by six local organisations working together: Startup Queenstown Lakes, Queenstown Coders Connect, FLINT Queenstown, Queenstown Resort College, huddl and Technology Queenstown. It is paid for by a grant from the Queenstown Lakes District Council Economic Diversification Fund.",
+        CREDIT_SENTENCE,
       ],
       // Title per the About page, which lists Giovanni as Chair and Dr Pradeesh
       // Parameswaran as delivery lead.
@@ -406,21 +452,31 @@ export function applicationsOpenBroadcast(
       lede: "**Community Tech Lab** pairs local software developers with community organisations across the Queenstown Lakes district. Both sides can apply now.",
       intro: [
         "Kia ora koutou,",
-        // Names the earlier email rather than repeating it. It tells a reader
-        // who deleted it that they have not missed anything they cannot get
-        // back, and it is why this one is allowed to be short.
+        // The whole programme in two sentences, for the reader who deleted the
+        // launch email or never opened it. An earlier draft pointed back at
+        // that email instead — "you will have had a longer note from us" — which
+        // asked the one reader who most needs telling to go and find something
+        // they have already thrown away.
         //
-        // "Earlier this month", not "a fortnight ago": the send date is not
-        // locked, and the launch went to one list on the 4th and the other on
-        // the 7th, so anything more precise is wrong for somebody.
-        "You will have had a longer note from us earlier this month about what this is. The short version today: applications are open, they close on 31 August, and there are two ways in.",
+        // PROBLEMS ARE COUNTED, NOT ORGANISATIONS, for the reason set out at the
+        // top of this file: how many organisations each chosen problem covers is
+        // not known yet and is the point of weighting reuse. "Three
+        // organisations get a tool" is the easy sentence to write here and it is
+        // a promise this cannot keep.
+        "Three problems get chosen, and a small team of local developers spends five weeks building something to fix each one, at no cost to the organisation. Everything made is open source.",
+        "Applications are open, they close on 31 August, and there are two ways in.",
       ],
       sections: [
         {
           label: "If you run a community organisation",
           paragraphs: [
             "Tell us a problem. Anything that gets in the way of the work you do, whether it eats hours every week or is something you cannot do at all. You do not need to know what the answer looks like.",
-            "Three problems get chosen, and a small team of local developers spends five weeks building something to fix each one. It costs your organisation nothing, and asks one person for one to two hours a week while it is being made.",
+            // Does NOT repeat how the programme works. The intro now carries
+            // that, four paragraphs up, and saying it twice in four hundred
+            // words is what makes a short email feel padded. This paragraph is
+            // only what it costs the reader, which is the thing the intro does
+            // not answer.
+            "It costs your organisation nothing, and asks one person for one to two hours a week while it is being made. You see it taking shape every week.",
             "The form runs to six sections and takes most people three quarters of an hour. It is worth a decent run at it rather than the last night.",
           ],
           // A section link has to ride in `meta`, because paragraphs render
@@ -487,7 +543,7 @@ export function applicationsOpenBroadcast(
         // be a junior developer wondering whether they are good enough as an
         // organisation wondering whether it counts.
         "Applying commits you to nothing. If you are not sure whether your organisation fits, or which seat would be yours, reply to this email and ask.",
-        "**Community Tech Lab** is run by six local organisations working together: Startup Queenstown Lakes, Queenstown Coders Connect, FLINT Queenstown, Queenstown Resort College, huddl and Technology Queenstown. It is paid for by a grant from the Queenstown Lakes District Council Economic Diversification Fund.",
+        CREDIT_SENTENCE,
       ],
       signoff: "Ngā mihi\nGiovanni Stephens\nChair, Community Tech Lab",
       logos: CREDIT_WALL,

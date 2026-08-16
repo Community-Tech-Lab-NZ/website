@@ -15,9 +15,11 @@ import { breadcrumbSchema, JsonLd, jobPostingsSchema } from "@/lib/structured-da
 
 /* For developers. Copy transcribed verbatim from the prototype.
  *
- * Ink hero, with the eyebrow in Fern — the one structural accent on an otherwise
- * unbroken dark surface. The lede is deliberately honest about the community
- * rate rather than burying it.
+ * Ink hero, with the eyebrow in Fern, the one structural accent on an otherwise
+ * unbroken dark surface. The lede says what the seats are and nothing else: the
+ * hours are in the stat row directly below it, the dates are in the key dates
+ * card, and the community rate is explained under the role cards, beside the
+ * figures it is explaining.
  */
 
 export const metadata: Metadata = {
@@ -61,10 +63,7 @@ export default function DevelopersPage() {
         </Heading>
         <Lede inverse className="mt-6">
           Six paid seats across three teams, three senior and three junior, plus unpaid
-          intern places. The rate is a community rate, well under commercial, because
-          the work goes to organisations that could not otherwise afford it. Part-time,
-          evenings and weekends, roughly 12 hours a week for five weeks, after the ski
-          season closes.
+          intern places.
         </Lede>
 
         <div className="mt-8 grid grid-cols-[repeat(auto-fit,minmax(var(--hero-stat-min),max-content))] gap-8">
@@ -140,7 +139,9 @@ export default function DevelopersPage() {
           </div>
 
           <Note muted className="mt-5">
-            {FEE_NOTE} Open to developers based in the Queenstown Lakes district.
+            The rate is a community rate, well under commercial, because the work goes
+            to organisations that could not otherwise afford it. {FEE_NOTE} Open to
+            developers based in the Queenstown Lakes district.
           </Note>
         </Reveal>
       </Section>

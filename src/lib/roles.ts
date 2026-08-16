@@ -79,7 +79,7 @@ export const ROLES: readonly Role[] = [
     paid: true,
     seats: 3,
     lookingFor:
-      "An experienced developer who genuinely enjoys bringing others up — someone who would rather pair with a junior for an hour than write the code themselves in ten minutes. You will guide technical decisions, keep scope sensible, and make sure what gets built is maintainable and actually useful to the community organisation receiving it.",
+      "An experienced developer who genuinely enjoys bringing others up, someone who would rather pair with a junior for an hour than write the code themselves in ten minutes. You will guide technical decisions, keep scope sensible, and make sure what gets built is maintainable and actually useful to the community organisation receiving it.",
     doing: {
       items: [
         "Lead or co-lead one of the three build teams",
@@ -92,17 +92,16 @@ export const ROLES: readonly Role[] = [
     },
     bringing: {
       items: [
-        "Solid track record shipping production software (stack-agnostic — we care about judgment, not specific frameworks)",
+        "Solid track record shipping production software (stack-agnostic, because we care about judgment, not specific frameworks)",
         "Genuine interest in mentoring and developing early-career talent",
         "Comfort with modern AI-assisted development workflows, and the judgment to coach juniors on where AI helps and where it hurts",
-        "Ability to right-size solutions — this is about small, useful, reusable tools, not over-engineered platforms",
+        "Ability to right-size solutions, because this is about small, useful, reusable tools, not over-engineered platforms",
         "Openness to open-source licensing (the programme's default)",
       ],
     },
     getting: {
       items: [
         "A paid contract (sole trader) with Startup Queenstown Lakes",
-        "Recognition as a mentor and programme partner across FLINT, QCC, Technology Queenstown, and QRC channels",
         "A tangible contribution to the local community and tech ecosystem",
         "Connection to the wider Queenstown Lakes tech leadership network",
       ],
@@ -130,7 +129,7 @@ export const ROLES: readonly Role[] = [
     },
     bringing: {
       items: [
-        "Genuine curiosity about AI and modern development tools (Claude Code, Cursor, Copilot, or similar — happy to introduce you)",
+        "Genuine curiosity about AI and modern development tools (Claude Code, Cursor, Copilot, or similar, and we are happy to introduce you)",
         "Willingness to learn in public and take feedback well",
         "Reliability, showing up to your sprints and commitments",
       ],
@@ -156,23 +155,23 @@ export const ROLES: readonly Role[] = [
     paid: false,
     seats: null,
     lookingFor:
-      "Someone aspiring, curious, and keen to get involved and see how a real technology project comes together. You might be exploring whether tech is for you, building confidence before applying for a junior role, or simply wanting to be part of something good for the community. No technical experience is needed at all — what matters is interest, reliability, and a willingness to learn by watching, listening, and helping where you can.",
+      "Someone aspiring, curious, and keen to get involved and see how a real technology project comes together. You might be exploring whether tech is for you, building confidence before applying for a junior role, or simply wanting to be part of something good for the community. No technical experience is needed at all. What matters is interest, reliability, and a willingness to learn by watching, listening, and helping where you can.",
     doing: {
       lede: "This is a light-touch, learning-focused role. You'll be around the teams and the work without the pressure of delivery.",
       items: [
         "Sit in on sprint ceremonies, stand-ups, demos, and retrospectives as an observer and participant",
         "Shadow developers and mentors to see how tools are scoped, built, and handed over, and how AI tools are used along the way",
-        "Help with light, non-build tasks where useful — note-taking, user research and testing, gathering feedback, and supporting documentation",
+        "Help with light, non-build tasks where useful: note-taking, user research and testing, gathering feedback, and supporting documentation",
         "Get to know the people and organisations involved across the local tech community",
         "Join the closing FLINT Showcase Hui",
       ],
-      note: "The time commitment is intentionally light and flexible — a few hours a week — so it can fit around study, work, or other commitments.",
+      note: "The time commitment is intentionally light and flexible, a few hours a week, so it can fit around study, work, or other commitments.",
     },
     bringing: {
       items: [
         "Curiosity about technology, AI, and how things get built",
         "Reliability and follow-through on what you commit to",
-        "A respectful, open attitude — happy to ask questions and learn in public",
+        "A respectful, open attitude, happy to ask questions and learn in public",
         "Care for the community organisations the programme supports, and discretion with anything sensitive you may see",
       ],
       note: "No programming, design, or prior tech experience is required.",

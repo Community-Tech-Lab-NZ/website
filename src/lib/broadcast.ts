@@ -574,3 +574,149 @@ export function applicationsOpenBroadcast(
     },
   };
 }
+
+/* The third and last broadcast: the deadline, two days out.
+ *
+ * IT IS TWO HUNDRED AND FORTY WORDS, AND THE SHORTNESS IS THE POINT. This is
+ * the third thing these two lists have had from us in a month. The 15 August
+ * send was already a nudge, and the way to make a list delete on sight is to
+ * send the nudge again with the date sharpened. Everything a reader needs to
+ * decide is on two pages this links to; what they do not have is the day.
+ *
+ * NO KEY DATES TABLE. Both earlier sends carried the same six rows, so this
+ * would be the third printing of a table nobody reads in order. It also works
+ * against the message: a reader weighing up whether to spend Sunday evening on
+ * a form does not need October, and six future dates make one imminent one
+ * look like just another row. The email is about a single date and prints only
+ * that. KEY_DATES is deliberately unused here.
+ *
+ * IT OFFERS A REPLY ROUTE, WHICH THE EARLIER SENDS DID NOT. The community form
+ * takes about three quarters of an hour, and at two days out that is the thing
+ * standing between a real problem and no application at all. So an
+ * organisation that cannot find the time can reply with the problem in a few
+ * sentences and get help finishing the form.
+ *
+ * What that promise is, exactly, matters in both directions. It is help
+ * COMPLETING an application, not a way around one: the panel reads
+ * applications, and a few sentences in an inbox is not one, so the copy says
+ * we work through the rest of the form with you. And it is a real commitment
+ * by a real person to be at the reply address over a weekend. Do not carry
+ * this paragraph into a future round without someone having agreed to answer
+ * it.
+ *
+ * BOTH GUARDS THROW, AND BOTH ARE LOAD-BEARING. The window guard is the same
+ * one applicationsOpenBroadcast has and is there for the same reason: every
+ * line points at a form, and after the 31st there is no honest version of any
+ * of them. The date guard is new and specific to this message. The subject and
+ * the heading name Monday, and the copy says this weekend. Sent on the 20th
+ * that is not a deadline notice, it is a wrong one, and it is the kind of
+ * wrong that looks completely fine in the dashboard. */
+
+/* The first moment this message is true. Before it, "Monday" and "this
+ * weekend" are not describing the days the reader is in. New Zealand offset
+ * for the same reason application-window.ts uses one. */
+export const FINAL_CALL_FROM = "2026-08-29T00:00:00+12:00";
+
+export function finalCallBroadcast(
+  state: WindowState = getWindowState(),
+  listReason: string = LIST_REASON.communityConnect,
+  now: Date = new Date(),
+): Message {
+  if (state !== "open") {
+    throw new Error(
+      `[broadcast] The final call broadcast is only true while applications are open, and the window state is "${state}". There is no version of this message to send once the form has closed.`,
+    );
+  }
+  if (now.getTime() < new Date(FINAL_CALL_FROM).getTime()) {
+    throw new Error(
+      `[broadcast] The final call broadcast names Monday and says "this weekend", so it cannot be drafted before ${FINAL_CALL_FROM}. Send applicationsOpenBroadcast if the deadline is still a fortnight away.`,
+    );
+  }
+
+  return {
+    // The one new fact, which is no longer the window but the day. The
+    // 15 August subject was "Applications are open until 31 August"; a reader
+    // scanning an inbox has to be able to tell these apart in four words.
+    subject: "Applications close on Monday",
+    replyTo: "stephens.giovanni@gmail.com",
+    content: {
+      // Names the reply route before the email is opened, because the reader
+      // it is written for is the one who has already decided they have not got
+      // time for this and is about to prove it.
+      preheader: "Two days left. If the form is the thing stopping you, reply and say so.",
+      eyebrow: "Applications close 31 August",
+      heading: "Applications close on Monday.",
+      lede: "**Community Tech Lab** pairs local software developers with community organisations across the Queenstown Lakes district. Both forms close at the end of Monday.",
+      intro: [
+        "Kia ora koutou,",
+        // Still here at the third time of asking, and still one sentence, for
+        // the reader who deleted the other two. Problems are counted, not
+        // organisations. See the top of this file.
+        "Three problems get chosen, and a small team of local developers spends five weeks building something to fix each one, at no cost to the organisation. Everything made is open source.",
+        "Applications close at the end of Monday 31 August.",
+      ],
+      sections: [
+        {
+          label: "If you run a community organisation",
+          paragraphs: [
+            "Tell us a problem. Anything that gets in the way of the work you do, whether it eats hours every week or is something you cannot do at all. You do not need to know what the answer looks like.",
+            // NO ESTIMATE OF HOW LONG THE FORM TAKES. The 15 August send said
+            // three quarters of an hour, and nobody has actually measured it.
+            // A number that turns out to be double is worse than no number in
+            // the last email before a deadline: the reader who believed it and
+            // started at nine on Sunday is the one this paragraph was for.
+            //
+            // The concession and its limit stay in one paragraph. Split them and
+            // the offer sits alone looking like an extension.
+            "If the form is more than you can get to this weekend, reply to this email with the problem in a few sentences and we will work through the rest of it with you before Monday closes. What we cannot do is take it afterwards.",
+          ],
+          meta: [
+            {
+              label: "What taking part involves",
+              value: "www.communitytechlab.co.nz/organisations",
+              href: `${PRODUCTION_URL}/organisations`,
+            },
+          ],
+        },
+        {
+          // The money rule from the top of this file still holds by
+          // containment: the seats and the fee are named here and in no other
+          // paragraph, and there is still no figure. Do not lift either
+          // sentence out to tighten something above.
+          label: "If you write software",
+          paragraphs: [
+            "Six paid seats across three teams, three senior and three junior, alongside unpaid intern places for people starting out. Each paid seat is a fixed fee, agreed in writing before you start, for around 12 hours a week across the five weeks that run once the ski season closes.",
+            "That application takes a few minutes. Say which seat fits and point us at something you have shipped. There is still time for it on Monday.",
+          ],
+          meta: [
+            {
+              label: "The three roles",
+              value: "www.communitytechlab.co.nz/developers",
+              href: `${PRODUCTION_URL}/developers`,
+            },
+          ],
+        },
+        {
+          // Kept from the 15 August send and sharpened, because with two days
+          // left a forward reaches people no list of ours can.
+          label: "Pass it on",
+          paragraphs: [
+            "One forward is worth more than anything else you could do with this email. If you know an organisation sitting on a problem, or a developer who would want one of the seats, send it to them today.",
+          ],
+        },
+      ],
+      outro: [
+        "Applying commits you to nothing. If you are not sure whether your organisation fits, or which seat would be yours, reply to this email and ask.",
+        CREDIT_SENTENCE,
+      ],
+      signoff: "Ngā mihi\nGiovanni Stephens\nChair, Community Tech Lab",
+      logos: CREDIT_WALL,
+      cta: { label: "Apply now", href: `${PRODUCTION_URL}/apply` },
+      bulk: {
+        reason: listReason,
+        unsubscribeUrl: "{{{RESEND_UNSUBSCRIBE_URL}}}",
+      },
+      unmonitored: false,
+    },
+  };
+}

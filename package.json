@@ -17,6 +17,7 @@
     "check:logic": "node scripts/check-application-logic.mjs",
     "preview:emails": "tsx scripts/preview-emails.ts",
     "broadcast:open": "tsx scripts/create-applications-open-broadcast.ts",
+    "broadcast:final": "tsx scripts/create-final-call-broadcast.ts",
     "check:mobile": "node scripts/mobile-check.mjs"
   },
   "dependencies": {

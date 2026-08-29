@@ -22,7 +22,13 @@ import {
   communityApplicationSummary,
   developerApplicationSummary,
 } from "../src/lib/application-doc";
-import { applicationsOpenBroadcast, communityLaunchBroadcast, LIST_REASON } from "../src/lib/broadcast";
+import {
+  applicationsOpenBroadcast,
+  communityLaunchBroadcast,
+  FINAL_CALL_FROM,
+  finalCallBroadcast,
+  LIST_REASON,
+} from "../src/lib/broadcast";
 import { renderHtmlEmail, renderTextEmail } from "../src/lib/email-template";
 import {
   applicationCopy,
@@ -152,6 +158,19 @@ const messages: { name: string; message: Message }[] = [
   {
     name: "09-applications-open-broadcast-friends",
     message: applicationsOpenBroadcast("open", LIST_REASON.personalContacts),
+  },
+  // The final call, again once per list, for the same footer reason.
+  //
+  // The clock is passed in because finalCallBroadcast refuses to render before
+  // the weekend its copy names, and a preview that only works on three days of
+  // the year is a preview nobody can check the wording of afterwards.
+  {
+    name: "10-final-call-broadcast-community",
+    message: finalCallBroadcast("open", LIST_REASON.communityConnect, new Date(FINAL_CALL_FROM)),
+  },
+  {
+    name: "11-final-call-broadcast-friends",
+    message: finalCallBroadcast("open", LIST_REASON.personalContacts, new Date(FINAL_CALL_FROM)),
   },
 ];
 

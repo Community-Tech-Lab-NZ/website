@@ -126,16 +126,44 @@ export async function draftToLists(
     // Read the membership rather than set it. Both lists were assembled and
     // audited elsewhere; the count is printed so whoever runs this can sanity
     // check it against what they expect before anything is drafted against it.
-    const emails: string[] = [];
+    const contacts: { email: string; unsubscribed: boolean }[] = [];
     let after: string | undefined;
     for (let page = 0; page < 60; page++) {
       const res = await resend.contacts.list({ segmentId: segment.id, limit: 100, ...(after ? { after } : {}) } as never);
       const rows = res.data?.data ?? [];
-      emails.push(...rows.map((c) => c.email.toLowerCase()));
+      for (const c of rows) {
+        // Not a default. A missing flag means this cannot tell who has opted
+        // out, and the one thing that must never happen is guessing "false"
+        // and mailing them anyway.
+        if (typeof c.unsubscribed !== "boolean") {
+          throw new Error(
+            `${list.segment}: contact ${c.email} has no unsubscribed flag, so this cannot tell who has opted out. Do not draft against a list it cannot read.`,
+          );
+        }
+        contacts.push({ email: c.email.toLowerCase(), unsubscribed: c.unsubscribed });
+      }
       if (!res.data?.has_more || !rows.length) break;
       after = rows[rows.length - 1].id;
     }
-    console.log(`"${list.segment}" ${segment.id}: ${emails.length} contacts`);
+
+    /* THE COUNT THAT GETS PRINTED IS THE DELIVERABLE ONE.
+     *
+     * A segment keeps people who have unsubscribed: the flag on the contact IS
+     * the record of the opt-out, and deleting them to tidy the count would
+     * throw away the only thing stopping the next import mailing them again.
+     * Resend skips them at send time.
+     *
+     * But this line is read by a person deciding whether the draft looks right
+     * before they press send, and printing the raw membership tells them a
+     * number of recipients that is wrong and too high. So it prints both, and
+     * the opted-out figure is named rather than quietly subtracted, because a
+     * count that moves between sends should be explainable. */
+    const optedOut = contacts.filter((c) => c.unsubscribed).length;
+    const deliverable = contacts.length - optedOut;
+    console.log(
+      `"${list.segment}" ${segment.id}: ${deliverable} will receive this` +
+        (optedOut ? `, ${optedOut} unsubscribed and skipped` : ", none unsubscribed"),
+    );
 
     const existing = broadcasts.find((b) => b.name === list.broadcast);
 

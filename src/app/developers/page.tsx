@@ -138,9 +138,16 @@ export default function DevelopersPage() {
 
                   <Note>{role.summary}</Note>
 
-                  <Button variant="outline" size="sm" href={applyHref("developer")}>
-                    Apply
-                  </Button>
+                  {/* Closed, the button goes rather than being relabelled.
+                      Its whole job is applying for THIS seat, there are three
+                      of them down the page, and "what happens next" is one
+                      answer that does not need saying three times: the hero and
+                      the closing band both carry it already. */}
+                  {state === "closed" ? null : (
+                    <Button variant="outline" size="sm" href={applyHref("developer")}>
+                      Apply
+                    </Button>
+                  )}
                 </div>
 
                 <RoleDescription role={role} />

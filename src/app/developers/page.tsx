@@ -10,6 +10,7 @@ import { SectionRule } from "@/components/SectionRule";
 import { StatFigure } from "@/components/StatFigure";
 import { Body, Eyebrow, Heading, Lede, Note } from "@/components/Typography";
 import { applyHref } from "@/lib/apply-path";
+import { getWindowState, WINDOW_COPY } from "@/lib/application-window";
 import { FEE_NOTE, ROLES } from "@/lib/roles";
 import { breadcrumbSchema, JsonLd, jobPostingsSchema } from "@/lib/structured-data";
 
@@ -39,6 +40,9 @@ const WHAT_YOU_GET = [
 ];
 
 export default function DevelopersPage() {
+  const state = getWindowState();
+  const cta = WINDOW_COPY[state].cta;
+
   return (
     <>
       {/* These are genuine paid contract seats with defined hours and a closing
@@ -73,10 +77,16 @@ export default function DevelopersPage() {
         </div>
 
         {/* Every apply link on this page opens the developer form. Nobody who
-            has read this far wants the community application. */}
+            has read this far wants the community application.
+            Closed, the parameter is dead weight: /apply renders no tabs to
+            fork, so it goes to the bare page. */}
         <div className="mt-7">
-          <Button variant="primary" size="lg" href={applyHref("developer")}>
-            Apply now
+          <Button
+            variant="primary"
+            size="lg"
+            href={state === "closed" ? cta.href : applyHref("developer")}
+          >
+            {cta.label}
           </Button>
         </div>
       </Section>

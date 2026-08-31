@@ -21,7 +21,7 @@ const entry = join(dir, "run.mjs");
 writeFileSync(
   entry,
   `
-import { getWindowState } from ${JSON.stringify(join(process.cwd(), "src/lib/application-window.ts"))};
+import { getWindowState, WINDOW_COPY, LATE_APPLICATION_EMAIL } from ${JSON.stringify(join(process.cwd(), "src/lib/application-window.ts"))};
 import { communitySchema, developerSchema, questionSchema } from ${JSON.stringify(join(process.cwd(), "src/lib/schemas.ts"))};
 
 const results = [];
@@ -47,6 +47,28 @@ check("14 Aug 1pm UTC is 15 Aug 1am NZ, so open",
   getWindowState(new Date("2026-08-14T13:00:00Z")), "open");
 check("14 Aug 11am UTC is 14 Aug 11pm NZ, so not yet",
   getWindowState(new Date("2026-08-14T11:00:00Z")), "before");
+
+// --- Window copy ----------------------------------------------------------
+// The header, the footer, both heroes and the closing band on every page read
+// these. A stale label here is the whole site advertising a closed application.
+check("open state says apply", WINDOW_COPY.open.cta.label, "Apply now");
+check("before state says apply", WINDOW_COPY.before.cta.label, "Apply now");
+check("closed state does NOT say apply",
+  WINDOW_COPY.closed.cta.label.toLowerCase().includes("apply"), false);
+check("closed label does not claim the window is open",
+  WINDOW_COPY.closed.label.toLowerCase().includes("open"), false);
+check("open label states the window", WINDOW_COPY.open.label,
+  "Applications open 15 to 31 August");
+
+// Closing the window closes the site's only contact route: /apply stops
+// rendering the forms, and the question form goes with them. This address is
+// what is left, so it has to be there and it has to be reachable.
+check("closed state carries a contact address",
+  WINDOW_COPY.closed.contact.email, LATE_APPLICATION_EMAIL);
+check("the address looks like an address",
+  /^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$/.test(LATE_APPLICATION_EMAIL), true);
+check("no address is published while applications are open",
+  "contact" in WINDOW_COPY.open || "contact" in WINDOW_COPY.before, false);
 
 // --- Eligibility gates ----------------------------------------------------
 const baseCommunity = {

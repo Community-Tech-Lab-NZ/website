@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Card } from "@/components/Card";
 import { KeyDatesCard } from "@/components/KeyDatesCard";
+import { MailLink } from "@/components/MailLink";
 import { ScoringTable, SCORING_APPLY } from "@/components/ScoringTable";
 import { Section } from "@/components/Section";
 import { Reveal } from "@/components/Reveal";
@@ -9,7 +10,10 @@ import { Body, Eyebrow, Heading, Note } from "@/components/Typography";
 import { ApplyTabs } from "@/components/form/ApplyTabs";
 import { APPLY_PARAM, parseApplyPath } from "@/lib/apply-path";
 import { getWindowState, WINDOW_COPY } from "@/lib/application-window";
-import { APPLICATION_WINDOW_LABEL } from "@/lib/navigation";
+
+/* Read off the closed entry directly. WINDOW_COPY[state] is a union of the
+ * three states and only this one carries a contact block. */
+const CONTACT = WINDOW_COPY.closed.contact;
 
 /* Apply.
  *
@@ -31,13 +35,20 @@ import { APPLICATION_WINDOW_LABEL } from "@/lib/navigation";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  // The deadline is the most useful thing a searcher can see in a result.
-  title: "Apply by 31 August",
-  description:
-    "Applications are open 15 to 31 August for community organisations and developers in the Queenstown Lakes district. You do not need to be technical.",
-  alternates: { canonical: "/apply" },
-};
+/* Generated rather than static, for the same reason the page is force-dynamic.
+ * A result headed "Apply by 31 August" is the most useful line a searcher can
+ * see in August and a wasted click in September. */
+export function generateMetadata(): Metadata {
+  const closed = getWindowState() === "closed";
+
+  return {
+    title: closed ? "Applications have closed" : "Apply by 31 August",
+    description: closed
+      ? "Applications closed on 31 August. A local panel reads every application between 1 and 18 September, and the three builds are announced on 24 September."
+      : "Applications are open 15 to 31 August for community organisations and developers in the Queenstown Lakes district. You do not need to be technical.",
+    alternates: { canonical: "/apply" },
+  };
+}
 
 export default async function ApplyPage({
   searchParams,
@@ -67,15 +78,50 @@ export default async function ApplyPage({
             <StatusTag tone={copy.tone}>{copy.tag}</StatusTag>
             {/* mb-0 matters here. Eyebrow renders a <p>, base.css gives every
                 <p> a 16px bottom margin, and flexbox centres the MARGIN box —
-                so items-center was lifting this text 8px above the pill. */}
-            <Eyebrow className="mb-0">{APPLICATION_WINDOW_LABEL}</Eyebrow>
+                so items-center was lifting this text 8px above the pill.
+
+                The label comes from the state. As a constant it read
+                "APPLICATIONS CLOSED · APPLICATIONS OPEN 15 TO 31 AUGUST", the
+                pill and the line beside it disagreeing.
+
+                Closed, it drops out entirely rather than saying it twice: the
+                pill is already "Applications closed" and the label adds only a
+                date. It stays everywhere else, where it is the only status on
+                the page. */}
+            {state === "closed" ? null : (
+              <Eyebrow className="mb-0">{copy.label}</Eyebrow>
+            )}
           </div>
 
           <Heading level={2} as="h1">
             {copy.heading}
           </Heading>
 
-          {state === "closed" ? <Body className="mt-4">{copy.body}</Body> : null}
+          {state === "closed" ? (
+            <>
+              <Body className="mt-4">{copy.body}</Body>
+
+              {/* The one place the site publishes an address, and only while
+                  closed. Every other contact route on this site is the
+                  application form, and the closed page does not render one, so
+                  without this a reader who missed the deadline has nowhere at
+                  all to go. See LATE_APPLICATION_EMAIL. */}
+              <Card tone="sunk" className="mt-6 max-w-measure">
+                <Eyebrow>Missed the deadline?</Eyebrow>
+                <Note className="mt-3">
+                  {CONTACT.lead}{" "}
+                  {/* ctl-hit: a 22px line box is under the 24px WCAG 2.2 target
+                      minimum, and this is the one link a reader who missed the
+                      deadline has to hit. */}
+                  <MailLink
+                    address={CONTACT.email}
+                    className="ctl-hit ctl-link-grow text-ink underline decoration-kowhai underline-offset-[var(--link-underline-offset)] hover:decoration-fern"
+                  />{" "}
+                  {CONTACT.rest}
+                </Note>
+              </Card>
+            </>
+          ) : null}
 
           {/* max-w-measure on the Card, not only on the paragraph inside it.
               Out here the heading block spans the container, and a 1024px card

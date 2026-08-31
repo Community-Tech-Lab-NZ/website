@@ -58,24 +58,75 @@ export function getWindowState(now: Date = new Date()): WindowState {
   return "open";
 }
 
-/** Copy for each state. Sentence case, no dashes, NZ English. */
+/* The address on the closed page, and the one exception to a brand rule.
+ *
+ * brand-guide.md: "No email address yet. There is no inbox that can receive
+ * mail, so no address goes on the site or in the footer. All contact runs
+ * through the application form until one exists." The reason it gives is that
+ * no inbox exists — and this is one, so publishing it meets the reason rather
+ * than defying it.
+ *
+ * It is still a departure, and it is a personal address on a public page, so it
+ * is deliberately kept to /apply in the closed state only: not in the footer,
+ * not on the closing band of five pages. Replace it the moment the programme
+ * has an inbox of its own.
+ *
+ * It exists because closing the window otherwise closes the site's ONLY contact
+ * route. Every other way in is the application form, and the closed page does
+ * not render it. */
+export const LATE_APPLICATION_EMAIL = "stephens.giovanni@gmail.com";
+
+/** Copy for each state. Sentence case, no dashes, NZ English.
+ *
+ *  `label` and `cta` are read by the header, the footer, the home and developer
+ *  heroes and the closing band on every page, which is what stops the rest of
+ *  the site advertising an application that has closed. */
 export const WINDOW_COPY = {
   before: {
     tag: "Opens 15 August",
     tone: "neutral" as const,
+    label: "Applications open 15 to 31 August",
+    cta: { label: "Apply now", href: "/apply" },
     heading: "Applications open on 15 August",
     body: "You can read every question now. Nothing can be submitted until the 15th, but coming prepared makes a real difference to a form this long.",
   },
   open: {
     tag: "Applications open",
     tone: "open" as const,
+    label: "Applications open 15 to 31 August",
+    cta: { label: "Apply now", href: "/apply" },
     heading: "Apply now",
     body: "Applications are open until 31 August.",
   },
   closed: {
     tag: "Applications closed",
     tone: "neutral" as const,
+    label: "Applications closed 31 August",
+    /* Not "Apply now" pointing at a page that cannot take one. The page it
+     * leads to answers exactly this: what happens next, and what to do if you
+     * missed it. */
+    cta: { label: "What happens next", href: "/apply" },
     heading: "Applications have closed",
     body: "A local panel reads every application between 1 and 18 September, and the three builds are announced on 24 September. We reply to everyone.",
+    /* Consideration, not acceptance. Promising a late application would be read
+     * as a second deadline by everyone who made the first one. */
+    contact: {
+      lead: "If something got in the way, write to Giovanni at",
+      email: LATE_APPLICATION_EMAIL,
+      rest: "with your organisation and the problem you wanted solved, in a few sentences. Late applications are read case by case. We would rather hear from you than not.",
+    },
   },
-} satisfies Record<WindowState, { tag: string; tone: string; heading: string; body: string }>;
+} satisfies Record<
+  WindowState,
+  {
+    tag: string;
+    tone: string;
+    label: string;
+    cta: { label: string; href: string };
+    heading: string;
+    body: string;
+    /* Closed only. Optional here so the other two states stay free of it, while
+     * `satisfies` still checks the shape of the one that has it. */
+    contact?: { lead: string; email: string; rest: string };
+  }
+>;

@@ -1,4 +1,5 @@
 import type { TimelineStep } from "@/components/Timeline";
+import { WINDOW_COPY, type WindowState } from "./application-window";
 
 /* Navigation, footer and timeline data, lifted from the prototype.
  *
@@ -50,37 +51,44 @@ export const PARTNER_URLS: Record<string, string> = {
 export const FUNDER_URL =
   "https://www.qldc.govt.nz/community/community-funding/economic-diversification-fund/";
 
-export const FOOTER_COLUMNS: FooterColumn[] = [
-  {
-    title: "Take part",
-    links: [
-      { label: "For organisations", href: "/organisations" },
-      { label: "For developers", href: "/developers" },
-      { label: "Apply now", href: "/apply" },
-    ],
-  },
-  {
-    title: "Programme",
-    links: [
-      { label: "About", href: "/about" },
-      { label: "Programme terms", href: "/terms" },
-      { label: "Privacy", href: "/privacy" },
-    ],
-  },
-  {
-    /* All six are listed at strictly equal weight, in the order the handoff
-     * gives them. An absolute href opens in a new tab; see SiteFooter. */
-    title: "Partners",
-    links: [
-      { label: "Startup Queenstown Lakes", href: PARTNER_URLS["Startup Queenstown Lakes"] },
-      { label: "Queenstown Coders Connect" },
-      { label: "FLINT Queenstown", href: PARTNER_URLS["FLINT Queenstown"] },
-      { label: "Queenstown Resort College", href: PARTNER_URLS["Queenstown Resort College"] },
-      { label: "huddl", href: PARTNER_URLS["huddl"] },
-      { label: "Technology Queenstown", href: PARTNER_URLS["Technology Queenstown"] },
-    ],
-  },
-];
+/* A function rather than a constant because the last "Take part" link is the
+ * apply CTA, and after 31 August "Apply now" in the footer of every page is a
+ * link that lies. Everything else here is fixed. */
+export function footerColumns(state: WindowState): FooterColumn[] {
+  const cta = WINDOW_COPY[state].cta;
+
+  return [
+    {
+      title: "Take part",
+      links: [
+        { label: "For organisations", href: "/organisations" },
+        { label: "For developers", href: "/developers" },
+        { label: cta.label, href: cta.href },
+      ],
+    },
+    {
+      title: "Programme",
+      links: [
+        { label: "About", href: "/about" },
+        { label: "Programme terms", href: "/terms" },
+        { label: "Privacy", href: "/privacy" },
+      ],
+    },
+    {
+      /* All six are listed at strictly equal weight, in the order the handoff
+       * gives them. An absolute href opens in a new tab; see SiteFooter. */
+      title: "Partners",
+      links: [
+        { label: "Startup Queenstown Lakes", href: PARTNER_URLS["Startup Queenstown Lakes"] },
+        { label: "Queenstown Coders Connect" },
+        { label: "FLINT Queenstown", href: PARTNER_URLS["FLINT Queenstown"] },
+        { label: "Queenstown Resort College", href: PARTNER_URLS["Queenstown Resort College"] },
+        { label: "huddl", href: PARTNER_URLS["huddl"] },
+        { label: "Technology Queenstown", href: PARTNER_URLS["Technology Queenstown"] },
+      ],
+    },
+  ];
+}
 
 export const TIMELINE: TimelineStep[] = [
   { date: "15 to 31 Aug", label: "Applications open", done: true },
@@ -90,11 +98,6 @@ export const TIMELINE: TimelineStep[] = [
   { date: "12 Oct to 13 Nov", label: "Five-week build, something to try each week" },
   { date: "26 Nov", label: "Showcase Hui, the three tools demonstrated" },
 ];
-
-/** The application window as copy: the eyebrow on every closing CTA and the
- *  status line on /apply. The actual boundaries live in application-window.ts;
- *  if the dates ever move, both files change together. */
-export const APPLICATION_WINDOW_LABEL = "Applications open 15 to 31 August";
 
 export const FOOTER_NOTE =
   "A Startup Queenstown Lakes programme, funded by the QLDC Economic Diversification Fund";

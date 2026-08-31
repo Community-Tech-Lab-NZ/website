@@ -4,6 +4,7 @@ import { Archivo, Source_Sans_3, Space_Mono } from "next/font/google";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { RouteFade } from "@/components/RouteFade";
+import { getWindowState, WINDOW_COPY } from "@/lib/application-window";
 import { IS_PRODUCTION, SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 import {
   JsonLd,
@@ -63,6 +64,24 @@ const spaceMono = Space_Mono({
  *
  * Deliberately NO maximumScale or userScalable: locking zoom is a WCAG 1.4.4
  * failure, and this form is read by people who need to pinch in on it. */
+/* Every route re-renders at least once a minute.
+ *
+ * The header, the footer and the closing band on every page now read the
+ * application window, and the window turns over on a date rather than on a
+ * request. Nothing in this tree touches a request-time API, so Next cannot see
+ * that time-dependence: at the default (revalidate: false) the open-state HTML
+ * would be prerendered once at build and served for the rest of the year.
+ *
+ * 60 seconds rather than force-dynamic. This keeps ISR and the CDN in front of
+ * it, which next.config.ts already argues for over a nonce-based CSP: pages
+ * stay fast for readers on rural connections. The cost is at most a minute of
+ * stale "Apply now" after midnight on the 31st, and it is cosmetic — /apply is
+ * force-dynamic and /api/apply rejects a late submission server-side, so a
+ * stale button cannot take an application it should not.
+ *
+ * Must stay a literal. Next requires the value to be statically analysable. */
+export const revalidate = 60;
+
 export const viewport: Viewport = {
   themeColor: "#F3EFE3", // --ctl-oat, the header surface
   colorScheme: "light",
@@ -154,6 +173,9 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const state = getWindowState();
+  const headerCta = WINDOW_COPY[state].cta;
+
   return (
     <html
       lang="en-NZ"
@@ -177,7 +199,13 @@ export default function RootLayout({
         >
           Skip to content
         </a>
-        <SiteHeader />
+        {/* The one action in the header follows the window: it stops saying
+            "Apply now", and stops pinging, the moment applications close. */}
+        <SiteHeader
+          actionLabel={headerCta.label}
+          actionHref={headerCta.href}
+          actionPing={state !== "closed"}
+        />
         <main id="main" className="flex flex-1 flex-col">
           <RouteFade>{children}</RouteFade>
         </main>

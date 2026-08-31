@@ -11,6 +11,7 @@ import { Section } from "@/components/Section";
 import { SectionRule } from "@/components/SectionRule";
 import { StatFigure } from "@/components/StatFigure";
 import { Body, Eyebrow, Heading, Lede, Note } from "@/components/Typography";
+import { getWindowState, WINDOW_COPY } from "@/lib/application-window";
 
 /* Home. Copy came verbatim from the prototype, then took a plain-language pass:
  * the owner's read was that a reader could finish the fork without learning what
@@ -50,6 +51,9 @@ const HOW_IT_RUNS = [
 ];
 
 export default function HomePage() {
+  const state = getWindowState();
+  const cta = WINDOW_COPY[state].cta;
+
   return (
     <>
       {/* Hero — the one Ink moment on the site, and the one gold thing in view.
@@ -69,9 +73,16 @@ export default function HomePage() {
           </Lede>
         </Reveal>
 
+        {/* The ping goes with the deadline. Pulsing at a closed window is the
+            site being urgent about nothing. */}
         <Reveal delay={550} className="mt-7">
-          <Button variant="primary" size="hero" href="/apply" className="ctl-cta-ping">
-            Apply now
+          <Button
+            variant="primary"
+            size="hero"
+            href={cta.href}
+            className={state === "closed" ? undefined : "ctl-cta-ping"}
+          >
+            {cta.label}
           </Button>
         </Reveal>
 

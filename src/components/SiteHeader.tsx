@@ -27,7 +27,9 @@ import { useTabIndicator } from "@/hooks/useTabIndicator";
  *    conversion and must never hide behind a menu. It carries the home hero's
  *    treatment — Kowhai, detached ring, same ping — so the CTA a visitor met in
  *    the hero is the CTA that follows them around the site. Only the scale
- *    differs: hero sizing would not sit in a 96px header. It briefly shortened
+ *    differs: hero sizing would not sit in a 96px header. The layout swaps the
+ *    label and drops the ping once applications close; the slot itself does not
+ *    move. It briefly shortened
  *    to "Apply" on phones to buy the lockup room; cropping the lockup to its
  *    ink returned 108px to the row and the abbreviation stopped paying for
  *    itself.
@@ -61,12 +63,15 @@ type SiteHeaderProps = {
   tone?: "oat" | "ink";
   actionLabel?: string;
   actionHref?: string;
+  /** The ping is a deadline signal. It comes off once there is no deadline. */
+  actionPing?: boolean;
 };
 
 export function SiteHeader({
   tone = "oat",
   actionLabel = "Apply now",
   actionHref = "/apply",
+  actionPing = true,
 }: SiteHeaderProps) {
   const dark = tone === "ink";
   const pathname = usePathname();
@@ -215,7 +220,10 @@ export function SiteHeader({
               variant="primary"
               size="sm"
               href={actionHref}
-              className="ctl-cta-ping ctl-cta-ping--offbeat ring-detached"
+              className={clsx(
+                "ring-detached",
+                actionPing && "ctl-cta-ping ctl-cta-ping--offbeat",
+              )}
             >
               {actionLabel}
             </Button>

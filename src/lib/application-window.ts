@@ -58,6 +58,51 @@ export function getWindowState(now: Date = new Date()): WindowState {
   return "open";
 }
 
+/* The late window: one more week, by invitation only.
+ *
+ * Applications closed on 31 August and the site says so on every page. This is
+ * the door held open behind it, for people sent the /apply/late URL directly.
+ * Nothing links to that page and it is not in the sitemap, so the 31 August
+ * deadline stays true for everyone reading the site.
+ *
+ * Exclusive, so the whole of Sunday 6 September counts. +12:00 again: daylight
+ * saving does not resume until 27 September, so this window is NZST throughout,
+ * same as the main one.
+ */
+export const LATE_CLOSES = "2026-09-07T00:00:00+12:00"; // exclusive
+
+/**
+ * Whether a late submission can still be accepted.
+ *
+ * Defined as "the main window has closed AND we are before the late boundary"
+ * rather than as a bare date check, which buys two things. It can never be open
+ * at the same time as the main window, so nobody is ever offered two live forms.
+ * And it closes itself on 7 September with no deploy and nothing to remember.
+ *
+ * `now` is injectable for the same reason getWindowState's is.
+ */
+export function isLateWindowOpen(now: Date = new Date()): boolean {
+  return getWindowState(now) === "closed" && now.getTime() < new Date(LATE_CLOSES).getTime();
+}
+
+/** Copy for /apply/late, in its two states. Same rules as WINDOW_COPY:
+ *  sentence case, no dashes, NZ English. */
+export const LATE_COPY = {
+  open: {
+    tag: "Late submissions",
+    heading: "We can still take this one",
+    /* Says what it is without pretending the deadline did not happen. Someone
+     * sent this link should understand they are being let in, not that they
+     * misread the date. */
+    body: "Applications closed on 31 August. This form is open for a few more days for people we have spoken to directly. It closes at the end of Sunday 6 September, and what you send is read alongside everything else, marked as having come in late.",
+  },
+  closed: {
+    tag: "Closed",
+    heading: "Late submissions have closed too",
+    body: "This page was open until 6 September. The panel is reading applications now, and the three builds are announced on 24 September.",
+  },
+} as const;
+
 /* The address on the closed page, and the one exception to a brand rule.
  *
  * brand-guide.md: "No email address yet. There is no inbox that can receive

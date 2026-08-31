@@ -41,7 +41,21 @@ const PORT = Number(process.env.CDP_PORT || 9344);
    pixel changes what renders. 390 and 430 are the common iPhone widths. */
 const WIDTHS = [320, 359, 360, 390, 430];
 
-const ROUTES = ["/", "/about", "/organisations", "/developers", "/apply", "/terms", "/privacy"];
+/* /apply/late is in here despite being unlisted: it carries the longest form on
+   the site and is the one people will fill in on a phone, so it is the last
+   route that should go unchecked. Listing it leaks nothing the repo does not
+   already show — this is a public repository and the route is a directory in
+   it. */
+const ROUTES = [
+  "/",
+  "/about",
+  "/organisations",
+  "/developers",
+  "/apply",
+  "/apply/late",
+  "/terms",
+  "/privacy",
+];
 
 /* WCAG 2.5.8 AA, which is the line this has to hold. The brand aims higher —
    --tap-target is 48px for the mobile nav — but aiming and conforming are

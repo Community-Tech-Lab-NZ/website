@@ -72,7 +72,19 @@ const nextConfig: NextConfig = {
      * config is loaded by the build before any path alias exists, and a stray
      * import here fails the whole build rather than one page. Seven literals
      * that change about once a year is the cheaper side of that trade. */
-    const routes = ["", "apply", "organisations", "developers", "about", "terms", "privacy"];
+    const routes = [
+      "",
+      "apply",
+      /* Needs this more than any other route: the late form is distributed ONLY
+       * as a link pasted into an email or a chat message, which is exactly the
+       * case the comment above was written for. */
+      "apply/late",
+      "organisations",
+      "developers",
+      "about",
+      "terms",
+      "privacy",
+    ];
 
     return routes.flatMap((route) =>
       TRAILING_PUNCTUATION.flatMap(spellings).map((suffix) => ({

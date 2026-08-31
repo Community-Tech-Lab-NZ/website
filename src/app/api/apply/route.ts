@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getWindowState } from "@/lib/application-window";
+import { getWindowState, isLateWindowOpen } from "@/lib/application-window";
 import {
   communityApplicationSummary,
   developerApplicationSummary,
@@ -107,7 +107,14 @@ export async function POST(request: Request) {
   // Enforced here, not only in the UI: a tab left open since before the window,
   // or a fiddled system clock, must not be able to post outside it. Questions
   // are always allowed, since someone may need to ask before applying.
-  if (data.formType !== "question" && getWindowState() !== "open") {
+  //
+  // The late window (see /apply/late) is the second way in. It is checked
+  // against the clock here rather than trusted from the payload, so knowing the
+  // URL is what gets you in, not editing a field.
+  const late = getWindowState() !== "open";
+  const accepting = !late || isLateWindowOpen();
+
+  if (data.formType !== "question" && !accepting) {
     return NextResponse.json(
       { ok: false, error: "Applications are not open at the moment." },
       { status: 409 },
@@ -224,6 +231,13 @@ export async function POST(request: Request) {
   }
 
   // --- Structured row ----------------------------------------------------
+  /* The panel has to be able to tell a late application from an on-time one,
+   * and this is the cheapest place to say so: the status column already exists,
+   * so no Sheet header has to be edited by hand mid-round to make room. If
+   * triage later overwrites the cell, the fact survives anyway — `_raw` holds
+   * the payload and its timestamp for good. */
+  const status = late ? "New, late" : "New";
+
   try {
     if (data.formType === "community") {
       const keys = Object.keys(COMMUNITY_LABELS);
@@ -231,7 +245,7 @@ export async function POST(request: Request) {
         data.submissionId,
         submittedAtIso,
         docUrl,
-        "New",
+        status,
         ...keys.map((k) => String((data as Record<string, unknown>)[k] ?? "")),
         data.gates.every(Boolean) ? "All six confirmed" : "INCOMPLETE",
       ]);
@@ -242,7 +256,7 @@ export async function POST(request: Request) {
         submittedAtIso,
         docUrl,
         cvUrl,
-        "New",
+        status,
         ...keys.map((k) => String((data as Record<string, unknown>)[k] ?? "")),
       ]);
     } else {

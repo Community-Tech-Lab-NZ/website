@@ -67,7 +67,13 @@ export const SITE_NAME = "Community Tech Lab";
 export const SITE_DESCRIPTION =
   "A civic tech initiative in the Queenstown Lakes District. We pair senior developer mentors with juniors to build open-source digital tools for local community organisations.";
 
-/** Routes in the sitemap, most important first. */
+/** Routes in the sitemap, most important first.
+ *
+ *  /apply/late is missing on purpose. It is the late submission form, handed out
+ *  as a URL to specific people, and listing it here would put it in front of
+ *  everyone who respected the 31 August deadline. The page carries noindex of
+ *  its own; do not add a robots.txt disallow for it either, because robots.txt
+ *  is public and would publish the URL it is meant to be hiding. */
 export const ROUTES = [
   { path: "/", priority: 1.0 },
   { path: "/apply", priority: 0.9 },

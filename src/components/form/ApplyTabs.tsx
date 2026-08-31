@@ -26,9 +26,12 @@ const TABS: { id: ApplyPath; label: string }[] = [
 export function ApplyTabs({
   canSubmit,
   initialPath = "community",
+  basePath = "/apply",
 }: {
   canSubmit: boolean;
   initialPath?: ApplyPath;
+  /** Which route the tabs keep the URL on. /apply/late passes its own. */
+  basePath?: string;
 }) {
   const [path, setPath] = useState<ApplyPath>(initialPath);
 
@@ -65,7 +68,7 @@ export function ApplyTabs({
     // which would otherwise remount both forms and lose whatever is typed in
     // them. Replace, not push, so Back still leaves the page rather than
     // walking the reader through every tab they tried.
-    window.history.replaceState(null, "", applyHref(next));
+    window.history.replaceState(null, "", applyHref(next, basePath));
   }
 
   return (

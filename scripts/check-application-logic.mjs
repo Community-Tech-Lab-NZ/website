@@ -21,7 +21,7 @@ const entry = join(dir, "run.mjs");
 writeFileSync(
   entry,
   `
-import { getWindowState, WINDOW_COPY, LATE_APPLICATION_EMAIL } from ${JSON.stringify(join(process.cwd(), "src/lib/application-window.ts"))};
+import { getWindowState, isLateWindowOpen, WINDOW_COPY, LATE_APPLICATION_EMAIL } from ${JSON.stringify(join(process.cwd(), "src/lib/application-window.ts"))};
 import { communitySchema, developerSchema, questionSchema } from ${JSON.stringify(join(process.cwd(), "src/lib/schemas.ts"))};
 
 const results = [];
@@ -47,6 +47,27 @@ check("14 Aug 1pm UTC is 15 Aug 1am NZ, so open",
   getWindowState(new Date("2026-08-14T13:00:00Z")), "open");
 check("14 Aug 11am UTC is 14 Aug 11pm NZ, so not yet",
   getWindowState(new Date("2026-08-14T11:00:00Z")), "before");
+
+// --- The late window ------------------------------------------------------
+// One more week behind the deadline, for people sent the /apply/late URL. The
+// route accepts a submission on the strength of this, so its boundaries carry
+// the same weight as the main window's.
+check("late window is shut while the main one is open",
+  isLateWindowOpen(new Date("2026-08-20T12:00:00+12:00")), false);
+check("still shut on the last night of the real deadline",
+  isLateWindowOpen(new Date("2026-08-31T23:59:59+12:00")), false);
+check("open the moment applications close",
+  isLateWindowOpen(new Date("2026-09-01T00:00:00+12:00")), true);
+check("open mid week", isLateWindowOpen(new Date("2026-09-03T12:00:00+12:00")), true);
+check("open for the whole of 6 September",
+  isLateWindowOpen(new Date("2026-09-06T23:59:59+12:00")), true);
+check("shut at the first instant of 7 September",
+  isLateWindowOpen(new Date("2026-09-07T00:00:00+12:00")), false);
+check("stays shut afterwards, with no deploy needed",
+  isLateWindowOpen(new Date("2026-10-01T12:00:00+12:00")), false);
+// Same UTC trap as the main window: 6 Sep 1pm UTC is 7 Sep 1am in NZ.
+check("6 Sep 1pm UTC is 7 Sep in NZ, so shut",
+  isLateWindowOpen(new Date("2026-09-06T13:00:00Z")), false);
 
 // --- Window copy ----------------------------------------------------------
 // The header, the footer, both heroes and the closing band on every page read

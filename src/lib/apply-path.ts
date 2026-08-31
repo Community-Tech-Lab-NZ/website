@@ -17,9 +17,13 @@ export type ApplyPath = (typeof APPLY_PATHS)[number];
 
 export const APPLY_PARAM = "for";
 
-/** The apply URL that opens on a given form. */
-export function applyHref(path: ApplyPath): string {
-  return path === "community" ? "/apply" : `/apply?${APPLY_PARAM}=${path}`;
+/** The apply URL that opens on a given form.
+ *
+ *  `base` exists for /apply/late, which reuses ApplyTabs: without it a tab click
+ *  there would rewrite the URL to /apply and quietly move the reader onto a page
+ *  with no form on it. */
+export function applyHref(path: ApplyPath, base = "/apply"): string {
+  return path === "community" ? base : `${base}?${APPLY_PARAM}=${path}`;
 }
 
 /** Anything unrecognised — a stale link, a hand-edited URL, a repeated param

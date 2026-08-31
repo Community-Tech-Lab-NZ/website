@@ -92,6 +92,19 @@ export function SiteHeader({
 
   const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
 
+  /* The action comes off entirely on the late form.
+   *
+   * The layout points it at /apply, which in the closed state renders no form
+   * and offers no way back — so the most prominent button on a page someone is
+   * part way through filling in throws their answers away. The community form
+   * would restore its draft; the developer form keeps none, so those answers
+   * are simply gone.
+   *
+   * Suppressed here rather than passed down from the layout because the layout
+   * is one tree for every route and this is a property of one of them. The
+   * header already knows the path. */
+  const onLateForm = pathname === "/apply/late";
+
   // Sliding underline: rests on the active route, glides to the hovered link,
   // returns on leave. Keyed on pathname so route changes re-measure.
   const { stripRef, barRef, moveTo, rest } = useTabIndicator(pathname);
@@ -215,7 +228,7 @@ export function SiteHeader({
             carries 18px of its own clear space on the left already; a gap on
             top of that is width spent on nothing. */}
         <div className="flex shrink-0 items-center md:gap-4">
-          {actionLabel ? (
+          {actionLabel && !onLateForm ? (
             <Button
               variant="primary"
               size="sm"

@@ -36,6 +36,13 @@ export function generateMetadata(): Metadata {
        Deliberately NOT also a robots.txt disallow: that file is public, so a
        disallow line would publish the URL of the page it is hiding. */
     robots: { index: false, follow: false },
+    /* Self-referential, and it has to be stated. The root layout sets
+       canonical: "/", so without this the page inherits it and tells a crawler
+       "do not index me, and by the way I am really the home page" — the one
+       pairing Google warns about, because the noindex can follow the canonical
+       to its target. Nothing leaks: this URL is only visible to someone already
+       on this URL. */
+    alternates: { canonical: "/apply/late" },
   };
 }
 

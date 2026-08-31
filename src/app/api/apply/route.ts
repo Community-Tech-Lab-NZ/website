@@ -108,9 +108,15 @@ export async function POST(request: Request) {
   // or a fiddled system clock, must not be able to post outside it. Questions
   // are always allowed, since someone may need to ask before applying.
   //
-  // The late window (see /apply/late) is the second way in. It is checked
-  // against the clock here rather than trusted from the payload, so knowing the
-  // URL is what gets you in, not editing a field.
+  // The late window (see /apply/late) is the second way in, and it is a WIDER
+  // door than the unlisted page suggests. This is a clock check and nothing
+  // else: for that week every application POST is accepted, whatever page it
+  // came from. A /apply tab left open since the 31st, or a scripted post, gets
+  // in too. That is tolerable because the row is filed as late either way and
+  // the panel weighs it — but if the week ever needs to be genuinely
+  // invitation-only, the invitation has to travel in the request (a token in
+  // the URL, carried through the payload and checked here), not in the fact
+  // that the URL is unlisted.
   const late = getWindowState() !== "open";
   const accepting = !late || isLateWindowOpen();
 

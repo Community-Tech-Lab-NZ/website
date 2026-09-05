@@ -37,6 +37,7 @@ import {
   questionAlert,
   type Message,
 } from "../src/lib/email";
+import { developerDecline } from "../src/lib/outcome";
 import type { CommunityApplication, DeveloperApplication } from "../src/lib/schemas";
 
 const OUT = join(process.cwd(), ".email-preview");
@@ -171,6 +172,17 @@ const messages: { name: string; message: Message }[] = [
   {
     name: "11-final-call-broadcast-friends",
     message: finalCallBroadcast("open", LIST_REASON.personalContacts, new Date(FINAL_CALL_FROM)),
+  },
+  // The decline. Rendered with an invented applicant, because the real ones are
+  // named people being told no and their names do not belong in a preview
+  // directory. What is being checked here is the tone and the shape, both of
+  // which are the same whoever it is addressed to.
+  {
+    name: "12-developer-decline",
+    message: developerDecline(
+      { firstName: "Sam", email: "sam@example.com" },
+      "giovanni@alcova.ai",
+    ),
   },
 ];
 

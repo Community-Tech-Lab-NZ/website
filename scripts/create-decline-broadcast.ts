@@ -49,7 +49,7 @@ function loadEnv(): void {
 
 /** Where replies go. The letter asks the applicant to reply about the meet-ups
  *  and the WhatsApp channels, so this has to be a mailbox someone reads. */
-const REPLY_TO = ["giovanni@alcova.ai", "pradeesh@gmail.com"];
+const REPLY_TO = ["stephens.giovanni@gmail.com", "pradeesh@gmail.com"];
 
 async function main() {
   const [email, ...nameParts] = process.argv.slice(2);
@@ -127,7 +127,10 @@ async function main() {
     console.log(`Segment "${segmentName}" created: ${segmentId}`);
   }
 
-  const contact = await resend.contacts.create({ email: address, segmentId } as never);
+  // `segments`, not `segmentId`. The contact create takes a list of segment
+  // ids; passing `segmentId` is silently accepted and creates a contact in no
+  // segment at all, which is how the first run of this drafted nothing.
+  const contact = await resend.contacts.create({ email: address, segments: [{ id: segmentId }] });
   if (contact.error) throw new Error(`Could not add ${address} to the segment: ${contact.error.message}`);
 
   /* THE CHECK THAT MATTERS.

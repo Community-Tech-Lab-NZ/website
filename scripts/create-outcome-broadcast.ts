@@ -1,9 +1,13 @@
 #!/usr/bin/env npx tsx
 /**
- * Drafts one applicant's decline into Resend, as a broadcast to a segment
- * containing only them. Never sends.
+ * Drafts one applicant's outcome letter into Resend, as a broadcast to a
+ * segment containing only them. Never sends.
  *
- * Run: pnpm outcome:decline <email> "<Full Name>"
+ * Run: pnpm outcome:draft <kind> <email> "<Full Name>"
+ *
+ * The kinds are `decline`, and `intern-observation` / `intern-practice` — the
+ * two framings of the same intern offer, so two applicants who know each other
+ * do not receive word-for-word identical letters.
  *
  * WHY A BROADCAST AT ALL, FOR ONE PERSON. A broadcast is the only path in this
  * repo that ends at a button in the dashboard rather than at an API call, and
@@ -35,7 +39,7 @@
 import { readFileSync } from "node:fs";
 import { Resend } from "resend";
 import { renderHtmlEmail, renderTextEmail } from "../src/lib/email-template";
-import { developerDecline, firstNameOf } from "../src/lib/outcome";
+import { developerDecline, firstNameOf, juniorInternOffer } from "../src/lib/outcome";
 import { reportAndExit } from "./lib/draft-to-lists";
 
 /** Loads .env without a dependency, leaving anything already exported alone.
@@ -52,10 +56,18 @@ function loadEnv(): void {
 const REPLY_TO = ["stephens.giovanni@gmail.com", "pradeesh@gmail.com"];
 
 async function main() {
-  const [email, ...nameParts] = process.argv.slice(2);
+  /* Which letter, then who it is for.
+   *
+   * The kind is a required first argument rather than a default, because the
+   * two messages say materially different things — one closes the door, the
+   * other holds it open on a condition — and the wrong one sent to the right
+   * person is as bad as the right one sent to the wrong person. */
+  const [kind, email, ...nameParts] = process.argv.slice(2);
   const fullName = nameParts.join(" ");
-  if (!email || !fullName) {
-    throw new Error('Usage: pnpm outcome:decline <email> "<Full Name>"');
+  const KINDS = ["decline", "intern-observation", "intern-practice"] as const;
+  type Kind = (typeof KINDS)[number];
+  if (!KINDS.includes(kind as Kind) || !email || !fullName) {
+    throw new Error(`Usage: pnpm outcome:draft <${KINDS.join("|")}> <email> "<Full Name>"`);
   }
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
     throw new Error(`"${email}" does not look like an email address.`);
@@ -68,7 +80,12 @@ async function main() {
 
   const address = email.toLowerCase();
   const firstName = firstNameOf(fullName);
-  const message = developerDecline({ firstName, email: address }, REPLY_TO.join(", "));
+  const applicant = { firstName, email: address };
+  const replyTo = REPLY_TO.join(", ");
+  const message =
+    kind === "decline"
+      ? developerDecline(applicant, replyTo)
+      : juniorInternOffer(applicant, replyTo, kind === "intern-observation" ? "observation" : "practice");
   const html = renderHtmlEmail(message.content);
   const text = renderTextEmail(message.content);
 
@@ -106,8 +123,9 @@ async function main() {
 
   // A segment of one, named for the applicant so it is obvious in the dashboard
   // what it is and who it reaches.
-  const segmentName = `Outcome, decline, ${fullName}`;
-  const broadcastName = `Decline, ${fullName}`;
+  const label = kind === "decline" ? "Decline" : "Intern offer";
+  const segmentName = `Outcome, ${label.toLowerCase()}, ${fullName}`;
+  const broadcastName = `${label}, ${fullName}`;
 
   const segments = (await resend.segments.list()).data?.data ?? [];
   const existingSegment = segments.find((s) => s.name === segmentName);

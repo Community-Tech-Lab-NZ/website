@@ -37,7 +37,7 @@ import {
   questionAlert,
   type Message,
 } from "../src/lib/email";
-import { developerDecline } from "../src/lib/outcome";
+import { developerDecline, juniorInternOffer } from "../src/lib/outcome";
 import type { CommunityApplication, DeveloperApplication } from "../src/lib/schemas";
 
 const OUT = join(process.cwd(), ".email-preview");
@@ -182,6 +182,26 @@ const messages: { name: string; message: Message }[] = [
     message: developerDecline(
       { firstName: "Sam", email: "sam@example.com" },
       "giovanni@alcova.ai",
+    ),
+  },
+  // Both framings of the intern offer, rendered next to each other. That
+  // adjacency is the check: they go to two people who know each other, so what
+  // matters is that they do not read as the same letter with the name swapped,
+  // while still offering identical terms.
+  {
+    name: "13-intern-offer-observation",
+    message: juniorInternOffer(
+      { firstName: "Sam", email: "sam@example.com" },
+      "giovanni@alcova.ai",
+      "observation",
+    ),
+  },
+  {
+    name: "14-intern-offer-practice",
+    message: juniorInternOffer(
+      { firstName: "Alex", email: "alex@example.com" },
+      "giovanni@alcova.ai",
+      "practice",
     ),
   },
 ];

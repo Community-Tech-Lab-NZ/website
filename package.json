@@ -18,7 +18,7 @@
     "preview:emails": "tsx scripts/preview-emails.ts",
     "broadcast:open": "tsx scripts/create-applications-open-broadcast.ts",
     "broadcast:final": "tsx scripts/create-final-call-broadcast.ts",
-    "outcome:decline": "tsx scripts/create-decline-broadcast.ts",
+    "outcome:draft": "tsx scripts/create-outcome-broadcast.ts",
     "check:mobile": "node scripts/mobile-check.mjs"
   },
   "dependencies": {

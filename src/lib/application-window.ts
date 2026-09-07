@@ -153,12 +153,28 @@ export const WINDOW_COPY = {
     cta: { label: "What happens next", href: "/apply" },
     heading: "Applications have closed",
     body: "A local panel reads every application between 1 and 18 September, and the three builds are announced on 24 September. We reply to everyone.",
-    /* Consideration, not acceptance. Promising a late application would be read
-     * as a second deadline by everyone who made the first one. */
+    /* A contact route, not a way in.
+     *
+     * This asked for "your organisation and the problem you wanted solved" and
+     * said late applications were read case by case. That was true in the days
+     * after 31 August, when the late window was open and a good application
+     * arriving on the 2nd could still be picked up. It stopped being true on
+     * 7 September: the late form closed, and the panel had been reading for a
+     * week. Copy inviting someone to describe their problem, when nothing can
+     * now be done with it, costs them the effort of writing and the programme
+     * the trust it takes to say no afterwards.
+     *
+     * So the door is named accurately. Applications for this cohort are closed
+     * and the sentence says so first, before offering the thing that is
+     * actually on offer, which is a conversation about anything else.
+     *
+     * WRITTEN TO SURVIVE 24 SEPTEMBER. The announcement is referred to as a
+     * fixed date rather than as an upcoming event, so this does not quietly
+     * become wrong on the 24th and need somebody to remember it. */
     contact: {
-      lead: "If something got in the way, write to Giovanni at",
+      lead: "Applications for this cohort are closed and the panel is reading them now. For anything else, a question, a conversation about a future round, or an organisation we should know about, write to Giovanni at",
       email: LATE_APPLICATION_EMAIL,
-      rest: "with your organisation and the problem you wanted solved, in a few sentences. Late applications are read case by case. We would rather hear from you than not.",
+      rest: "The three builds are announced on 24 September, and we reply to everyone who applied.",
     },
   },
 } satisfies Record<

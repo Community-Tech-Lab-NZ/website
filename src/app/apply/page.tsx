@@ -104,10 +104,14 @@ export default async function ApplyPage({
               {/* The one place the site publishes an address, and only while
                   closed. Every other contact route on this site is the
                   application form, and the closed page does not render one, so
-                  without this a reader who missed the deadline has nowhere at
-                  all to go. See LATE_APPLICATION_EMAIL. */}
+                  without this a reader arriving after the deadline has nowhere
+                  at all to go. See LATE_APPLICATION_EMAIL.
+
+                  The eyebrow asked "Missed the deadline?", which invited the
+                  one thing that can no longer be done. It now names what the
+                  card is actually for. */}
               <Card tone="sunk" className="mt-6 max-w-measure">
-                <Eyebrow>Missed the deadline?</Eyebrow>
+                <Eyebrow>Get in touch</Eyebrow>
                 <Note className="mt-3">
                   {CONTACT.lead}{" "}
                   {/* ctl-hit: a 22px line box is under the 24px WCAG 2.2 target

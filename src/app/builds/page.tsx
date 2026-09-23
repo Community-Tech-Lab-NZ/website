@@ -5,7 +5,7 @@ import { Reveal } from "@/components/Reveal";
 import { Section } from "@/components/Section";
 import { SectionRule } from "@/components/SectionRule";
 import { Timeline } from "@/components/Timeline";
-import { Body, Eyebrow, Heading, Lede, Note } from "@/components/Typography";
+import { Body, Eyebrow, Heading, Lede } from "@/components/Typography";
 import { CHOSEN } from "@/lib/announcement";
 import { breadcrumbSchema, JsonLd } from "@/lib/structured-data";
 
@@ -160,14 +160,6 @@ export default function BuildsPage() {
             <Card tone="light" accentRule>
               <Eyebrow className="mb-5">What happens next</Eyebrow>
               <Timeline steps={WHAT_HAPPENS_NEXT} />
-              <div className="mt-6 border-t border-solid border-hairline pt-5">
-                <Eyebrow>What happens to the rest</Eyebrow>
-                <Note className="mt-3">
-                  Far more good applications came in than three, and the ones that did not
-                  get a build this time were not weak. Most were simply bigger than five
-                  weeks. Every organisation that applied hears from us directly.
-                </Note>
-              </div>
             </Card>
           </div>
         </Reveal>

@@ -50,11 +50,21 @@ import { PRODUCTION_URL } from "./site";
  * turns up the reason it should be something else.
  *
  * THE UNSUCCESSFUL APPLICANTS READ THIS TOO. Some of them are on these lists,
- * and every one of them was told the three builds would be announced today. The
- * message cannot read as a victory lap over their heads. Two things carry that:
- * the "What happens to the rest" section, which is not padding and must not be
- * cut for length, and the absence of any word like "winners". Nobody won
+ * and every one of them was told the three builds would be announced today, so
+ * the message cannot read as a victory lap over their heads.
+ *
+ * It carried a "What happens to the rest" section for exactly that, and that
+ * section was removed on 23 September at the Chair's direction: the individual
+ * replies to unsuccessful applicants carry it instead, and saying it twice made
+ * the announcement read as half apology. What still holds the line here is the
+ * thanks in the opening paragraph, which is why it comes before the news rather
+ * than after it, and the absence of any word like "winners". Nobody won
  * anything; three problems fitted a five-week build and a great many did not.
+ *
+ * If a future round restores the section, restore it as its own labelled
+ * section rather than a clause bolted onto the outro. A sentence about the
+ * people who were not chosen, buried in a paragraph asking readers to forward
+ * the email, is worse than not saying it.
  *
  * NO CONGRATULATIONS, NO EXCLAMATION MARKS, NO "WE ARE THRILLED". The brand
  * guide bans the exclamation mark outright and the register is plain
@@ -274,18 +284,6 @@ export function announcementBroadcast(
             "Everything made is open source. What gets built for these three is there for any other organisation in the district to pick up and use.",
           ],
           meta: WHAT_HAPPENS_NEXT,
-        },
-        {
-          /* NOT OPTIONAL, AND NOT TO BE CUT FOR LENGTH. See the top of this
-           * file. The organisations that applied and were not chosen are on
-           * these lists, they were promised a reply, and this section is where
-           * an announcement email stops being a thing that happens to other
-           * people. */
-          label: "What happens to the rest",
-          paragraphs: [
-            "Far more good applications came in than three, and the ones that did not get a build this time were not weak. Most of them were simply bigger than five weeks, or needed something we could not commit to supporting afterwards.",
-            "Every organisation that applied hears from us directly. If you applied and have not had a reply, it is coming, and you can reply to this email to chase it.",
-          ],
         },
       ],
       outro: [

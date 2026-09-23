@@ -471,17 +471,40 @@ function htmlLink(href: string, label: string): string {
  * the label on its own line above the value at narrow widths, which is what the
  * classes here are for. A client that drops the <style> block keeps the two
  * columns, which is the same layout it has always had rather than a broken one. */
+/* Named facts, one per row: the value first, the label under it.
+ *
+ * STACKED IN THE MARKUP, NOT BY A MEDIA QUERY, and that is the whole point of
+ * this shape.
+ *
+ * It was two columns at 34% and 66%, with a breakpoint that set both cells to
+ * `display:block` under 620px so they stacked on a phone. Gmail broke it. It
+ * rewrites and rescopes `@media` blocks, and it applied the two `display:block`
+ * rules while dropping the padding rules that went with them, so on a DESKTOP
+ * the cells became blocks still carrying `padding:12px 0` and the label wrapped
+ * around the value: "Designing each solution, with28 September to 9 October /
+ * the organisation". Unreadable, and only visible in Gmail.
+ *
+ * One cell per row cannot do that. There is no second column to collapse
+ * against, no width to honour, and nothing for a media query to half-apply. It
+ * renders the same everywhere, which for a table of dates that has already gone
+ * out in three broadcasts is worth more than the columns were.
+ *
+ * VALUE FIRST, because it is what the reader is scanning for, and because it is
+ * the shorter of the two. The label under it in muted ink reads as a caption on
+ * the date rather than as a second fact. */
 function htmlMeta(meta: EmailMeta[]): string {
   const rows = meta
     .map(
       (item) => `
         <tr>
-          <td class="ctl-meta-l" style="padding:12px 0;border-top:1px solid ${HAIRLINE};font-family:${BODY};font-size:14px;line-height:1.5;color:${INK_MUTED};" width="34%" valign="top">${escapeHtml(item.label)}</td>
-          <td class="ctl-meta-v" style="padding:12px 0;border-top:1px solid ${HAIRLINE};font-family:${BODY};font-size:14px;line-height:1.5;color:${INK};word-break:break-word;" valign="top">${
-            item.href
-              ? htmlLink(item.href, item.display ?? item.value)
-              : escapeHtml(item.display ?? item.value)
-          }</td>
+          <td style="padding:12px 0;border-top:1px solid ${HAIRLINE};" valign="top">
+            <p style="margin:0;font-family:${BODY};font-size:15px;line-height:1.5;color:${INK};word-break:break-word;">${
+              item.href
+                ? htmlLink(item.href, item.display ?? item.value)
+                : escapeHtml(item.display ?? item.value)
+            }</p>
+            <p style="margin:2px 0 0;font-family:${BODY};font-size:14px;line-height:1.5;color:${INK_MUTED};">${escapeHtml(item.label)}</p>
+          </td>
         </tr>`,
     )
     .join("");
@@ -849,12 +872,9 @@ export function renderHtmlEmail(content: EmailContent): string {
   @media only screen and (max-width:620px){
     .ctl-pad{padding-left:24px!important;padding-right:24px!important}
     .ctl-heading{font-size:26px!important}
-    /* Key dates stack: label on its own line, value under it. The hairline
-       moves to the label, which is now the top of each pair, so the rule still
-       separates rows rather than splitting one in half. */
-    .ctl-meta-l,.ctl-meta-v{display:block!important;width:auto!important}
-    .ctl-meta-l{padding:14px 0 0!important}
-    .ctl-meta-v{padding:2px 0 14px!important;border-top:0!important;font-size:15px!important}
+    /* Nothing here for the key dates any more. They stack in the markup, one
+       cell per row; see htmlMeta for what Gmail did to the two-column version.
+       Do not reintroduce a class here that only a media query honours. */
   }
 </style>
 </head>

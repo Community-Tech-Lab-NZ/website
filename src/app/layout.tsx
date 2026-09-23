@@ -4,7 +4,8 @@ import { Archivo, Source_Sans_3, Space_Mono } from "next/font/google";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { RouteFade } from "@/components/RouteFade";
-import { getWindowState, WINDOW_COPY } from "@/lib/application-window";
+import { getSiteCopy, getWindowState } from "@/lib/application-window";
+import { nav } from "@/lib/navigation";
 import { IS_PRODUCTION, SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 import {
   JsonLd,
@@ -174,7 +175,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const state = getWindowState();
-  const headerCta = WINDOW_COPY[state].cta;
+  const headerCta = getSiteCopy().cta;
 
   return (
     <html
@@ -199,9 +200,11 @@ export default function RootLayout({
         >
           Skip to content
         </a>
-        {/* The one action in the header follows the window: it stops saying
-            "Apply now", and stops pinging, the moment applications close. */}
+        {/* The one action in the header follows the window, then the
+            announcement: it stops saying "Apply now", and stops pinging, the
+            moment applications close. */}
         <SiteHeader
+          nav={nav()}
           actionLabel={headerCta.label}
           actionHref={headerCta.href}
           actionPing={state !== "closed"}

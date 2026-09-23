@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Button } from "@/components/Button";
 import { CaretList } from "@/components/CaretList";
 import { ClosingCta } from "@/components/ClosingCta";
 import { KeyDatesCard } from "@/components/KeyDatesCard";
@@ -7,6 +8,8 @@ import { ScoringTable, SCORING_ORGANISATIONS } from "@/components/ScoringTable";
 import { Section } from "@/components/Section";
 import { SectionRule } from "@/components/SectionRule";
 import { Body, Eyebrow, Heading, Lede, Note } from "@/components/Typography";
+import { CHOSEN } from "@/lib/announcement";
+import { isAnnounced } from "@/lib/application-window";
 import { breadcrumbSchema, JsonLd } from "@/lib/structured-data";
 
 /* For organisations. Copy transcribed verbatim from the prototype.
@@ -33,7 +36,12 @@ const WHAT_IT_INVOLVES = [
   "After that: the code is open source, so you are never locked in",
 ];
 
+/* "A, B and C", for the lede. */
+const CHOSEN_NAMES = `${CHOSEN.slice(0, -1).map((b) => b.name).join(", ")} and ${CHOSEN.at(-1)!.name}`;
+
 export default function OrganisationsPage() {
+  const announced = isAnnounced();
+
   return (
     <>
       <JsonLd
@@ -45,15 +53,33 @@ export default function OrganisationsPage() {
       <Section drift="hero" className="pb-7">
         <Eyebrow className="mb-4">For community organisations</Eyebrow>
         <Heading level={1} fluid className="max-w-[var(--page-heading-max)]">
-          Tell us a problem. We build you the tool to fix it.
+          {announced
+            ? "A real problem, and a local team to fix it."
+            : "Tell us a problem. We build you the tool to fix it."}
         </Heading>
-        <Lede className="mt-6">
-          Three tools are built at the same time, each one aimed at as many organisations
-          as the problem allows, sometimes several, sometimes one. Each is matched with a
-          small team of local developers working at community rates, well under what they
-          charge commercially. Over five weeks they work out what would help most, build
-          it, and hand it over. There is no cost to your organisation.
-        </Lede>
+        {announced ? (
+          <>
+            <Lede className="mt-6">
+              This round, three organisations bring a problem each: {CHOSEN_NAMES}.
+              Each is matched with a small team of local developers working at community
+              rates. Over five weeks they work out what would help most, build it, and hand
+              it over, at no cost to the organisation.
+            </Lede>
+            <div className="mt-7">
+              <Button variant="secondary" href="/builds">
+                Meet the three
+              </Button>
+            </div>
+          </>
+        ) : (
+          <Lede className="mt-6">
+            Three tools are built at the same time, each one aimed at as many organisations
+            as the problem allows, sometimes several, sometimes one. Each is matched with a
+            small team of local developers working at community rates, well under what they
+            charge commercially. Over five weeks they work out what would help most, build
+            it, and hand it over. There is no cost to your organisation.
+          </Lede>
+        )}
       </Section>
 
       <SectionRule variant="gold" />
@@ -64,7 +90,7 @@ export default function OrganisationsPage() {
             <div>
               <Heading level={2}>What taking part actually involves</Heading>
               <Body className="mt-5">
-                One named contact person. Roughly one to two hours a week during the
+                {announced ? "For each of the three: one" : "One"} named contact person. Roughly one to two hours a week during the
                 build to answer questions and test progress. A willingness to give honest
                 feedback as it takes shape. That is the whole ask. You do not need any
                 technical knowledge and you do not need to write a specification.
@@ -74,16 +100,20 @@ export default function OrganisationsPage() {
               </div>
             </div>
 
+            {/* Once announced the eligibility note goes with nothing in its
+                place: a second round is not decided. */}
             <KeyDatesCard>
-              <div className="mt-6 border-t border-solid border-hairline pt-5">
-                <Eyebrow>Who can apply</Eyebrow>
-                <Note className="mt-3">
-                  Not-for-profits, registered charities, marae, sports clubs, community
-                  groups and incorporated societies based in the Queenstown Lakes
-                  district. Businesses can be eligible where what gets built serves the
-                  community rather than commercial gain.
-                </Note>
-              </div>
+              {announced ? null : (
+                <div className="mt-6 border-t border-solid border-hairline pt-5">
+                  <Eyebrow>Who can apply</Eyebrow>
+                  <Note className="mt-3">
+                    Not-for-profits, registered charities, marae, sports clubs, community
+                    groups and incorporated societies based in the Queenstown Lakes
+                    district. Businesses can be eligible where what gets built serves the
+                    community rather than commercial gain.
+                  </Note>
+                </div>
+              )}
             </KeyDatesCard>
           </div>
         </Reveal>
@@ -93,9 +123,10 @@ export default function OrganisationsPage() {
         <Reveal>
           <div className="grid grid-cols-1 items-start gap-9 lg:grid-aside">
             <div>
-              <Eyebrow className="mb-4">How we choose</Eyebrow>
+              <Eyebrow className="mb-4">{announced ? "How the three were chosen" : "How we choose"}</Eyebrow>
               <Heading level={3} as="h2">
-                A panel of local tech and community people reads every application
+                A panel of local tech and community people {announced ? "read" : "reads"} every
+                application
               </Heading>
               <Body className="mt-4">
                 Reuse carries real weight, because only three tools get built. If five

@@ -4,7 +4,7 @@ import { CaretList } from "@/components/CaretList";
 import { Reveal } from "@/components/Reveal";
 import { Section } from "@/components/Section";
 import { Body, Eyebrow, Heading } from "@/components/Typography";
-import { getWindowState, WINDOW_COPY } from "@/lib/application-window";
+import { getSiteCopy, getWindowState, isAnnounced } from "@/lib/application-window";
 
 /* 404.
  *
@@ -27,7 +27,8 @@ export const metadata: Metadata = {
 
 export default function NotFound() {
   const state = getWindowState();
-  const cta = WINDOW_COPY[state].cta;
+  const cta = getSiteCopy().cta;
+  const announced = isAnnounced();
   const open = state !== "closed";
 
   return (
@@ -45,12 +46,14 @@ export default function NotFound() {
         <div className="mt-7">
           <CaretList
             items={[
-              {
-                content: open
-                  ? "Apply, if applications are open"
-                  : "What happens now applications have closed",
-                href: "/apply",
-              },
+              announced
+                ? { content: "The three builds this round", href: "/builds" }
+                : {
+                    content: open
+                      ? "Apply, if applications are open"
+                      : "What happens now applications have closed",
+                    href: "/apply",
+                  },
               { content: "What is involved for community organisations", href: "/organisations" },
               { content: "The paid developer roles", href: "/developers" },
               { content: "Why the programme exists", href: "/about" },

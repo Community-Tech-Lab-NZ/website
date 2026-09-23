@@ -21,7 +21,8 @@ const entry = join(dir, "run.mjs");
 writeFileSync(
   entry,
   `
-import { getWindowState, isLateWindowOpen, WINDOW_COPY, LATE_APPLICATION_EMAIL } from ${JSON.stringify(join(process.cwd(), "src/lib/application-window.ts"))};
+import { getWindowState, isLateWindowOpen, WINDOW_COPY, LATE_APPLICATION_EMAIL, isAnnounced, getSiteCopy, getContact } from ${JSON.stringify(join(process.cwd(), "src/lib/application-window.ts"))};
+import { timeline } from ${JSON.stringify(join(process.cwd(), "src/lib/navigation.ts"))};
 import { communitySchema, developerSchema, questionSchema } from ${JSON.stringify(join(process.cwd(), "src/lib/schemas.ts"))};
 
 const results = [];
@@ -90,6 +91,34 @@ check("the address looks like an address",
   /^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$/.test(LATE_APPLICATION_EMAIL), true);
 check("no address is published while applications are open",
   "contact" in WINDOW_COPY.open || "contact" in WINDOW_COPY.before, false);
+
+// --- The announcement -----------------------------------------------------
+// The site switches itself to the three builds, with no deploy.
+check("not announced on the 23rd", isAnnounced(new Date("2026-09-23T23:59:59+12:00")), false);
+check("announced from the first instant of the 24th",
+  isAnnounced(new Date("2026-09-24T00:00:00+12:00")), true);
+check("before the announcement the CTA is still the closed one",
+  getSiteCopy(new Date("2026-09-23T12:00:00+12:00")).cta.href, "/apply");
+check("once announced every CTA leads to the builds",
+  getSiteCopy(new Date("2026-09-25T12:00:00+12:00")).cta.href, "/builds");
+const announcedText = JSON.stringify([
+  getSiteCopy(new Date("2026-09-25T12:00:00+12:00")),
+  getContact(new Date("2026-09-25T12:00:00+12:00")),
+]).toLowerCase();
+check("announced copy does not say the panel is still reading",
+  /reading|are announced|is announced/.test(announcedText), false);
+check("announced copy does not invite problems for another round",
+  /second round|future round|next round/.test(announcedText), false);
+check("announced contact keeps the address",
+  getContact(new Date("2026-09-25T12:00:00+12:00")).email, LATE_APPLICATION_EMAIL);
+check("forms stay shut once announced",
+  getWindowState(new Date("2026-09-25T12:00:00+12:00")), "closed");
+check("timeline on 25 Sep: first three done, rest ahead",
+  timeline(new Date("2026-09-25T12:00:00+12:00")).map((s) => s.done),
+  [true, true, true, false, false, false]);
+check("timeline on 23 Sep: announcement not yet done",
+  timeline(new Date("2026-09-23T12:00:00+12:00")).map((s) => s.done),
+  [true, true, false, false, false, false]);
 
 // --- Eligibility gates ----------------------------------------------------
 const baseCommunity = {

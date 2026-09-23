@@ -1,7 +1,7 @@
 import { Card } from "./Card";
 import { Timeline } from "./Timeline";
 import { Eyebrow } from "./Typography";
-import { TIMELINE } from "@/lib/navigation";
+import { timeline } from "@/lib/navigation";
 
 /* The "Key dates" card that rides beside the main column on four pages
  * (home, /developers, /organisations, /apply). One source for the
@@ -12,7 +12,7 @@ export function KeyDatesCard({ children }: { children?: React.ReactNode }) {
   return (
     <Card tone="light" accentRule>
       <Eyebrow className="mb-5">Key dates</Eyebrow>
-      <Timeline steps={TIMELINE} />
+      <Timeline steps={timeline()} />
       {children}
     </Card>
   );

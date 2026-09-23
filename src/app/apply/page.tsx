@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
 import { KeyDatesCard } from "@/components/KeyDatesCard";
 import { MailLink } from "@/components/MailLink";
@@ -9,11 +10,13 @@ import { StatusTag } from "@/components/StatusTag";
 import { Body, Eyebrow, Heading, Note } from "@/components/Typography";
 import { ApplyTabs } from "@/components/form/ApplyTabs";
 import { APPLY_PARAM, parseApplyPath } from "@/lib/apply-path";
-import { getWindowState, WINDOW_COPY } from "@/lib/application-window";
-
-/* Read off the closed entry directly. WINDOW_COPY[state] is a union of the
- * three states and only this one carries a contact block. */
-const CONTACT = WINDOW_COPY.closed.contact;
+import {
+  ANNOUNCED_COPY,
+  getContact,
+  getSiteCopy,
+  getWindowState,
+  isAnnounced,
+} from "@/lib/application-window";
 
 /* Apply.
  *
@@ -43,7 +46,9 @@ export function generateMetadata(): Metadata {
 
   return {
     title: closed ? "Applications have closed" : "Apply by 31 August",
-    description: closed
+    description: isAnnounced()
+      ? ANNOUNCED_COPY.body
+      : closed
       ? "Applications closed on 31 August. A local panel reads every application between 1 and 18 September, and the three builds are announced on 24 September."
       : "Applications are open 15 to 31 August for community organisations and developers in the Queenstown Lakes district. You do not need to be technical.",
     alternates: { canonical: "/apply" },
@@ -57,8 +62,9 @@ export default async function ApplyPage({
 }) {
   const path = parseApplyPath((await searchParams)[APPLY_PARAM]);
   const state = getWindowState();
-  const copy = WINDOW_COPY[state];
+  const copy = getSiteCopy();
   const canSubmit = state === "open";
+  const contact = getContact();
 
   return (
     <>
@@ -101,6 +107,14 @@ export default async function ApplyPage({
             <>
               <Body className="mt-4">{copy.body}</Body>
 
+              {isAnnounced() ? (
+                <div className="mt-6">
+                  <Button variant="primary" href={copy.cta.href}>
+                    {copy.cta.label}
+                  </Button>
+                </div>
+              ) : null}
+
               {/* The one place the site publishes an address, and only while
                   closed. Every other contact route on this site is the
                   application form, and the closed page does not render one, so
@@ -113,15 +127,15 @@ export default async function ApplyPage({
               <Card tone="sunk" className="mt-6 max-w-measure">
                 <Eyebrow>Get in touch</Eyebrow>
                 <Note className="mt-3">
-                  {CONTACT.lead}{" "}
+                  {contact.lead}{" "}
                   {/* ctl-hit: a 22px line box is under the 24px WCAG 2.2 target
                       minimum, and this is the one link a reader who missed the
                       deadline has to hit. */}
                   <MailLink
-                    address={CONTACT.email}
+                    address={contact.email}
                     className="ctl-hit ctl-link-grow text-ink underline decoration-kowhai underline-offset-[var(--link-underline-offset)] hover:decoration-fern"
                   />{" "}
-                  {CONTACT.rest}
+                  {contact.rest}
                 </Note>
               </Card>
             </>

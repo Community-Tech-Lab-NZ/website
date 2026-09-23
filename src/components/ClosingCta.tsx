@@ -1,6 +1,6 @@
 import { CalloutBanner } from "./CalloutBanner";
 import { Section } from "./Section";
-import { getWindowState, WINDOW_COPY } from "@/lib/application-window";
+import { getSiteCopy, getWindowState, isAnnounced } from "@/lib/application-window";
 
 /* The Ink band that closes every content page: same window eyebrow, same
  * action, only the title and note vary per page. Extracted so the window
@@ -16,6 +16,8 @@ import { getWindowState, WINDOW_COPY } from "@/lib/application-window";
  * is nothing page-specific left to say: what happens next is the same wherever
  * you were reading. The button leads to /apply, which is the one page that
  * carries the whole answer, including how to reach us if you missed it.
+ *
+ * Once the three are announced, every page closes on them instead.
  */
 
 export function ClosingCta({
@@ -27,9 +29,23 @@ export function ClosingCta({
   note: string;
   actionHref?: string;
 }) {
-  const state = getWindowState();
-  const copy = WINDOW_COPY[state];
-  const closed = state === "closed";
+  const copy = getSiteCopy();
+  const closed = getWindowState() === "closed";
+
+  if (isAnnounced()) {
+    return (
+      <Section tone="ink" tight>
+        <CalloutBanner
+          bare
+          eyebrow={copy.label}
+          title="Meet the three"
+          note="Three local organisations, three problems, and five weeks of building from 12 October."
+          actionLabel={copy.cta.label}
+          actionHref={copy.cta.href}
+        />
+      </Section>
+    );
+  }
 
   return (
     <Section tone="ink" tight>

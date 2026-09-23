@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { AudiencePath } from "@/components/AudiencePath";
 import { Button } from "@/components/Button";
 import { ClosingCta } from "@/components/ClosingCta";
@@ -11,7 +12,8 @@ import { Section } from "@/components/Section";
 import { SectionRule } from "@/components/SectionRule";
 import { StatFigure } from "@/components/StatFigure";
 import { Body, Eyebrow, Heading, Lede, Note } from "@/components/Typography";
-import { getWindowState, WINDOW_COPY } from "@/lib/application-window";
+import { CHOSEN } from "@/lib/announcement";
+import { getSiteCopy, getWindowState, isAnnounced } from "@/lib/application-window";
 
 /* Home. Copy came verbatim from the prototype, then took a plain-language pass:
  * the owner's read was that a reader could finish the fork without learning what
@@ -36,12 +38,14 @@ export const metadata: Metadata = {
     "Local developers build software for community organisations across the Queenstown Lakes district, at no cost to the organisation.",
 };
 
-const HERO_STATS = [
-  { figure: "3", label: "Tools to be built" },
-  { figure: "6", label: "Paid developer seats" },
-  { figure: "5 weeks", label: "One build, start to finish" },
-  { figure: "Open source", label: "Free to reuse" },
-];
+function heroStats(announced: boolean) {
+  return [
+    { figure: "3", label: announced ? "Tools being built" : "Tools to be built" },
+    { figure: "6", label: "Paid developer seats" },
+    { figure: "5 weeks", label: "One build, start to finish" },
+    { figure: "Open source", label: "Free to reuse" },
+  ];
+}
 
 const HOW_IT_RUNS = [
   "A panel of local tech and community people reads every application",
@@ -52,7 +56,11 @@ const HOW_IT_RUNS = [
 
 export default function HomePage() {
   const state = getWindowState();
-  const cta = WINDOW_COPY[state].cta;
+  const announced = isAnnounced();
+  const cta = getSiteCopy().cta;
+  const howItRuns = announced
+    ? ["A panel of local tech and community people read every application", ...HOW_IT_RUNS.slice(1)]
+    : HOW_IT_RUNS;
 
   return (
     <>
@@ -93,7 +101,7 @@ export default function HomePage() {
           delay={700}
           className="mt-9 grid grid-cols-[repeat(auto-fit,minmax(var(--hero-stat-min),max-content))] gap-x-8 gap-y-3"
         >
-          {HERO_STATS.map((stat) => (
+          {heroStats(announced).map((stat) => (
             <StatFigure
               key={stat.label}
               inverse
@@ -109,12 +117,44 @@ export default function HomePage() {
       </Section>
       <SectionRule variant="gold" />
 
+      {/* The three, once announced. Same order as the email and unnumbered;
+          see CHOSEN. */}
+      {announced ? (
+        <Section>
+          <Reveal>
+            <Eyebrow as="h2" className="mb-5">This round</Eyebrow>
+            <div className="grid grid-fit gap-6">
+              {CHOSEN.map((build) => (
+                <article key={build.slug}>
+                  <Image
+                    src={`/images/builds/${build.slug}.jpg`}
+                    alt={build.image.alt}
+                    width={1120}
+                    height={747}
+                    sizes="(min-width: 1024px) 33vw, 100vw"
+                    className="h-auto w-full rounded-card"
+                  />
+                  <Eyebrow className="mt-5 mb-3">{build.place}</Eyebrow>
+                  <Heading level={3}>{build.name}</Heading>
+                  <Note className="mt-3">{build.short}</Note>
+                </article>
+              ))}
+            </div>
+            <div className="mt-7">
+              <Button variant="secondary" href={cta.href}>
+                {cta.label}
+              </Button>
+            </div>
+          </Reveal>
+        </Section>
+      ) : null}
+
       {/* Two ways in — the audience fork */}
       <Section>
         <Reveal>
           {/* Was "Two ways in", which framed the programme as a pair of doors
               you had to pick between. "Get involved" is an invitation. */}
-          <Eyebrow as="h2" className="mb-5">Get involved</Eyebrow>
+          <Eyebrow as="h2" className="mb-5">{announced ? "How it works" : "Get involved"}</Eyebrow>
           {/* min(): a bare minmax(320px,1fr) track does not shrink below its
               minimum, so on a phone narrower than 320 plus gutters the card
               pushed out of the container and took the whole page into
@@ -123,8 +163,16 @@ export default function HomePage() {
             <AudiencePath
               audience="community"
               eyebrow="For community organisations"
-              title="Tell us a problem. A local team builds you the tool to fix it."
-              blurb="We work out what to build with you, build it around the way you already work, and train your people to use it. It costs your organisation nothing."
+              title={
+                announced
+                  ? "One real problem. A local team builds the tool to fix it."
+                  : "Tell us a problem. A local team builds you the tool to fix it."
+              }
+              blurb={
+                announced
+                  ? "Each team works out what to build with its organisation, builds it around the way they already work, and trains their people to use it. It costs the organisation nothing."
+                  : "We work out what to build with you, build it around the way you already work, and train your people to use it. It costs your organisation nothing."
+              }
               points={[
                 "No cost to your organisation",
                 "One to two hours a week, from one person at your end",
@@ -181,8 +229,8 @@ export default function HomePage() {
                 Everything is <span className="ctl-sweep-gold">open source</span>
               </Heading>
               <Body className="mt-4">
-                Only three tools get built, so each one is chosen partly on how many
-                organisations it could serve. If five need the same thing, the aim is to
+                Only three tools get built, so each one {announced ? "was" : "is"} chosen
+                partly on how many organisations it could serve. If five need the same thing, the aim is to
                 build it once so all five can use it, rather than once for one of them.
               </Body>
             </div>
@@ -200,14 +248,14 @@ export default function HomePage() {
                 Planned properly and led by senior developers, not a rushed side project
               </Heading>
               <Body className="mt-5">
-                Three tools are chosen by open application, each one picked so more than
-                one organisation can use it. Each is matched with a small team of local
+                Three tools {announced ? "were" : "are"} chosen by open application, each
+                one picked so more than one organisation can use it. Each is matched with a small team of local
                 developers, led by a senior developer. The programme
                 is run by Startup Queenstown Lakes and funded by the Queenstown Lakes
                 District Council Economic Diversification Fund.
               </Body>
               <div className="mt-6">
-                <CaretList items={HOW_IT_RUNS} />
+                <CaretList items={howItRuns} />
               </div>
             </div>
 

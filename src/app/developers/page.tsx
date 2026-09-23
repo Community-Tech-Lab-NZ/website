@@ -10,7 +10,7 @@ import { SectionRule } from "@/components/SectionRule";
 import { StatFigure } from "@/components/StatFigure";
 import { Body, Eyebrow, Heading, Lede, Note } from "@/components/Typography";
 import { applyHref } from "@/lib/apply-path";
-import { getWindowState, WINDOW_COPY } from "@/lib/application-window";
+import { getSiteCopy, getWindowState, isAnnounced } from "@/lib/application-window";
 import { FEE_NOTE, ROLES } from "@/lib/roles";
 import { breadcrumbSchema, JsonLd, jobPostingsSchema } from "@/lib/structured-data";
 
@@ -41,7 +41,8 @@ const WHAT_YOU_GET = [
 
 export default function DevelopersPage() {
   const state = getWindowState();
-  const cta = WINDOW_COPY[state].cta;
+  const announced = isAnnounced();
+  const cta = getSiteCopy().cta;
 
   return (
     <>
@@ -49,9 +50,11 @@ export default function DevelopersPage() {
           date, which is exactly what JobPosting describes. Marking them up means
           a developer searching for work in the district can find them without
           ever having heard of the programme. */}
+      {/* The postings go once the seats are filled; their validThrough has
+          passed anyway. */}
       <JsonLd
         data={[
-          ...jobPostingsSchema(),
+          ...(announced ? [] : jobPostingsSchema()),
           breadcrumbSchema([
             { name: "Home", path: "/" },
             { name: "For developers", path: "/developers" },
@@ -66,8 +69,9 @@ export default function DevelopersPage() {
           Paid work, real users, and code you can point at.
         </Heading>
         <Lede inverse className="mt-6">
-          Six paid seats across three teams, three senior and three junior, plus unpaid
-          intern places.
+          {announced
+            ? "Six paid seats across three teams, three senior and three junior, plus unpaid intern places. This round's teams are building for the three chosen organisations from 28 September."
+            : "Six paid seats across three teams, three senior and three junior, plus unpaid intern places."}
         </Lede>
 
         <div className="mt-8 grid grid-cols-[repeat(auto-fit,minmax(var(--hero-stat-min),max-content))] gap-8">

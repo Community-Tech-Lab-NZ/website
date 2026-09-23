@@ -8,7 +8,13 @@ import { StatusTag } from "@/components/StatusTag";
 import { Body, Eyebrow, Heading, Note } from "@/components/Typography";
 import { ApplyTabs } from "@/components/form/ApplyTabs";
 import { APPLY_PARAM, parseApplyPath } from "@/lib/apply-path";
-import { isLateWindowOpen, LATE_COPY, WINDOW_COPY } from "@/lib/application-window";
+import {
+  getContact,
+  isAnnounced,
+  isLateWindowOpen,
+  LATE_ANNOUNCED_BODY,
+  LATE_COPY,
+} from "@/lib/application-window";
 
 /* Late submissions. Both forms, one more week, by invitation.
  *
@@ -46,7 +52,6 @@ export function generateMetadata(): Metadata {
   };
 }
 
-const CONTACT = WINDOW_COPY.closed.contact;
 
 export default async function LateApplyPage({
   searchParams,
@@ -56,6 +61,8 @@ export default async function LateApplyPage({
   const path = parseApplyPath((await searchParams)[APPLY_PARAM]);
   const open = isLateWindowOpen();
   const copy = open ? LATE_COPY.open : LATE_COPY.closed;
+  const body = !open && isAnnounced() ? LATE_ANNOUNCED_BODY : copy.body;
+  const CONTACT = getContact();
 
   return (
     <>
@@ -69,7 +76,7 @@ export default async function LateApplyPage({
             {copy.heading}
           </Heading>
 
-          <Body className="mt-4">{copy.body}</Body>
+          <Body className="mt-4">{body}</Body>
 
           {open ? (
             <ApplyTabs canSubmit initialPath={path} basePath="/apply/late" />

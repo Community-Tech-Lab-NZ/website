@@ -5,7 +5,6 @@ import { ExternalLink } from "./ExternalLink";
 import { FunderCredit } from "./FunderCredit";
 import { AnimatedLockup } from "./AnimatedLockup";
 import { footerColumns, FOOTER_NOTE, OPEN_SOURCE_NOTE } from "@/lib/navigation";
-import { getWindowState } from "@/lib/application-window";
 
 /* Site footer on Ink: primary lockup, link columns, funder credit.
  *
@@ -48,7 +47,7 @@ export function SiteFooter() {
           </div>
 
           <div className="grid grid-cols-[repeat(auto-fit,minmax(var(--footer-col-min),1fr))] gap-6 md:grid-cols-[repeat(3,max-content)] md:justify-end md:gap-x-12">
-            {footerColumns(getWindowState()).map((col) => (
+            {footerColumns().map((col) => (
               <div key={col.title}>
                 <Eyebrow inverse>{col.title}</Eyebrow>
                 <ul className="m-0 mt-4 grid list-none gap-3 p-0">

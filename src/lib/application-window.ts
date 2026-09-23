@@ -42,6 +42,8 @@ export function getWindowState(now: Date = new Date()): WindowState {
   // it. MUST be unset before launch, or the form stays in whichever state it
   // names forever. The warning below is there to make a mistake noisy.
   const override = process.env.APPLICATION_WINDOW_OVERRIDE;
+  // Announced is after closing, so the forms stay shut.
+  if (override === "announced") return "closed";
   if (override === "before" || override === "open" || override === "closed") {
     console.warn(
       `[application-window] OVERRIDE ACTIVE: forcing "${override}". Unset APPLICATION_WINDOW_OVERRIDE before launch.`,
@@ -191,3 +193,51 @@ export const WINDOW_COPY = {
     contact?: { lead: string; email: string; rest: string };
   }
 >;
+
+/* The announcement: the three chosen builds go public, and the site stops
+ * talking about a panel still reading. A separate flag rather than a fourth
+ * WindowState, because pages test `state !== "closed"` to decide whether to
+ * render the forms. +12:00 holds until daylight saving on 27 September. */
+export const ANNOUNCED_AT = "2026-09-24T00:00:00+12:00";
+
+/** Whether the three builds have been announced. `now` is injectable, and
+ *  APPLICATION_WINDOW_OVERRIDE=announced previews it before the date. */
+export function isAnnounced(now: Date = new Date()): boolean {
+  const override = process.env.APPLICATION_WINDOW_OVERRIDE;
+  if (override === "announced") return true;
+  if (override === "before" || override === "open" || override === "closed") return false;
+  return now.getTime() >= new Date(ANNOUNCED_AT).getTime();
+}
+
+/** Copy once the three are announced. Same shape as the closed state, and the
+ *  same readers: header, footer, heroes, closing band and /apply. */
+export const ANNOUNCED_COPY = {
+  tag: "Applications closed",
+  tone: "neutral" as const,
+  label: "The three builds are underway",
+  // A literal rather than BUILDS_PATH: announcement.ts pulls in the email code.
+  cta: { label: "Meet the three", href: "/builds" },
+  heading: "The three are chosen",
+  body: "Applications closed on 31 August and the three builds were announced on 24 September. Everyone who applied has had a reply.",
+  /* Questions only. Whether there is a second round is not decided, so
+   * nothing here invites problems for one. */
+  contact: {
+    lead: "Applications for this round are closed. For a question about the programme, write to Giovanni at",
+    email: LATE_APPLICATION_EMAIL,
+    rest: "",
+  },
+} satisfies (typeof WINDOW_COPY)["closed"];
+
+/** Late page copy once announced: the closed version, minus the future tense. */
+export const LATE_ANNOUNCED_BODY =
+  "This page was open until 6 September. The three builds were announced on 24 September.";
+
+/** The copy the site should be showing right now. */
+export function getSiteCopy(now: Date = new Date()) {
+  return isAnnounced(now) ? ANNOUNCED_COPY : WINDOW_COPY[getWindowState(now)];
+}
+
+/** The contact block for pages past the deadline, in the current tense. */
+export function getContact(now: Date = new Date()) {
+  return isAnnounced(now) ? ANNOUNCED_COPY.contact : WINDOW_COPY.closed.contact;
+}

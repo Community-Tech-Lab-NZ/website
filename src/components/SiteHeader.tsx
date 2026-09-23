@@ -7,7 +7,7 @@ import { clsx } from "clsx";
 import { AnimatedLockup } from "./AnimatedLockup";
 import { Button } from "./Button";
 import { Caret } from "./Caret";
-import { NAV } from "@/lib/navigation";
+import type { NavItem } from "@/lib/navigation";
 import { hoverCapable } from "@/lib/motion";
 import { useDisclosure } from "@/hooks/useDisclosure";
 import { useTabIndicator } from "@/hooks/useTabIndicator";
@@ -60,6 +60,8 @@ import { useTabIndicator } from "@/hooks/useTabIndicator";
  */
 
 type SiteHeaderProps = {
+  /** From the layout, which knows whether the builds are announced. */
+  nav: NavItem[];
   tone?: "oat" | "ink";
   actionLabel?: string;
   actionHref?: string;
@@ -68,6 +70,7 @@ type SiteHeaderProps = {
 };
 
 export function SiteHeader({
+  nav,
   tone = "oat",
   actionLabel = "Apply now",
   actionHref = "/apply",
@@ -192,7 +195,7 @@ export function SiteHeader({
           onMouseLeave={rest}
           className="ctl-tab-strip hidden shrink-0 items-center gap-6 md:flex"
         >
-          {NAV.map((item) => (
+          {nav.map((item) => (
             <Link
               key={item.href}
               href={item.href}
@@ -275,7 +278,7 @@ export function SiteHeader({
       >
         <nav aria-label="Main" className="mx-auto max-w-page px-gutter">
           <ul className="m-0 list-none p-0">
-            {NAV.map((item) => (
+            {nav.map((item) => (
               <li key={item.href}>
                 <Link
                   href={item.href}

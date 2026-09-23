@@ -1,13 +1,17 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { Card } from "@/components/Card";
+import { ExternalLink } from "@/components/ExternalLink";
 import { Reveal } from "@/components/Reveal";
 import { Section } from "@/components/Section";
 import { SectionRule } from "@/components/SectionRule";
 import { Timeline } from "@/components/Timeline";
 import { Body, Eyebrow, Heading, Lede } from "@/components/Typography";
 import { CHOSEN } from "@/lib/announcement";
-import { breadcrumbSchema, JsonLd } from "@/lib/structured-data";
+import { breadcrumbSchema, JsonLd, showcaseEventSchema } from "@/lib/structured-data";
+
+const LINK =
+  "ctl-link-grow text-ink underline decoration-kowhai underline-offset-[var(--link-underline-offset)] hover:decoration-fern";
 
 /* The three chosen problems, as a permanent record.
  *
@@ -40,7 +44,7 @@ import { breadcrumbSchema, JsonLd } from "@/lib/structured-data";
  * on. That band invites the reader to apply, and applications for this cohort
  * closed on 31 August. A page announcing who was chosen, closing on a button
  * asking the reader to apply, is the one arrangement that would actively
- * mislead. It closes on what happens next instead.
+ * mislead. It closes on what happens next, and how to follow along, instead.
  *
  * THE PHOTOGRAPHS ARE THE ORGANISATIONS' OWN, and two of the three carry a
  * photographer's credit that is not optional. See `credit` on EmailImage. They
@@ -75,22 +79,26 @@ export default function BuildsPage() {
   return (
     <>
       <JsonLd
-        data={breadcrumbSchema([
-          { name: "Home", path: "/" },
-          { name: "The three chosen problems", path: "/builds" },
-        ])}
+        data={[
+          breadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "The three chosen problems", path: "/builds" },
+          ]),
+          showcaseEventSchema(),
+        ]}
       />
 
       <Section drift="hero" className="pb-7">
-        <Eyebrow className="mb-4">Announced 24 September</Eyebrow>
+        {/* Undated, so the eyebrow still reads right in November. */}
+        <Eyebrow className="mb-4">This round</Eyebrow>
         <Heading level={1} fluid className="max-w-[var(--page-heading-max)]">
           The three are chosen.
         </Heading>
         <Lede className="mt-6">
-          A local panel read every application between 1 and 18 September. These are the
-          three problems going to a build, chosen on how much difference it would make,
-          whether other organisations in the district have the same problem, and whether
-          five weeks is honestly enough to do something useful about it.
+          Announced on 24 September. A local panel read every application, and these are
+          the three problems going to a build: chosen on how much difference it would
+          make, whether other organisations in the district share the problem, and
+          whether five weeks is honestly enough to do something useful about it.
         </Lede>
       </Section>
 
@@ -107,7 +115,15 @@ export default function BuildsPage() {
               <article className="grid grid-cols-1 items-start gap-9 lg:grid-aside">
                 <div>
                   <Eyebrow className="mb-4">{build.place}</Eyebrow>
-                  <Heading level={2}>{build.name}</Heading>
+                  <Heading level={2}>
+                    {build.url ? (
+                      <ExternalLink href={build.url} className={LINK}>
+                        {build.name}
+                      </ExternalLink>
+                    ) : (
+                      build.name
+                    )}
+                  </Heading>
                   <Body className="mt-5">{build.who}</Body>
                   <Body className="mt-4">{build.problem}</Body>
                 </div>
@@ -148,16 +164,12 @@ export default function BuildsPage() {
                 We have an idea of the shape of each solution. What each will do, and how
                 they will work exactly, has yet to be designed. Between 28 September and
                 9 October each team will sit down with their organisation and work that
-                out with them, before anything gets built. From 12 October there are five
-                weeks of building, with something to try at the end of each week.
+                out with them, before anything gets built.
               </Body>
               <Body className="mt-4">
-                All three are demonstrated at the Showcase Hui on 26 November, which FLINT
-                Queenstown is running as its Q4 event.
-              </Body>
-              <Body className="mt-4">
-                Everything made is open source. What gets built for these three is there
-                for any other organisation in the district to pick up and use.
+                From 12 October there are five weeks of building, with something for the
+                organisation to try at the end of each week. Then comes the handover,
+                with training and written instructions for the people who will use it.
               </Body>
             </div>
 
@@ -165,6 +177,31 @@ export default function BuildsPage() {
               <Eyebrow className="mb-5">What happens next</Eyebrow>
               <Timeline steps={WHAT_HAPPENS_NEXT} />
             </Card>
+          </div>
+        </Reveal>
+      </Section>
+
+      <Section flush>
+        <Reveal>
+          <SectionRule variant="hairline" draw={false} className="mb-7" />
+          <Heading level={2}>Follow along</Heading>
+          <div className="mt-6 grid grid-fit gap-8">
+            <div>
+              <Eyebrow className="mb-4">26 November</Eyebrow>
+              <Heading level={3}>Showcase Hui</Heading>
+              <Body className="mt-4">
+                All three are demonstrated in public at the Showcase Hui, which FLINT
+                Queenstown is running as its Q4 event. It is free to come along.
+              </Body>
+            </div>
+            <div>
+              <Eyebrow className="mb-4">Open source</Eyebrow>
+              <Heading level={3}>Free for anyone to reuse</Heading>
+              <Body className="mt-4">
+                Everything made is open source, so what gets built for these three is
+                there for any other organisation in the district to pick up and use.
+              </Body>
+            </div>
           </div>
         </Reveal>
       </Section>

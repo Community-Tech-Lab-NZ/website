@@ -128,6 +128,10 @@ export type ChosenBuild = {
   who: string;
   /** The problem, in their terms, concrete. */
   problem: string;
+  /** The problem in one line, for the home page cards. Site only. */
+  short: string;
+  /** The organisation's own website, checked live 23 September. Site only. */
+  url?: string;
   /** The photograph, and the words for the reader who cannot see it. */
   image: EmailImage;
 };
@@ -136,6 +140,8 @@ export const CHOSEN: ChosenBuild[] = [
   {
     name: "Tāhuna Glenorchy Dark Sky Sanctuary",
     slug: "dark-sky-aurora",
+    url: "https://glenorchydarkskies.org.nz/",
+    short: "Sky readings taken by hand, two people at a time, and typed into one person's spreadsheet.",
     place: "Glenorchy",
     // The certification is the fact that does the work here: it is recent, it
     // is external, and it is why the monitoring matters rather than being a
@@ -155,6 +161,8 @@ export const CHOSEN: ChosenBuild[] = [
   {
     name: "Whakatipu Reforestation Trust",
     slug: "reforestation-volunteers",
+    url: "https://wrtqt.org.nz/",
+    short: "Seed, nursery, planting and survival records in Excel files that cannot talk to each other.",
     place: "Kelvin Heights",
     who: "A volunteer powered trust running the Jean Malpas nursery since 2013, growing around 10,000 native plants a year and putting more than 140,000 into the ground across some 70 sites since 2015.",
     // "Cannot talk to each other" is the trust's own phrase and it is better
@@ -182,6 +190,8 @@ export const CHOSEN: ChosenBuild[] = [
   {
     name: "Queenstown Mountain Bike Club",
     slug: "mtb-ridgeline",
+    url: "https://www.queenstownmtb.co.nz/",
+    short: "Trail audits and feature inspections noted on the trail, then typed up again afterwards.",
     place: "Queenstown",
     who: "The district's largest club, formed in 2003, with more than 2,000 members and over 100 kilometres of trails kept up largely by volunteers.",
     // The new national guidelines are the reason this became urgent this year

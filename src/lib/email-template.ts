@@ -365,8 +365,24 @@ function textList(items: EmailList, marker: EmailListMarker = "caret"): string {
     .map((item, i) => {
       const lead = marker === "number" ? `${i + 1}.` : "-";
       const indent = " ".repeat(lead.length + 1);
+
+      /* THE URL SURVIVES HERE, unlike in a paragraph.
+       *
+       * `wrap` takes an inline link down to its label and drops the address,
+       * which is right in prose: the credit sentence names six organisations
+       * and five URLs mid-paragraph is unreadable. A list item has somewhere to
+       * put it. It goes on its own line under the item, indented with it and
+       * never wrapped, because a URL broken across two lines stops being a link
+       * in every client that would otherwise have made it one.
+       *
+       * Only the first link in an item is printed. An item needing two is an
+       * item that should have been two items. */
+      const link = /\[[^\]]+\]\((https?:\/\/[^)\s]+)\)/.exec(item);
+
       const body = wrap(item, TEXT_WIDTH - indent.length).split("\n");
-      return [`${lead} ${body[0]}`, ...body.slice(1).map((line) => `${indent}${line}`)].join("\n");
+      const lines = [`${lead} ${body[0]}`, ...body.slice(1).map((line) => `${indent}${line}`)];
+      if (link) lines.push(`${indent}${link[1]}`);
+      return lines.join("\n");
     })
     .join("\n");
 }

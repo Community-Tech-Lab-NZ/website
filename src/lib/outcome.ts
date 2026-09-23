@@ -368,8 +368,41 @@ export function communityDecline(replyTo: string): Message {
          * myTurn closes it because shared equipment was a shape that came up
          * more than once, across groups that look nothing like each other.
          *
+         * LINKED, and every URL was loaded before it went in. That check
+         * earned its keep immediately: the domain in the original scan notes,
+         * zelos.space, does not resolve at all, and the product actually lives
+         * at getzelos.com. Same failure as POINT, caught this time because the
+         * link had to be verified rather than merely written down.
+         *
+         * The Sporty claim was corrected at the same time. The scan said
+         * "free"; its own pricing page says freemium, free for clubs "within a
+         * few fair use limits" with a paid tier to lift them. "Free for clubs
+         * within fair use limits" is what the page supports, and a decline that
+         * oversells a free tier to thirteen organisations is a second
+         * disappointment waiting a fortnight out.
+         *
          * No prices; see the note at the top of this function. */
-        "A few examples, from the problems we saw more than once. Tracking what a grant commits you to, and what is left of it, is usually a chart of accounts change in Xero rather than anything new. Volunteer hours collected for funder reporting is what Zelos does, and it has a free community plan. Club membership, subscriptions and equipment records are covered by Sporty, which is free and built in New Zealand. Lending gear or tools out and getting them back is what myTurn is for.",
+        "A few examples, from the problems we saw more than once:",
+        /* The four, one per line, each linked.
+         *
+         * A LIST RATHER THAN THE PARAGRAPH THEY STARTED IN, for the plain-text
+         * part's sake. `wrap` strips an inline link down to its label and drops
+         * the URL, which is right for the credit sentence naming six partner
+         * organisations whose names are findable, and wrong here: "Zelos" and
+         * "myTurn" are not names anyone can guess a domain from, and finding
+         * the right one is the entire favour this paragraph is doing. On its
+         * own line the address can be printed beside the name, so a reader
+         * whose client shows no HTML still gets something they can type in.
+         *
+         * Caret marker, as the criteria list above has. */
+        {
+          list: [
+            "Tracking what a grant commits you to, and what is left of it: usually a chart of accounts change in [Xero](https://www.xero.com/nz/) rather than anything new.",
+            "Volunteer hours collected for funder reporting: [Zelos](https://getzelos.com/), whose free plan has no cap on volunteer numbers.",
+            "Club membership, subscriptions and equipment records: [Sporty](https://www.sporty.co.nz/), built in New Zealand and free for clubs within fair use limits.",
+            "Lending gear or tools out and getting them back: [myTurn](https://myturn.com/).",
+          ],
+        },
         /* First person, because the Chair signs the letter.
          *
          * This named him in the third person for a while, on the reasoning that

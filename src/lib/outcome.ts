@@ -287,34 +287,70 @@ export function communityDecline(replyTo: string): Message {
         "Thank you for applying to Community Tech Lab, and for the time your organisation put into the application. It is a long form and we know what an hour of an evening is worth in a small team.",
         // The answer. One sentence, no "unfortunately we regret to inform".
         "We are not able to take your problem forward this round.",
-        // The arithmetic first, because it reflects nothing about the applicant.
-        "Our funding from the QLDC Economic Diversification Fund covered three builds, and sixteen organisations applied. A local panel read every application in full.",
-        /* Then the criteria that did the work. The three heaviest, named as
-         * weightings rather than as a story about who won. All three were
-         * published on the site before applications opened. */
-        "The three heaviest criteria are what decided a very close field: how much difference it would make, how many other organisations in the district share the same problem, and whether five weeks was honestly enough to finish something useful. Those three carry 65 percent of the score between them, and they were published before applications opened. It is not a reflection on your organisation or on the problem you brought us.",
-        // Said plainly, because they are about to see it. "Today", not
-        // "tomorrow": this now sends on the same day as the announcement.
-        "The three that were chosen are announced publicly later today, and you will most likely see that email as well. We wanted you to hear this from us first.",
-        /* THE PART THAT IS ACTUALLY WORTH THEIR TIME.
+        /* The arithmetic, as one thought.
          *
-         * Leads with the finding rather than the offer, because the finding is
-         * the surprising bit: most of these problems are solved, several for
-         * nothing, and at least one needs no new software at all. */
-        "There is something more useful I can offer than a no. While the panel was reading, we looked at what already exists for the problems people brought us, and for most of them something does, often free and sometimes needing no new software at all.",
-        /* The three examples. Written as shapes, not as advice to this reader.
+         * This was two sentences that did not follow from each other: the fund
+         * covering three builds and a panel reading every application are both
+         * true and only the first explains the outcome. The reading is now
+         * where it belongs, attached to the criteria that came out of it. */
+        "Our funding from the QLDC Economic Diversification Fund covered three builds, and sixteen organisations applied.",
+        /* The criteria, introduced and then enumerated.
          *
-         * Order is deliberate: the Xero one goes first because it is the most
-         * surprising and the only one where the answer is a setup change to
-         * something the organisation already pays for. No prices; see the note
-         * at the top of this function. */
-        "Three of the shapes we saw, as examples. Tracking what a grant commits you to, and what is left, is usually a chart of accounts change in Xero rather than anything new. Volunteer hours collected for funder reporting is what Zelos does, and it has a free community plan. Club membership, subscriptions and equipment records are covered by Sporty, which is free and built in New Zealand.",
-        /* The offer, reframed. It is no longer "I will explain the decision",
-         * which invites an appeal; it is "I will tell you what we found for
-         * your problem", which is the thing they can act on. The decision is
-         * still on the table for anyone who asks for it. */
-        "Yours may well have an answer like that, and we have notes on every application. Reply to this email and I will tell you what we found for your problem, and we can talk through whether it fits. Worth saying that plans and prices move, so anything we point you at is a starting point to check rather than a recommendation to buy.",
-        "If you would rather talk about how your application was read, I am happy to do that too.",
+         * A LIST BECAUSE IT IS A LIST. Three weighted criteria read as three
+         * things when they are numbered and as a long sentence when they are
+         * not, and the reader deciding whether the process was fair is
+         * counting them.
+         *
+         * NO TOTAL. This said the three carry 65 percent between them, which
+         * is arithmetic the reader can do and does not need done for them.
+         * Naming the weights and stopping is the version that respects them. */
+        "A local panel read every application in full and scored each against six criteria, published before applications opened. Three of them carry the most weight:",
+        /* The three, in weight order, immediately under the colon that
+         * introduces them.
+         *
+         * Worded as the questions the panel was actually asking rather than as
+         * the scoring matrix's own labels ("genuine need", "reuse and wider
+         * application"), which are the internal names for these and read as
+         * jargon to the person being told no. The weights are kept because they
+         * are what makes this a fact rather than a claim, and they are not
+         * totalled: the reader can add three numbers. */
+        {
+          list: [
+            "How much difference it would make. 25 percent.",
+            "How many other organisations in the district share the same problem. 20 percent.",
+            "Whether five weeks was honestly enough to finish something useful. 20 percent.",
+          ],
+        },
+        // The reassurance, after the list rather than inside it.
+        "It is not a reflection on your organisation or on the problem you brought us.",
+        // "Today", not "tomorrow": this sends on the same day as the
+        // announcement.
+        "The three that were chosen are announced publicly later today, and you will most likely see that email as well.",
+        /* The finding, said plainly.
+         *
+         * This opened "There is something more useful I can offer than a no",
+         * which announced the paragraph instead of being it. The finding is
+         * interesting on its own and does not need billing. */
+        "While the panel was reading, we looked at what already exists for the problems people brought us. For most of them something does, often free, and sometimes needing no new software at all.",
+        /* The examples. Written as shapes, not as advice to this reader: one
+         * broadcast means every product named is read by twelve organisations
+         * it was not chosen for.
+         *
+         * Xero leads because it is the most surprising and the only one where
+         * the answer is a setup change to something already being paid for.
+         * myTurn closes it because shared equipment was a shape that came up
+         * more than once, across groups that look nothing like each other.
+         *
+         * No prices; see the note at the top of this function. */
+        "Some of the shapes we saw, as examples. Tracking what a grant commits you to, and what is left, is usually a chart of accounts change in Xero rather than anything new. Volunteer hours collected for funder reporting is what Zelos does, and it has a free community plan. Club membership, subscriptions and equipment records are covered by Sporty, which is free and built in New Zealand. Lending gear or tools out and getting them back is what myTurn is for.",
+        /* The offer, in the third person.
+         *
+         * Names the Chair and the role rather than saying "I", because the
+         * reply address is a personal one and a reader who has never met him
+         * should know who is going to answer and in what capacity before they
+         * write. */
+        "Yours may well have an answer like that, and we have notes on every application. Reply to this email and the Community Tech Lab chair, Giovanni Stephens, will walk you through what we found for your problem and whether it is worth pursuing. Plans and prices move, so anything we point you at is a starting point to check rather than a recommendation to buy.",
+        "If you would rather talk about how your application was read, he is happy to do that too.",
         "If we run the programme again, I would be glad to see your application come back.",
       ],
       signoff: "Ngā mihi nui\nGiovanni Stephens\nChair, Community Tech Lab",

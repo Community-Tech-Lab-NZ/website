@@ -166,12 +166,31 @@ export type EmailImage = {
  *
  * `meta` rides inside a section rather than only at the top level so the dates
  * table can sit under its own heading instead of floating between paragraphs. */
+/* A numbered list, for the few places the copy is genuinely enumerating.
+ *
+ * NUMBERED, NOT BULLETED, and there is no option for the other. The site's list
+ * marker is the caret from the logo, drawn in CSS, which an email cannot do; a
+ * bullet character would be a Unicode symbol used as decoration, which the
+ * brand forbids outright. A number is neither. It is also the only marker that
+ * says something a paragraph could not, which is the test for using a list at
+ * all rather than a sentence with commas in it.
+ *
+ * The number is set in Space Mono, as every other small piece of structure in
+ * these emails is, and sits in its own narrow cell so the item text aligns
+ * against a straight left edge rather than wrapping under the digit.
+ *
+ * Rendered as a table rather than <ol>, because Outlook's list rendering comes
+ * through Word and its indentation is unpredictable at best. */
+export type EmailList = string[];
+
 export type EmailSection = {
   label: string;
   paragraphs?: string[];
   meta?: EmailMeta[];
   /** A photograph, above the label. See `EmailImage`. */
   image?: EmailImage;
+  /** A numbered list, after the paragraphs. See `EmailList`. */
+  list?: EmailList;
 };
 
 /* What bulk mail has to carry and transactional mail must not.
@@ -217,8 +236,15 @@ export type EmailContent = {
    *  gets to say who does what about it. Set larger and lighter than body copy,
    *  so heading and lede read as one unit and the letter starts after them. */
   lede?: string;
-  /** Paragraphs between the heading and everything else. */
-  intro: string[];
+  /** The letter body: paragraphs, in order, with an optional numbered list
+   *  sitting wherever it belongs among them.
+   *
+   *  A bare string is a paragraph, which is what almost every entry is and how
+   *  every existing message is written. `{ list }` is a numbered list at that
+   *  point in the flow, which is the only way an enumeration can follow the
+   *  sentence that introduces it: a list appended after the whole intro reads
+   *  as an orphan four paragraphs from its own colon. */
+  intro: (string | { list: EmailList })[];
   /** Named facts: who applied, where the Doc is. Rendered as rows, links live. */
   meta?: EmailMeta[];
   /** Labelled body sections, rendered after `intro`. Long messages only. */
@@ -306,6 +332,22 @@ function wrap(text: string, width = TEXT_WIDTH): string {
       }
       out.push(current);
       return out.join("\n");
+    })
+    .join("\n");
+}
+
+/* A numbered list for the plain-text part.
+ *
+ * Hanging indent: the number, then the item wrapped three columns in so a
+ * wrapping line sits under the text rather than under the digit. Wrapped at
+ * three less than the usual width to pay for that indent, so the right edge
+ * still lands where every other paragraph's does. */
+function textList(items: EmailList): string {
+  return items
+    .map((item, i) => {
+      const n = `${i + 1}.`;
+      const body = wrap(item, TEXT_WIDTH - 3).split("\n");
+      return [`${n} ${body[0]}`, ...body.slice(1).map((line) => `   ${line}`)].join("\n");
     })
     .join("\n");
 }
@@ -445,6 +487,36 @@ function htmlImage(image: EmailImage): string {
     </table>`;
 }
 
+/* A numbered list. See `EmailList`.
+ *
+ * Two cells per row: the number in Space Mono at a fixed narrow width, and the
+ * item beside it. `valign="top"` on both so a wrapping item keeps its number
+ * level with its first line rather than centred against the block.
+ *
+ * The number gets the muted ink rather than Fern or gold. It is structure, not
+ * emphasis, and the brand's one-gold-thing rule is already spent on the rule
+ * under the header.
+ *
+ * ITS LINE-HEIGHT IS NOT THE BODY'S, and the odd number is deliberate. The
+ * number is 13px Space Mono beside 16px Source Sans, so matching line-heights
+ * puts the digit's baseline above the text's and the list reads as though the
+ * numbers are superscript. 1.97 on 13px is 25.6px, which is 16px at 1.6: the
+ * two baselines then agree. Change one of these and you have to change the
+ * other. */
+function htmlList(items: EmailList, top = 20): string {
+  const rows = items
+    .map(
+      (item, i) => `
+        <tr>
+          <td width="28" valign="top" style="padding:${i === 0 ? 0 : 10}px 0 0;font-family:${MONO};font-size:13px;line-height:1.97;color:${INK_MUTED};">${i + 1}.</td>
+          <td valign="top" style="padding:${i === 0 ? 0 : 10}px 0 0;font-family:${BODY};font-size:16px;line-height:1.6;color:${INK_BODY};">${inlineLinks(brandMark(escapeMultiline(item)))}</td>
+        </tr>`,
+    )
+    .join("");
+
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;margin-top:${top}px;">${rows}</table>`;
+}
+
 function htmlSection(section: EmailSection): string {
   // Hairline above, then the label. The rule is what makes this scannable at
   // arm's length: an eyebrow alone is small enough that the eye slides past it
@@ -455,6 +527,7 @@ function htmlSection(section: EmailSection): string {
     // and read as belonging to that one instead of this.
     section.image ? htmlImage(section.image) : "",
     ...(section.paragraphs ?? []).map((text, i) => htmlParagraph(text, i === 0 && !section.image ? 14 : 18)),
+    section.list?.length ? htmlList(section.list) : "",
     section.meta?.length ? htmlMeta(section.meta) : "",
   ]
     .filter(Boolean)
@@ -661,7 +734,9 @@ export function renderHtmlEmail(content: EmailContent): string {
     content.lede
       ? `<p style="margin:14px 0 0;font-family:${BODY};font-size:19px;line-height:1.5;color:${INK_BODY};">${brandMark(escapeMultiline(content.lede))}</p>`
       : "",
-    ...content.intro.map((text) => htmlParagraph(text, 24)),
+    ...content.intro.map((entry) =>
+      typeof entry === "string" ? htmlParagraph(entry, 24) : htmlList(entry.list, 24),
+    ),
     content.meta?.length ? htmlMeta(content.meta) : "",
     content.quote ? htmlQuote(content.quote) : "",
     ...(content.sections ?? []).map(htmlSection),
@@ -787,7 +862,7 @@ export function renderTextEmail(content: EmailContent): string {
   const blocks: string[] = [
     wrap(content.heading),
     ...(content.lede ? [wrap(content.lede)] : []),
-    ...content.intro.map((p) => wrap(p)),
+    ...content.intro.map((entry) => (typeof entry === "string" ? wrap(entry) : textList(entry.list))),
   ];
 
   if (content.meta?.length) {
@@ -818,6 +893,7 @@ export function renderTextEmail(content: EmailContent): string {
       blocks.push(wrap(`[${section.image.alt}${credit}]`));
     }
     for (const paragraph of section.paragraphs ?? []) blocks.push(wrap(paragraph));
+    if (section.list?.length) blocks.push(textList(section.list));
     if (section.meta?.length) {
       blocks.push(section.meta.map((item) => `${item.label}: ${item.value}`).join("\n"));
     }

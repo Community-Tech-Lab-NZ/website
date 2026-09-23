@@ -204,19 +204,48 @@ export function juniorInternOffer(
  * is from the subject line and skims for the verdict, so making them hunt for
  * it reads as cowardice.
  *
- * THE REASON IS CAPACITY, AND IT IS TRUE. Three builds were funded and sixteen
- * organisations applied. That is the whole explanation, it reflects nothing
- * about the applicant, and being true is what lets it be said in one sentence
- * without hedging. It deliberately does NOT say their problem was too big or
- * not reusable enough: the panel scored on six weighted criteria and a
- * one-line paraphrase of a scoring matrix is a judgement the sender would then
- * have to defend, organisation by organisation, to people who are welcome to
- * ask. What is offered instead is a real conversation, below.
+ * THE REASON IS THE FUND AND THE CRITERIA, IN THAT ORDER. The grant covered
+ * three builds; sixteen organisations applied. That arithmetic comes first
+ * because it reflects nothing about the applicant.
+ *
+ * Then the three heaviest criteria are named: need 25%, reuse 20%,
+ * deliverability 20%, which is 65% of the score between them. Naming the
+ * CRITERIA rather than the winners is the whole design of this paragraph. It
+ * explains the decision without asking thirteen organisations to measure
+ * themselves against three named others, which is what "we chose X because it
+ * was more Y than yours" does however carefully it is phrased. These three
+ * weightings were already published on /organisations and in the programme
+ * terms before anyone applied, so this tells nobody anything they were not
+ * told upfront.
+ *
+ * It still does not say where any individual application scored. That is a
+ * conversation, and the letter offers one.
+ *
+ * THE ALTERNATIVES ARE THE POINT OF THE LETTER, NOT A CONSOLATION. A scan of
+ * the thirteen found that most of these problems already have good answers,
+ * several of them free, and for at least one the answer is a setup change in
+ * accounting software the organisation already pays for. Sending a decline
+ * without that, having just had them describe the problem in detail, would be
+ * sitting on the single most useful thing this programme learned about them.
+ *
+ * THREE EXAMPLES, AND THEY ARE WRITTEN AS EXAMPLES. This is one broadcast to
+ * thirteen organisations, so every product named is read by twelve it was not
+ * chosen for. The copy therefore says "the kind of thing" and gives three
+ * shapes, and the specific pairing for each organisation is offered as a
+ * conversation rather than asserted here. Do not turn these into
+ * recommendations addressed to the reader; a reader told to use Sporty when
+ * they run a food bank stops trusting the rest of the paragraph.
+ *
+ * NO PRICES, DELIBERATELY. The scan's figures were checked five weeks before
+ * this sends, and one product in it turned out to be unavailable in New Zealand
+ * after being recommended. Plan names are stable in a way numbers are not, so
+ * "a free community plan" is safe where "$0 for unlimited volunteers" is a
+ * hostage. The copy also says plainly that these are worth checking, which is
+ * both true and the honest way to hand over research of this age.
  *
  * NO PROMISE OF A SECOND ROUND. Whether there is one is not decided, and this
  * is exactly the audience that would remember being told there would be. The
- * copy says "if", in the same words the developer decline uses, and puts the
- * thing that IS certain, the open source code, next to it.
+ * copy says "if", in the same words the developer decline uses.
  *
  * NO CALL TO ACTION BUTTON, same rule as the developer decline. A decline with
  * a button is asking the reader to do something on their way out. */
@@ -242,8 +271,15 @@ export function communityDecline(replyTo: string): Message {
       // The answer, before the email is opened. Same reasoning as the developer
       // decline: a preview line that only thanks them makes the reader open the
       // email to find the no.
+      /* The answer, then the reason to keep reading.
+       *
+       * Both halves matter. The verdict is first because a preview line that
+       * hides it makes the reader open the email to find the no. But this
+       * letter now carries something they would want even having read the
+       * verdict, and a preheader that stopped at "not this round" would get it
+       * deleted before the useful half was seen. */
       preheader:
-        "We are not able to take your problem forward this round. Thank you for the time you put into applying.",
+        "Not this round, and we are sorry. We did find something that may solve your problem anyway.",
       eyebrow: "Application outcome",
       heading: "Your application",
       intro: [
@@ -251,25 +287,34 @@ export function communityDecline(replyTo: string): Message {
         "Thank you for applying to Community Tech Lab, and for the time your organisation put into the application. It is a long form and we know what an hour of an evening is worth in a small team.",
         // The answer. One sentence, no "unfortunately we regret to inform".
         "We are not able to take your problem forward this round.",
-        // The reason, which is arithmetic rather than a judgement.
-        "Sixteen organisations applied and three builds were funded. A local panel read every application in full, and the decision came down to what three teams could honestly finish in five weeks. It is not a reflection on your organisation or on the problem you brought us.",
-        // Said plainly, because they are about to see it. This is the sentence
-        // that makes the sequencing legible rather than odd.
-        "The three that were chosen are announced publicly tomorrow, and you will most likely see that email as well. We wanted you to hear this from us first.",
-        /* The open offer. Deliberately specific about what it is: a
-         * conversation with a person, not a review or an appeal.
+        // The arithmetic first, because it reflects nothing about the applicant.
+        "Our funding from the QLDC Economic Diversification Fund covered three builds, and sixteen organisations applied. A local panel read every application in full.",
+        /* Then the criteria that did the work. The three heaviest, named as
+         * weightings rather than as a story about who won. All three were
+         * published on the site before applications opened. */
+        "The three heaviest criteria are what decided a very close field: how much difference it would make, how many other organisations in the district share the same problem, and whether five weeks was honestly enough to finish something useful. Those three carry 65 percent of the score between them, and they were published before applications opened. It is not a reflection on your organisation or on the problem you brought us.",
+        // Said plainly, because they are about to see it. "Today", not
+        // "tomorrow": this now sends on the same day as the announcement.
+        "The three that were chosen are announced publicly later today, and you will most likely see that email as well. We wanted you to hear this from us first.",
+        /* THE PART THAT IS ACTUALLY WORTH THEIR TIME.
          *
-         * An earlier draft ended "that offer is genuine and it stays open".
-         * brand-guide.md bans "genuinely" for protesting too much, and the
-         * objection holds for "genuine" doing the same job here: an offer that
-         * has to assert its own sincerity invites the reader to wonder. Naming
-         * who answers and saying there is no deadline is the version that
-         * actually reassures. */
-        "If you would like to know how your application was read, reply to this email and I will talk you through it. There is no deadline on that, and it is me who answers.",
-        // What they get regardless. This is the one concrete thing that is true
-        // for every organisation that did not get a build, and it is the reason
-        // open source is in the brand guide rather than in a footnote.
-        "Everything built in this round is released open source. If what gets made for one of the three turns out to be close to what you needed, it is yours to take and adapt, and we will tell you when each one is finished.",
+         * Leads with the finding rather than the offer, because the finding is
+         * the surprising bit: most of these problems are solved, several for
+         * nothing, and at least one needs no new software at all. */
+        "There is something more useful I can offer than a no. While the panel was reading, we looked at what already exists for the problems people brought us, and for most of them something does, often free and sometimes needing no new software at all.",
+        /* The three examples. Written as shapes, not as advice to this reader.
+         *
+         * Order is deliberate: the Xero one goes first because it is the most
+         * surprising and the only one where the answer is a setup change to
+         * something the organisation already pays for. No prices; see the note
+         * at the top of this function. */
+        "Three of the shapes we saw, as examples. Tracking what a grant commits you to, and what is left, is usually a chart of accounts change in Xero rather than anything new. Volunteer hours collected for funder reporting is what Zelos does, and it has a free community plan. Club membership, subscriptions and equipment records are covered by Sporty, which is free and built in New Zealand.",
+        /* The offer, reframed. It is no longer "I will explain the decision",
+         * which invites an appeal; it is "I will tell you what we found for
+         * your problem", which is the thing they can act on. The decision is
+         * still on the table for anyone who asks for it. */
+        "Yours may well have an answer like that, and we have notes on every application. Reply to this email and I will tell you what we found for your problem, and we can talk through whether it fits. Worth saying that plans and prices move, so anything we point you at is a starting point to check rather than a recommendation to buy.",
+        "If you would rather talk about how your application was read, I am happy to do that too.",
         "If we run the programme again, I would be glad to see your application come back.",
       ],
       signoff: "Ngā mihi nui\nGiovanni Stephens\nChair, Community Tech Lab",

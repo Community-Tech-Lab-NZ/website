@@ -23,13 +23,25 @@ import { breadcrumbSchema, JsonLd, jobPostingsSchema } from "@/lib/structured-da
  * figures it is explaining.
  */
 
-export const metadata: Metadata = {
-  // Developers search for work and a place, not for a nav label.
-  title: "Paid developer roles in Queenstown Lakes",
-  description:
-    "Six paid contract seats for developers and designers in the Queenstown Lakes district. About 12 hours a week for five weeks, building open-source tools.",
-  alternates: { canonical: "/developers" },
-};
+// Developers search for work and a place, not for a nav label.
+export function generateMetadata(): Metadata {
+  return {
+    title: "Paid developer roles in Queenstown Lakes",
+    description: isAnnounced()
+      ? "The paid developer seats in this round of Community Tech Lab: three senior and three junior across three build teams, about 12 hours a week for five weeks."
+      : "Six paid contract seats for developers and designers in the Queenstown Lakes district. About 12 hours a week for five weeks, building open-source tools.",
+    alternates: { canonical: "/developers" },
+  };
+}
+
+/* Third person once announced: the reader is no longer applying. */
+const WHAT_THEY_GET = [
+  "Paid contract work, at a community rate",
+  "A shipped tool with real users, named in their portfolio",
+  "Weekly review and mentoring from an experienced local engineer",
+  "A public open source repository at the end of the five weeks",
+  "A way into a tech community that is small and spread out",
+];
 
 const WHAT_YOU_GET = [
   "Paid contract work on your invoice, at a community rate",
@@ -66,11 +78,13 @@ export default function DevelopersPage() {
           For developers
         </Eyebrow>
         <Heading level={1} fluid inverse className="max-w-[var(--page-heading-max)]">
-          Paid work, real users, and code you can point at.
+          {announced
+            ? "Three teams. Three local builds."
+            : "Paid work, real users, and code you can point at."}
         </Heading>
         <Lede inverse className="mt-6">
           {announced
-            ? "Six paid seats across three teams, three senior and three junior, plus unpaid intern places. This round's teams are building for the three chosen organisations from 28 September."
+            ? "Six paid seats across three teams, three senior and three junior, plus unpaid intern places. Applications closed on 31 August, and the teams start with their organisations on 28 September."
             : "Six paid seats across three teams, three senior and three junior, plus unpaid intern places."}
         </Lede>
 
@@ -98,13 +112,15 @@ export default function DevelopersPage() {
 
       <Section>
         <Reveal>
-          <Eyebrow as="h2" className="mb-5">The roles</Eyebrow>
+          <Eyebrow as="h2" className="mb-5">{announced ? "The roles this round" : "The roles"}</Eyebrow>
 
           {/* Said out loud, because a fold nobody opens is a fold nobody knew
               was there. The row summary is forty words; the decision someone is
               actually making needs the six hundred behind it. */}
           <Body className="mb-5">
-            Every seat has a full description you can read here, or take away as a PDF.
+            {announced
+              ? "Applications for these seats closed on 31 August. The full descriptions stay here as a record of what each role involves."
+              : "Every seat has a full description you can read here, or take away as a PDF."}
           </Body>
 
           {/* Three rows in a single hairline frame. Stacks below lg, where a
@@ -161,8 +177,9 @@ export default function DevelopersPage() {
 
           <Note muted className="mt-5">
             The rate is a community rate, well under commercial, because the work goes
-            to organisations that could not otherwise afford it. {FEE_NOTE} Open to
-            developers based in the Queenstown Lakes district.
+            to organisations that could not otherwise afford it. {FEE_NOTE}{" "}
+            {announced ? "Seats were open" : "Open"} to developers based in the Queenstown
+            Lakes district.
           </Note>
         </Reveal>
       </Section>
@@ -171,9 +188,11 @@ export default function DevelopersPage() {
         <Reveal>
           <div className="grid grid-cols-1 items-start gap-9 lg:grid-aside">
             <div>
-              <Heading level={2}>What you get out of it</Heading>
+              <Heading level={2}>
+                {announced ? "What the developers get out of it" : "What you get out of it"}
+              </Heading>
               <div className="mt-5">
-                <CaretList items={WHAT_YOU_GET} />
+                <CaretList items={announced ? WHAT_THEY_GET : WHAT_YOU_GET} />
               </div>
             </div>
 

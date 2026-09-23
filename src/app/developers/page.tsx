@@ -97,16 +97,20 @@ export default function DevelopersPage() {
         {/* Every apply link on this page opens the developer form. Nobody who
             has read this far wants the community application.
             Closed, the parameter is dead weight: /apply renders no tabs to
-            fork, so it goes to the bare page. */}
-        <div className="mt-7">
-          <Button
-            variant="primary"
-            size="lg"
-            href={state === "closed" ? cta.href : applyHref("developer")}
-          >
-            {cta.label}
-          </Button>
-        </div>
+            fork, so it goes to the bare page.
+            Announced, it goes: "Meet the three" under a headline about the
+            teams reads as meeting the developers. */}
+        {announced ? null : (
+          <div className="mt-7">
+            <Button
+              variant="primary"
+              size="lg"
+              href={state === "closed" ? cta.href : applyHref("developer")}
+            >
+              {cta.label}
+            </Button>
+          </div>
+        )}
       </Section>
       <SectionRule variant="gold" />
 

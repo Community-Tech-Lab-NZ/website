@@ -345,8 +345,9 @@ async function main() {
   }
 
   console.log(
-    "\nSend this BEFORE the announcement. The letter tells them the three are " +
-      "announced publicly tomorrow and that they are hearing it from us first.",
+    "\nSend this BEFORE the announcement, and on the same day. The letter says " +
+      "the three are announced publicly later today and that they are hearing " +
+      "it from us first, so both halves have to be true when it lands.",
   );
 }
 

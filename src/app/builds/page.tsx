@@ -95,8 +95,8 @@ export default function BuildsPage() {
           The three are chosen.
         </Heading>
         <Lede className="mt-6">
-          Announced on 24 September. A local panel read every application, and these are
-          the three problems going to a build: chosen on how much difference it would
+          Announced on 24 September. Every application was read by a local panel, and
+          these are the three problems going to a build: chosen on how much difference it would
           make, whether other organisations in the district share the problem, and
           whether five weeks is honestly enough to do something useful about it.
         </Lede>

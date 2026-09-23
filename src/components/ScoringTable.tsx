@@ -37,14 +37,21 @@ export const SCORING_APPLY: ScoringRow[] = [
 
 type ScoringTableProps = {
   rows: ScoringRow[];
+  /** Past tense once the round is decided. */
+  title?: string;
   children?: React.ReactNode;
   className?: string;
 };
 
-export function ScoringTable({ rows, children, className }: ScoringTableProps) {
+export function ScoringTable({
+  rows,
+  title = "How applications are scored",
+  children,
+  className,
+}: ScoringTableProps) {
   return (
     <Card tone="light" className={className}>
-      <Eyebrow className="mb-4">How applications are scored</Eyebrow>
+      <Eyebrow className="mb-4">{title}</Eyebrow>
       <dl className="m-0">
         {rows.map(([criterion, weight], i) => (
           <div

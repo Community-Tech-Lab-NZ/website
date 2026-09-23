@@ -18,15 +18,27 @@ import { breadcrumbSchema, JsonLd } from "@/lib/structured-data";
  * two dark heroes in a row would flatten the contrast the system relies on.
  */
 
-export const metadata: Metadata = {
-  // "For organisations" is a navigation label, not a search. Nobody types it.
-  // A volunteer treasurer searches for the thing they want, so the title leads
-  // with that and names the district for local search.
-  title: "Free digital tools for community organisations",
-  description:
-    "Free custom software for not-for-profits, charities and community groups in the Queenstown Lakes district. Local developers build it, at no cost to you.",
-  alternates: { canonical: "/organisations" },
-};
+// "For organisations" is a navigation label, not a search. Nobody types it.
+// A volunteer treasurer searches for the thing they want, so the title leads
+// with that and names the district for local search.
+export function generateMetadata(): Metadata {
+  return {
+    title: "Free digital tools for community organisations",
+    description: isAnnounced()
+      ? "Local developers are building free tools for three community organisations in the Queenstown Lakes district. What taking part involves, and how the three were chosen."
+      : "Free custom software for not-for-profits, charities and community groups in the Queenstown Lakes district. Local developers build it, at no cost to you.",
+    alternates: { canonical: "/organisations" },
+  };
+}
+
+/* Third person once announced: the reader is no longer the one taking part. */
+const WHAT_IT_INVOLVED = [
+  "First: the team and the organisation design exactly what gets built, together",
+  "During the build: the organisation sees working versions each week and says what is wrong",
+  "At handover: training, written instructions, and help settling in",
+  "For six weeks after that: bugs fixed free",
+  "After that: the code is open source, so nobody is locked in",
+];
 
 const WHAT_IT_INVOLVES = [
   "First: we sit down with you and agree exactly what is being built",
@@ -62,8 +74,8 @@ export default function OrganisationsPage() {
             <Lede className="mt-6">
               This round, three organisations bring a problem each: {CHOSEN_NAMES}.
               Each is matched with a small team of local developers working at community
-              rates. Over five weeks they work out what would help most, build it, and hand
-              it over, at no cost to the organisation.
+              rates. From 28 September each solution is designed with its organisation,
+              then built over five weeks and handed over, at no cost to the organisation.
             </Lede>
             <div className="mt-7">
               <Button variant="secondary" href="/builds">
@@ -89,14 +101,23 @@ export default function OrganisationsPage() {
           <div className="grid grid-cols-1 items-start gap-9 lg:grid-aside">
             <div>
               <Heading level={2}>What taking part actually involves</Heading>
-              <Body className="mt-5">
-                {announced ? "For each of the three: one" : "One"} named contact person. Roughly one to two hours a week during the
-                build to answer questions and test progress. A willingness to give honest
-                feedback as it takes shape. That is the whole ask. You do not need any
-                technical knowledge and you do not need to write a specification.
-              </Body>
+              {announced ? (
+                <Body className="mt-5">
+                  From each of the three: one named contact person, roughly one to two
+                  hours a week during the build to answer questions and test progress, and
+                  honest feedback as it takes shape. That is the whole ask. Nobody needs
+                  technical knowledge, and nobody has to write a specification.
+                </Body>
+              ) : (
+                <Body className="mt-5">
+                  One named contact person. Roughly one to two hours a week during the
+                  build to answer questions and test progress. A willingness to give honest
+                  feedback as it takes shape. That is the whole ask. You do not need any
+                  technical knowledge and you do not need to write a specification.
+                </Body>
+              )}
               <div className="mt-6">
-                <CaretList items={WHAT_IT_INVOLVES} />
+                <CaretList items={announced ? WHAT_IT_INVOLVED : WHAT_IT_INVOLVES} />
               </div>
             </div>
 
@@ -129,13 +150,16 @@ export default function OrganisationsPage() {
                 application
               </Heading>
               <Body className="mt-4">
-                Reuse carries real weight, because only three tools get built. If five
+                Reuse {announced ? "carried" : "carries"} real weight, because only three tools get built. If five
                 organisations need the same thing, the aim is to build it once so all five
                 can use it, rather than once for one of them.
               </Body>
             </div>
 
-            <ScoringTable rows={SCORING_ORGANISATIONS} />
+            <ScoringTable
+              rows={SCORING_ORGANISATIONS}
+              title={announced ? "How applications were scored" : undefined}
+            />
           </div>
         </Reveal>
       </Section>

@@ -123,9 +123,13 @@ export default function HomePage() {
         <Section>
           <Reveal>
             <Eyebrow as="h2" className="mb-5">This round</Eyebrow>
-            <div className="grid grid-fit gap-6">
+            {/* Each card spans four rows via subgrid, so the one-liners start
+                on the same line however many lines a name wraps to. No row
+                gap: the margins below space the rows, and mb-6 on the last
+                separates cards once they stack. */}
+            <div className="grid grid-fit gap-x-6">
               {CHOSEN.map((build) => (
-                <article key={build.slug}>
+                <article key={build.slug} className="row-span-4 grid grid-rows-subgrid">
                   <Image
                     src={`/images/builds/${build.slug}.jpg`}
                     alt={build.image.alt}
@@ -136,11 +140,11 @@ export default function HomePage() {
                   />
                   <Eyebrow className="mt-5 mb-3">{build.place}</Eyebrow>
                   <Heading level={3}>{build.name}</Heading>
-                  <Note className="mt-3">{build.short}</Note>
+                  <Note className="mt-3 mb-6">{build.short}</Note>
                 </article>
               ))}
             </div>
-            <div className="mt-7">
+            <div className="mt-3">
               <Button variant="secondary" href={cta.href}>
                 {cta.label}
               </Button>

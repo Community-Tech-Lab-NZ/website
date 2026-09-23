@@ -198,7 +198,7 @@ export const WINDOW_COPY = {
  * talking about a panel still reading. A separate flag rather than a fourth
  * WindowState, because pages test `state !== "closed"` to decide whether to
  * render the forms. +12:00 holds until daylight saving on 27 September. */
-export const ANNOUNCED_AT = "2026-09-24T00:00:00+12:00";
+export const ANNOUNCED_AT = "2026-09-24T08:05:00+12:00";
 
 /** Whether the three builds have been announced. `now` is injectable, and
  *  APPLICATION_WINDOW_OVERRIDE=announced previews it before the date. */

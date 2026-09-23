@@ -94,9 +94,12 @@ check("no address is published while applications are open",
 
 // --- The announcement -----------------------------------------------------
 // The site switches itself to the three builds, with no deploy.
-check("not announced on the 23rd", isAnnounced(new Date("2026-09-23T23:59:59+12:00")), false);
-check("announced from the first instant of the 24th",
-  isAnnounced(new Date("2026-09-24T00:00:00+12:00")), true);
+check("not announced at 8:04am on the 24th", isAnnounced(new Date("2026-09-24T08:04:59+12:00")), false);
+check("announced from 8:05am on the 24th",
+  isAnnounced(new Date("2026-09-24T08:05:00+12:00")), true);
+// 8:05am NZST is 20:05 UTC the day before.
+check("20:05 UTC on the 23rd is 8:05am NZST, so announced",
+  isAnnounced(new Date("2026-09-23T20:05:00Z")), true);
 check("before the announcement the CTA is still the closed one",
   getSiteCopy(new Date("2026-09-23T12:00:00+12:00")).cta.href, "/apply");
 check("once announced every CTA leads to the builds",

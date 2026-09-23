@@ -65,7 +65,7 @@ export const metadata: Metadata = {
  * rows are now history. A reader arriving here wants to know what is coming,
  * and a list whose top half has already happened buries it. */
 const WHAT_HAPPENS_NEXT = [
-  { date: "28 Sep to 9 Oct", label: "Working out exactly what gets made" },
+  { date: "28 Sep to 9 Oct", label: "Designing each solution, with the organisation" },
   { date: "12 Oct to 13 Nov", label: "Building it, with something to try each week" },
   { date: "From 13 Nov", label: "Handover, with training and written instructions" },
   { date: "26 Nov", label: "Showcase Hui, where all three are demonstrated" },
@@ -145,11 +145,11 @@ export default function BuildsPage() {
             <div>
               <Heading level={2}>What happens now</Heading>
               <Body className="mt-5">
-                We have a good idea of the shape of each one. What it does exactly, and
-                what it has to get right, is what the fortnight from 28 September is for:
-                each team sits down with their organisation and works that out with them
-                before anything gets built. From 12 October there are five weeks of
-                building, with something to try at the end of each week.
+                We have an idea of the shape of each solution. What each will do, and how
+                they will work exactly, has yet to be designed. Between 28 September and
+                9 October each team will sit down with their organisation and work that
+                out with them, before anything gets built. From 12 October there are five
+                weeks of building, with something to try at the end of each week.
               </Body>
               <Body className="mt-4">
                 All three are demonstrated at the Showcase Hui on 26 November, which FLINT

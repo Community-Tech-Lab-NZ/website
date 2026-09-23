@@ -210,7 +210,16 @@ export const CHOSEN: ChosenBuild[] = [
  * rather than navigation.ts for the reason set out there: the site says "build"
  * as a noun and this audience is not sold to in delivery vocabulary. */
 const WHAT_HAPPENS_NEXT = [
-  { label: "Working out exactly what gets made", value: "28 September to 9 October" },
+  /* "Designing" here, not "working out exactly what gets made", which is the
+   * wording the three earlier broadcasts and navigation.ts use for the same
+   * fortnight.
+   *
+   * Deliberately diverged rather than changed everywhere. The paragraph above
+   * this table now says the solutions have yet to be designed, and a row
+   * underneath calling the same fortnight something else reads as two
+   * descriptions of two activities. The sent broadcasts keep their wording
+   * because they are history and cannot be edited anyway. */
+  { label: "Designing each solution, with the organisation", value: "28 September to 9 October" },
   { label: "Building it, with something to try each week", value: "12 October to 13 November" },
   { label: "Handover, with training and written instructions", value: "From 13 November" },
   { label: "Showcase Hui, where all three are demonstrated", value: "26 November" },
@@ -285,21 +294,33 @@ export function announcementBroadcast(
             // The single most important sentence in the email for managing what
             // people expect, and it is first in its section for that reason.
             //
-            // "A good idea of the shape", NOT "nobody knows". The earlier draft
-            // said nobody knows yet what gets built, which was wrong in the
+            // "AN IDEA OF THE SHAPE", NOT "NOBODY KNOWS". The first draft said
+            // nobody knows yet what gets built, which was wrong in the
             // direction that costs most: the panel scored these three partly on
-            // deliverability, which it could not have done without a view on
-            // what each one would take. Saying otherwise makes the programme
-            // sound like it picked three problems and will work the rest out
-            // later, and it quietly tells the three organisations their build
-            // has not been thought about.
+            // deliverability, which it could not have done without a view of
+            // what each would take. Saying otherwise makes the programme sound
+            // like it picked three problems and will work the rest out later,
+            // and it tells the three organisations their build has not been
+            // thought about.
             //
-            // What is still true, and is the reason this paragraph exists, is
-            // that the detail is not settled and is settled WITH them. So the
-            // sentence claims a shape and no more: no feature, no platform, no
-            // noun that discovery could contradict. Do not let a later edit
-            // trade "the shape" for an example of it.
-            "We have a good idea of the shape of each one. What it does exactly, and what it has to get right, is what the fortnight from 28 September is for: each team sits down with their organisation and works that out with them before anything gets built.",
+            // "HAS YET TO BE DESIGNED" is doing the real work, and it is the
+            // Chair's wording. It puts a named activity between now and the
+            // build, which is what stops "we have an idea" being read as "it is
+            // basically decided". The shape is claimed, the design is not.
+            //
+            // NO FEATURE, NO PLATFORM, no noun that discovery could contradict.
+            // A shape cannot be quoted back at the delivery team in October and
+            // a feature can. Do not let a later edit trade "the shape" for an
+            // example of it.
+            //
+            // "SOLUTION" IS THE BRAND'S COUNTABLE NOUN, per brand-guide.md:
+            // three solutions, one per organisation. It is deliberately absent
+            // from broadcast.ts, which was written for readers who had been
+            // promised nothing and where any countable noun was a promise. That
+            // reason expired when these three were chosen. "Each solution" is
+            // the sanctioned use; "digital solutions for the community sector"
+            // is the one the brand sheet warns against.
+            "We have an idea of the shape of each solution. What each will do, and how they will work exactly, has yet to be designed. Between 28 September and 9 October each team will sit down with their organisation and work that out with them, before anything gets built.",
             "From 12 October there are five weeks of building, with something to try at the end of each week. All three are demonstrated at the Showcase Hui on 26 November, which FLINT Queenstown is running as its Q4 event.",
             // The open source line is not a footnote in this programme, per the
             // brand guide, and this is the email where it pays off: the reader

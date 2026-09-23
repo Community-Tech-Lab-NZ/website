@@ -38,7 +38,7 @@ import {
   questionAlert,
   type Message,
 } from "../src/lib/email";
-import { developerDecline, juniorInternOffer } from "../src/lib/outcome";
+import { communityDecline, developerDecline, juniorInternOffer } from "../src/lib/outcome";
 import type { CommunityApplication, DeveloperApplication } from "../src/lib/schemas";
 
 const OUT = join(process.cwd(), ".email-preview");
@@ -190,8 +190,16 @@ const messages: { name: string; message: Message }[] = [
     name: "13-announcement-friends",
     message: announcementBroadcast(LIST_REASON.personalContacts),
   },
+  // The community decline, to the thirteen organisations not chosen. Rendered
+  // here for the greeting above all: it is a Resend merge tag rather than a
+  // name, so this is the only place to see that the sentence around it still
+  // reads, and that the fallback is a greeting rather than a blank.
   {
-    name: "14-developer-decline",
+    name: "14-community-decline",
+    message: communityDecline("stephens.giovanni@gmail.com"),
+  },
+  {
+    name: "15-developer-decline",
     message: developerDecline(
       { firstName: "Sam", email: "sam@example.com" },
       "giovanni@alcova.ai",
@@ -202,7 +210,7 @@ const messages: { name: string; message: Message }[] = [
   // matters is that they do not read as the same letter with the name swapped,
   // while still offering identical terms.
   {
-    name: "15-intern-offer-observation",
+    name: "16-intern-offer-observation",
     message: juniorInternOffer(
       { firstName: "Sam", email: "sam@example.com" },
       "giovanni@alcova.ai",
@@ -210,7 +218,7 @@ const messages: { name: string; message: Message }[] = [
     ),
   },
   {
-    name: "16-intern-offer-practice",
+    name: "17-intern-offer-practice",
     message: juniorInternOffer(
       { firstName: "Alex", email: "alex@example.com" },
       "giovanni@alcova.ai",

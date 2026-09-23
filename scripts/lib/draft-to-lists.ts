@@ -53,8 +53,12 @@ export type BroadcastList = {
   mustNotSay: string;
 };
 
-/** Loads .env without a dependency, leaving anything already exported alone. */
-function loadEnv(): void {
+/** Loads .env without a dependency, leaving anything already exported alone.
+ *
+ *  Exported because the decline broadcast builds its own segment and so cannot
+ *  use draftToLists, but still needs the same two variables from the same file.
+ *  A third copy of this six-line reader is a third place for it to drift. */
+export function loadEnv(): void {
   for (const line of readFileSync(".env", "utf8").split("\n")) {
     const m = /^([A-Z0-9_]+)=(.*)$/.exec(line.trim());
     if (m) process.env[m[1]] ??= m[2].replace(/^["']|["']$/g, "");

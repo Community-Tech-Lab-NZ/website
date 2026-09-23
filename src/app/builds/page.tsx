@@ -26,11 +26,15 @@ import { breadcrumbSchema, JsonLd } from "@/lib/structured-data";
  * WHAT IT DOES NOT DO.
  *
  * It does not say what is being built, for the reason set out at length in
- * announcement.ts: discovery runs 28 September to 9 October and has not
- * happened. Unlike the email, this page CAN be corrected afterwards, and the
- * intention is that it is — once each team knows what it is making, this is
- * where that goes, and later still the link to the thing itself. The page is
- * built to be added to. It is not built to be right about the future.
+ * announcement.ts: there is a shape for each one, but the detail is settled
+ * with the organisation over the fortnight from 28 September, and naming a
+ * feature now is how a delivery team gets held to a sentence written before
+ * anyone sat down with the people who have to use it.
+ *
+ * Unlike the email, this page CAN be corrected afterwards, and the intention is
+ * that it is. Once each team knows what it is making, this is where that goes,
+ * and later still the link to the thing itself. The page is built to be added
+ * to. It is not built to be right about the future.
  *
  * It does not carry the ClosingCta band that the other five content pages end
  * on. That band invites the reader to apply, and applications for this cohort
@@ -141,11 +145,11 @@ export default function BuildsPage() {
             <div>
               <Heading level={2}>What happens now</Heading>
               <Body className="mt-5">
-                Nobody knows yet what gets built. Each team spends the fortnight from
-                28 September sitting down with their organisation and working out what
-                would actually help, and only then does anything get made. From 12 October
-                there are five weeks of building, with something to try at the end of each
-                week.
+                We have a good idea of the shape of each one. What it does exactly, and
+                what it has to get right, is what the fortnight from 28 September is for:
+                each team sits down with their organisation and works that out with them
+                before anything gets built. From 12 October there are five weeks of
+                building, with something to try at the end of each week.
               </Body>
               <Body className="mt-4">
                 All three are demonstrated at the Showcase Hui on 26 November, which FLINT

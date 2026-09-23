@@ -35,14 +35,22 @@ import { PRODUCTION_URL } from "./site";
  * share" is as far as the evidence goes, and it is as far as the copy goes.
  *
  * IT DESCRIBES PROBLEMS, NOT SOLUTIONS, AND THAT IS A PROMISE NOT A HEDGE.
- * Discovery runs 28 September to 9 October and has not happened. Nobody knows
- * yet what gets built, and an email cannot be corrected after it has gone to
- * seven hundred and eighty people. So each organisation gets its problem in its
- * own terms, the concrete detail that made the panel pick it, and then the copy
- * says plainly that what gets made is worked out with them over the fortnight
- * from the 28th. A reader who wants to know what the thing will be is told when
- * that will be known, which is the honest answer and also the reason to open
- * the next email.
+ * Discovery runs 28 September to 9 October, and an email cannot be corrected
+ * after it has gone to seven hundred and sixty three people. So each
+ * organisation gets its problem in its own terms, the concrete detail that made
+ * the panel pick it, and then the copy says plainly that the detail of what
+ * gets made is worked out with them over the fortnight from the 28th. A reader
+ * who wants to know what the thing will be is told when that will be known,
+ * which is the honest answer and also the reason to open the next email.
+ *
+ * THAT IS NOT THE SAME AS KNOWING NOTHING, and an earlier draft got this wrong
+ * by saying nobody knows yet what gets built. The panel scored these three
+ * partly on whether five weeks was enough, which is not a judgement anyone can
+ * make without a view of what each would take. There is a shape for each one;
+ * what is open is the detail, and the detail is settled with the organisation
+ * rather than for it. The copy now says exactly that and still names no
+ * feature, because a shape cannot be quoted back at the delivery team in
+ * October and a feature can.
  *
  * Writing it the other way was the tempting draft and it was a trap: "a phone
  * app that syncs readings to a shared dataset" is a lovely sentence to write in
@@ -276,7 +284,22 @@ export function announcementBroadcast(
           paragraphs: [
             // The single most important sentence in the email for managing what
             // people expect, and it is first in its section for that reason.
-            "Nobody knows yet what gets built. Each team spends the fortnight from 28 September sitting down with their organisation and working out what would actually help, and only then does anything get made.",
+            //
+            // "A good idea of the shape", NOT "nobody knows". The earlier draft
+            // said nobody knows yet what gets built, which was wrong in the
+            // direction that costs most: the panel scored these three partly on
+            // deliverability, which it could not have done without a view on
+            // what each one would take. Saying otherwise makes the programme
+            // sound like it picked three problems and will work the rest out
+            // later, and it quietly tells the three organisations their build
+            // has not been thought about.
+            //
+            // What is still true, and is the reason this paragraph exists, is
+            // that the detail is not settled and is settled WITH them. So the
+            // sentence claims a shape and no more: no feature, no platform, no
+            // noun that discovery could contradict. Do not let a later edit
+            // trade "the shape" for an example of it.
+            "We have a good idea of the shape of each one. What it does exactly, and what it has to get right, is what the fortnight from 28 September is for: each team sits down with their organisation and works that out with them before anything gets built.",
             "From 12 October there are five weeks of building, with something to try at the end of each week. All three are demonstrated at the Showcase Hui on 26 November, which FLINT Queenstown is running as its Q4 event.",
             // The open source line is not a footnote in this programme, per the
             // brand guide, and this is the email where it pays off: the reader
@@ -286,14 +309,24 @@ export function announcementBroadcast(
           meta: WHAT_HAPPENS_NEXT,
         },
       ],
-      outro: [
-        // The forward ask, which is different from the earlier ones: there is
-        // nothing to apply for now, so the reason to pass it on is that three
-        // local organisations are about to have something built and their
-        // people would want to know.
-        "If you know anyone at these three, send this to them. And if you have been watching this round wondering whether your own problem would have fitted, reply and tell us what it is. There is no form to fill in, and knowing what is out there is how a second round gets built.",
-        CREDIT_SENTENCE,
-      ],
+      /* THE CREDIT SENTENCE AND NOTHING ELSE.
+       *
+       * This carried a forward ask as well, which asked readers to pass the
+       * email on and to reply with problems of their own for a future round.
+       * Removed on 23 September at the Chair's direction.
+       *
+       * The second half was the part that had to go: whether there IS a second
+       * round is not decided, and inviting seven hundred people to describe a
+       * problem into an inbox that may never be able to do anything with it
+       * spends trust the programme will want later. The first half went with it
+       * rather than leave a one-line ask hanging where a paragraph had been.
+       *
+       * The credit line stays, because the funder credit is a condition of the
+       * grant and the partner names are owed. An outro of one sentence is a
+       * normal shape here: the message has already finished saying what it came
+       * to say, and the last section ends on open source, which is a better
+       * close than a request would have been. */
+      outro: [CREDIT_SENTENCE],
       signoff: "Ngā mihi\nGiovanni Stephens\nChair, Community Tech Lab",
       logos: CREDIT_WALL,
       // The permanent record, not an ask. Every earlier broadcast's button sent
@@ -305,8 +338,13 @@ export function announcementBroadcast(
         reason: listReason,
         unsubscribeUrl: "{{{RESEND_UNSUBSCRIBE_URL}}}",
       },
-      // Invites a reply twice, in the last two sections. Must not claim the
-      // address is unmonitored.
+      /* Still false, though the copy no longer asks for a reply anywhere.
+       *
+       * Two paragraphs that did have been cut. What has not changed is that
+       * replyTo is a real mailbox and the footer offers "reply and say so" as
+       * the unsubscribe route that works when the hosted link does not, which
+       * only holds if someone reads replies. Setting this true would print
+       * "this address is not monitored" directly above that offer. */
       unmonitored: false,
     },
   };

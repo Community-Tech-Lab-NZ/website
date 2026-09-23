@@ -48,9 +48,6 @@ const WHAT_IT_INVOLVES = [
   "After that: the code is open source, so you are never locked in",
 ];
 
-/* "A, B and C", for the lede. */
-const CHOSEN_NAMES = `${CHOSEN.slice(0, -1).map((b) => b.name).join(", ")} and ${CHOSEN.at(-1)!.name}`;
-
 export default function OrganisationsPage() {
   const announced = isAnnounced();
 
@@ -71,11 +68,13 @@ export default function OrganisationsPage() {
         </Heading>
         {announced ? (
           <>
-            <Lede className="mt-6">
-              This round, three organisations bring a problem each: {CHOSEN_NAMES}.
-              Each is matched with a small team of local developers working at community
-              rates. From 28 September each solution is designed with its organisation,
-              then built over five weeks and handed over, at no cost to the organisation.
+            <Lede className="mt-6">This round, three organisations brought a problem each:</Lede>
+            <CaretList className="mt-4" items={CHOSEN.map((build) => build.name)} />
+            <Lede className="mt-5">
+              Each was matched with a small team of local developers working at community
+              rates. From 28 September each solution will be designed with its
+              organisation, then built over five weeks and handed over, at no cost to the
+              organisation.
             </Lede>
             <div className="mt-7">
               <Button variant="secondary" href="/builds">
@@ -146,11 +145,13 @@ export default function OrganisationsPage() {
             <div>
               <Eyebrow className="mb-4">{announced ? "How the three were chosen" : "How we choose"}</Eyebrow>
               <Heading level={3} as="h2">
-                A panel of local tech and community people {announced ? "read" : "reads"} every
-                application
+                {announced
+                  ? "Every application was read by a panel of local tech and community people"
+                  : "A panel of local tech and community people reads every application"}
               </Heading>
               <Body className="mt-4">
-                Reuse {announced ? "carried" : "carries"} real weight, because only three tools get built. If five
+                Reuse {announced ? "carried" : "carries"} real weight, because only three tools{" "}
+                {announced ? "could be" : "get"} built. If five
                 organisations need the same thing, the aim is to build it once so all five
                 can use it, rather than once for one of them.
               </Body>

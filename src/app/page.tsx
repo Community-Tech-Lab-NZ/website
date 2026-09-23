@@ -59,7 +59,7 @@ export default function HomePage() {
   const announced = isAnnounced();
   const cta = getSiteCopy().cta;
   const howItRuns = announced
-    ? ["A panel of local tech and community people read every application", ...HOW_IT_RUNS.slice(1)]
+    ? ["Every application was read by a panel of local tech and community people", ...HOW_IT_RUNS.slice(1)]
     : HOW_IT_RUNS;
 
   return (
@@ -253,7 +253,8 @@ export default function HomePage() {
               </Heading>
               <Body className="mt-5">
                 Three tools {announced ? "were" : "are"} chosen by open application, each
-                one picked so more than one organisation can use it. Each is matched with a small team of local
+                one picked so more than one organisation can use it. Each{" "}
+                {announced ? "was" : "is"} matched with a small team of local
                 developers, led by a senior developer. The programme
                 is run by Startup Queenstown Lakes and funded by the Queenstown Lakes
                 District Council Economic Diversification Fund.

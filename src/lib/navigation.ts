@@ -112,7 +112,7 @@ const TIMELINE_STEPS: { date: string; label: string; past?: string; ends: string
   {
     date: "1 to 18 Sep",
     label: "A local panel reads every application",
-    past: "A local panel read every application",
+    past: "Every application read by a local panel",
     ends: "2026-09-19T00:00:00+12:00",
   },
   {

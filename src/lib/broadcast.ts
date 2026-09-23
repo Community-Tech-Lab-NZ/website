@@ -134,7 +134,7 @@ export const LIST_REASON = {
  * widths and heights below come from. Do not hand-edit them: they are the
  * generated files' real dimensions at 1x, and a wrong pair here is a mark that
  * arrives stretched. */
-const CREDIT_WALL = {
+export const CREDIT_WALL = {
   label: "Delivered with",
   logos: [
     { src: `${LOGOS}/partner-startup-queenstown-lakes.png`, alt: "Startup Queenstown Lakes", w: 134, h: 56, href: PARTNER_URLS["Startup Queenstown Lakes"] },
@@ -212,7 +212,7 @@ const partnerLink = (name: string) => {
  * wall is images, and images are off by default in Outlook and stripped by some
  * corporate gateways entirely, so for a real share of readers the sentence is
  * the only place the credit exists at all. */
-const CREDIT_SENTENCE = [
+export const CREDIT_SENTENCE = [
   "**Community Tech Lab** is run by six local organisations working together:",
   [
     partnerLink("Startup Queenstown Lakes"),

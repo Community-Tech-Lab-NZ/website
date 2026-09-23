@@ -45,3 +45,17 @@ next-env.d.ts
 
 # rendered email previews (pnpm preview:emails)
 /.email-preview/
+
+# Full-resolution photograph originals (assets/photos).
+#
+# The derived files in public/images ARE committed, because they are what the
+# site and the emails serve. These are the camera files behind them, 5.9MB of
+# JPEG that nothing at runtime reads: scripts/build-email-photos.mjs is the only
+# consumer and it is run by hand when the photographs change.
+#
+# They are kept out of the repo rather than in it because git stores every
+# version of a binary forever, and a re-crop of nine photographs would add
+# another 5.9MB that can never be removed. They live in the programme's own
+# Drive alongside the permissions for them, which is also where the next person
+# has to go for the ones we were not given.
+/assets/photos/

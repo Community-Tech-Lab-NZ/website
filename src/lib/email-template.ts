@@ -124,6 +124,36 @@ export type EmailLogoWall = {
   };
 };
 
+/* A photograph, at the head of a section.
+ *
+ * NOT THE SAME THING AS `EmailLogo`, and deliberately not reusing it. A logo is
+ * a mark at a fixed small size inside a grid cell, drawn with `width:Wpx` so
+ * Outlook holds it at that size; a photograph fills the card's full measure and
+ * is drawn with `width:100%`. They sit differently, they scale differently, and
+ * the one thing they share is the `<img>` tag.
+ *
+ * `w` AND `h` ARE THE FILE'S REAL DIMENSIONS, as with EmailLogo, and they are
+ * here for one reason: the attributes reserve the space before the file
+ * arrives. Without them a reader on a slow connection watches the whole message
+ * jump down the screen as each photograph lands. scripts/build-email-photos.mjs
+ * prints the pair to paste in. Do not hand-edit them.
+ *
+ * `credit` IS NOT OPTIONAL WHERE A PHOTOGRAPHER IS KNOWN. Two of the
+ * announcement photographs are signed in the frame and one is credited in its
+ * filename. Printing the line under the image is the least that arrangement
+ * implies, and it is a field rather than a sentence in the copy so that it
+ * cannot be dropped in an edit that was only meant to tighten a paragraph. */
+export type EmailImage = {
+  src: string;
+  /** What the photograph shows, for the reader whose client blocks images,
+   *  which is most of Outlook. Describes the scene, never "photo of". */
+  alt: string;
+  w: number;
+  h: number;
+  /** The photographer, where one is known. Rendered under the image. */
+  credit?: string;
+};
+
 /* A labelled run of the body, for messages long enough to need finding your
  * place in.
  *
@@ -140,6 +170,8 @@ export type EmailSection = {
   label: string;
   paragraphs?: string[];
   meta?: EmailMeta[];
+  /** A photograph, above the label. See `EmailImage`. */
+  image?: EmailImage;
 };
 
 /* What bulk mail has to carry and transactional mail must not.
@@ -380,12 +412,49 @@ function htmlMeta(meta: EmailMeta[]): string {
   return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;margin-top:28px;">${rows}</table>`;
 }
 
+/* A photograph across the card's full measure.
+ *
+ * `width:100%` with the real dimensions in the attributes. The attributes are
+ * what Outlook uses and what reserves the space everywhere else before the file
+ * lands; the CSS is what lets the frame shrink with the card on a phone. The
+ * file is built at 536, which is exactly the card's usable width, so 100% is
+ * its natural size on a desktop and it is never scaled up.
+ *
+ * The alt text carries real weight here. Images are off by default in Outlook
+ * and stripped by some corporate gateways, so for a real share of readers this
+ * sentence IS the photograph, and it is styled to read as a line of type rather
+ * than as a failure: Source Sans at 13px muted, which is the same treatment as
+ * the credit below it.
+ *
+ * NO BORDER, NO RADIUS. The brand's cards are near-square with a hairline, and
+ * a photograph inside a card that already has one would be a second frame
+ * around the first. Flat, edge to edge in its column. */
+function htmlImage(image: EmailImage): string {
+  const img = `<img src="${escapeHtml(image.src)}" width="${image.w}" height="${image.h}" alt="${escapeHtml(image.alt)}" style="display:block;border:0;outline:none;text-decoration:none;width:100%;max-width:100%;height:auto;font-family:${BODY};font-size:13px;line-height:1.5;color:${INK_MUTED};">`;
+
+  // Space Mono, as every other piece of meta at this size is. A credit is
+  // exactly what the brand reserves that face for.
+  const credit = image.credit
+    ? `<p style="margin:8px 0 0;font-family:${MONO};font-size:10px;line-height:1.4;letter-spacing:0.12em;text-transform:uppercase;color:${INK_MUTED};">${escapeHtml(image.credit)}</p>`
+    : "";
+
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;margin-top:26px;">
+      <tr>
+        <td>${img}${credit}</td>
+      </tr>
+    </table>`;
+}
+
 function htmlSection(section: EmailSection): string {
   // Hairline above, then the label. The rule is what makes this scannable at
   // arm's length: an eyebrow alone is small enough that the eye slides past it
   // in a column of body copy, and the line gives it something to sit on.
   const body = [
-    ...(section.paragraphs ?? []).map((text, i) => htmlParagraph(text, i === 0 ? 14 : 18)),
+    // The photograph sits under the label rather than above the hairline. Above
+    // it, the image would butt against the previous section's last paragraph
+    // and read as belonging to that one instead of this.
+    section.image ? htmlImage(section.image) : "",
+    ...(section.paragraphs ?? []).map((text, i) => htmlParagraph(text, i === 0 && !section.image ? 14 : 18)),
     section.meta?.length ? htmlMeta(section.meta) : "",
   ]
     .filter(Boolean)
@@ -733,6 +802,21 @@ export function renderTextEmail(content: EmailContent): string {
     // Upper-cased here rather than by CSS, because the plain-text part has no
     // CSS and the label has to read as a heading on its own.
     blocks.push(section.label.toUpperCase());
+    /* The photograph's alt text and credit, as words.
+     *
+     * The logo wall is deliberately not rendered in the text part, four hundred
+     * lines down, on the grounds that all it could add is the partner names a
+     * second time. This is the opposite case and the reasoning inverts: the alt
+     * text is a sentence that appears nowhere else in the message, it was
+     * written for exactly the reader who cannot see the image, and the credit is
+     * owed to a photographer whether or not the reader's client renders JPEGs.
+     *
+     * In brackets because it is a description of something absent rather than
+     * part of the letter, and a reader should be able to tell those apart. */
+    if (section.image) {
+      const credit = section.image.credit ? `. Photograph by ${section.image.credit}` : "";
+      blocks.push(wrap(`[${section.image.alt}${credit}]`));
+    }
     for (const paragraph of section.paragraphs ?? []) blocks.push(wrap(paragraph));
     if (section.meta?.length) {
       blocks.push(section.meta.map((item) => `${item.label}: ${item.value}`).join("\n"));

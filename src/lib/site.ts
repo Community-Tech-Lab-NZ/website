@@ -77,6 +77,10 @@ export const SITE_DESCRIPTION =
 export const ROUTES = [
   { path: "/", priority: 1.0 },
   { path: "/apply", priority: 0.9 },
+  /* The announcement's permanent record, published 24 September. High
+   * priority because for a while it is the most newsworthy page on the site
+   * and the one three organisations will be linking to. */
+  { path: "/builds", priority: 0.8 },
   { path: "/organisations", priority: 0.8 },
   { path: "/developers", priority: 0.8 },
   { path: "/about", priority: 0.6 },

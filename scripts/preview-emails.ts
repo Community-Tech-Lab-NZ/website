@@ -22,6 +22,7 @@ import {
   communityApplicationSummary,
   developerApplicationSummary,
 } from "../src/lib/application-doc";
+import { announcementBroadcast } from "../src/lib/announcement";
 import {
   applicationsOpenBroadcast,
   communityLaunchBroadcast,
@@ -177,8 +178,20 @@ const messages: { name: string; message: Message }[] = [
   // named people being told no and their names do not belong in a preview
   // directory. What is being checked here is the tone and the shape, both of
   // which are the same whoever it is addressed to.
+  // The announcement, once per list, for the same footer reason as the pair
+  // above it. It is also the only message carrying photographs, so these two
+  // are the check that three remote JPEGs actually resolve and that the alt
+  // text reads as a sentence in the client that blocks them.
   {
-    name: "12-developer-decline",
+    name: "12-announcement-community",
+    message: announcementBroadcast(LIST_REASON.communityConnect),
+  },
+  {
+    name: "13-announcement-friends",
+    message: announcementBroadcast(LIST_REASON.personalContacts),
+  },
+  {
+    name: "14-developer-decline",
     message: developerDecline(
       { firstName: "Sam", email: "sam@example.com" },
       "giovanni@alcova.ai",
@@ -189,7 +202,7 @@ const messages: { name: string; message: Message }[] = [
   // matters is that they do not read as the same letter with the name swapped,
   // while still offering identical terms.
   {
-    name: "13-intern-offer-observation",
+    name: "15-intern-offer-observation",
     message: juniorInternOffer(
       { firstName: "Sam", email: "sam@example.com" },
       "giovanni@alcova.ai",
@@ -197,7 +210,7 @@ const messages: { name: string; message: Message }[] = [
     ),
   },
   {
-    name: "14-intern-offer-practice",
+    name: "16-intern-offer-practice",
     message: juniorInternOffer(
       { firstName: "Alex", email: "alex@example.com" },
       "giovanni@alcova.ai",

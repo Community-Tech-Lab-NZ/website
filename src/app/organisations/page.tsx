@@ -68,7 +68,9 @@ export default function OrganisationsPage() {
         </Heading>
         {announced ? (
           <>
-            <Lede className="mt-6">This round, three organisations brought a problem each:</Lede>
+            <Lede className="mt-6">
+              Sixteen organisations brought a problem this round, and three were chosen:
+            </Lede>
             <CaretList className="mt-4" items={CHOSEN.map((build) => build.name)} />
             <Lede className="mt-5">
               Each was matched with a small team of local developers working at community

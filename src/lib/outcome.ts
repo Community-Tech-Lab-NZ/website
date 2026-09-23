@@ -338,13 +338,16 @@ export function communityDecline(replyTo: string): Message {
         },
         /* The reassurance, after the list rather than inside it.
          *
-         * "A very close field" rather than a bare denial. "It is not a
-         * reflection on you" is the sentence every decline contains and every
-         * reader discounts; pairing it with the thing that makes it true, which
-         * is that the decisions were hard, is what gives it something to stand
-         * on. The Chair's "challenging decisions" two paragraphs above is the
-         * same fact, so this reads as a continuation rather than a new claim. */
-        "It was a very close field, and this is not a reflection on your organisation or on the problem you brought us.",
+         * "It is not a reflection on you" is the sentence every decline
+         * contains and every reader discounts, so it is paired with the thing
+         * that makes it true. That was "it was a very close field", which is
+         * competition vocabulary: a close field is a horse race or an election,
+         * and it casts thirteen organisations as entrants who lost narrowly.
+         * The whole letter says the opposite, that the constraint was three
+         * builds rather than the quality of what came in.
+         *
+         * So it says that instead, in words anyone uses. */
+        "There were more good applications than there were places, and this is not a reflection on your organisation or on the problem you brought us.",
         // "Today", not "tomorrow": this sends on the same day as the
         // announcement.
         "The three that were chosen are announced publicly later today, and you will most likely see that email as well.",

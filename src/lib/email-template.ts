@@ -166,22 +166,31 @@ export type EmailImage = {
  *
  * `meta` rides inside a section rather than only at the top level so the dates
  * table can sit under its own heading instead of floating between paragraphs. */
-/* A numbered list, for the few places the copy is genuinely enumerating.
+/* A list, marked the way the brand marks lists.
  *
- * NUMBERED, NOT BULLETED, and there is no option for the other. The site's list
- * marker is the caret from the logo, drawn in CSS, which an email cannot do; a
- * bullet character would be a Unicode symbol used as decoration, which the
- * brand forbids outright. A number is neither. It is also the only marker that
- * says something a paragraph could not, which is the test for using a list at
- * all rather than a sentence with commas in it.
+ * `marker: "caret"` is the default and is the site's own list marker: the caret
+ * from the logo, in place of a bullet. brand-guide.md is explicit on both
+ * halves of that, "the caret as a list marker in place of a bullet" and
+ * "Unicode symbols as decoration: never", so a `•` is not an option here however
+ * ordinary it would look.
  *
- * The number is set in Space Mono, as every other small piece of structure in
- * these emails is, and sits in its own narrow cell so the item text aligns
- * against a straight left edge rather than wrapping under the digit.
+ * HOW A CARET SURVIVES AN INBOX. The site draws it as an SVG polyline, which
+ * email clients do not render reliably. This draws the same angle with CSS
+ * borders on an empty element: a box with two transparent sides and two
+ * coloured ones, rotated, is a chevron, and border rendering is the one drawing
+ * primitive every client including Outlook supports. Fern, because the brand
+ * reserves it for small structural markers and the viewport's one gold thing is
+ * already the rule under the header.
  *
- * Rendered as a table rather than <ol>, because Outlook's list rendering comes
- * through Word and its indentation is unpredictable at best. */
+ * `marker: "number"` is there for a list that is genuinely ordered, where the
+ * sequence is part of the meaning rather than decoration. Set in Space Mono,
+ * like every other small piece of structure in these emails.
+ *
+ * Either way it is a table rather than <ul> or <ol>, because Outlook's list
+ * rendering comes through Word and its indentation is unpredictable at best. */
 export type EmailList = string[];
+
+export type EmailListMarker = "caret" | "number";
 
 export type EmailSection = {
   label: string;
@@ -189,8 +198,10 @@ export type EmailSection = {
   meta?: EmailMeta[];
   /** A photograph, above the label. See `EmailImage`. */
   image?: EmailImage;
-  /** A numbered list, after the paragraphs. See `EmailList`. */
+  /** A list, after the paragraphs. See `EmailList`. */
   list?: EmailList;
+  /** Caret by default; "number" where the order carries meaning. */
+  listMarker?: EmailListMarker;
 };
 
 /* What bulk mail has to carry and transactional mail must not.
@@ -244,7 +255,7 @@ export type EmailContent = {
    *  point in the flow, which is the only way an enumeration can follow the
    *  sentence that introduces it: a list appended after the whole intro reads
    *  as an orphan four paragraphs from its own colon. */
-  intro: (string | { list: EmailList })[];
+  intro: (string | { list: EmailList; marker?: EmailListMarker })[];
   /** Named facts: who applied, where the Doc is. Rendered as rows, links live. */
   meta?: EmailMeta[];
   /** Labelled body sections, rendered after `intro`. Long messages only. */
@@ -342,12 +353,20 @@ function wrap(text: string, width = TEXT_WIDTH): string {
  * wrapping line sits under the text rather than under the digit. Wrapped at
  * three less than the usual width to pay for that indent, so the right edge
  * still lands where every other paragraph's does. */
-function textList(items: EmailList): string {
+function textList(items: EmailList, marker: EmailListMarker = "caret"): string {
+  /* The caret comes down to "-" in the text part, not to "^" or ">".
+   *
+   * The brand's objection is to Unicode symbols used as decoration, and a
+   * hyphen is neither Unicode nor decoration: it is what a plain-text list has
+   * looked like since before there were email clients, and every reader parses
+   * it without being taught. "^" is the caret's literal character and reads as
+   * a typo mid-sentence; ">" is quoting. */
   return items
     .map((item, i) => {
-      const n = `${i + 1}.`;
-      const body = wrap(item, TEXT_WIDTH - 3).split("\n");
-      return [`${n} ${body[0]}`, ...body.slice(1).map((line) => `   ${line}`)].join("\n");
+      const lead = marker === "number" ? `${i + 1}.` : "-";
+      const indent = " ".repeat(lead.length + 1);
+      const body = wrap(item, TEXT_WIDTH - indent.length).split("\n");
+      return [`${lead} ${body[0]}`, ...body.slice(1).map((line) => `${indent}${line}`)].join("\n");
     })
     .join("\n");
 }
@@ -503,15 +522,36 @@ function htmlImage(image: EmailImage): string {
  * numbers are superscript. 1.97 on 13px is 25.6px, which is 16px at 1.6: the
  * two baselines then agree. Change one of these and you have to change the
  * other. */
-function htmlList(items: EmailList, top = 20): string {
+function htmlList(items: EmailList, top = 20, marker: EmailListMarker = "caret"): string {
+  /* The caret, drawn with borders.
+   *
+   * An empty 6px box with its left and top edges coloured and the others
+   * transparent, rotated 45 degrees, is a chevron pointing up: the same angle
+   * the logo makes. Sized and positioned to sit on the text's optical centre
+   * for its first line, which is what `margin-top` is paying for. A rotated
+   * box is measured from its unrotated top edge, so the offset is not the
+   * distance anyone would compute from the text metrics; it was set by
+   * looking at it.
+   *
+   * `font-size:0;line-height:0` on the cell, because an empty element in a
+   * table cell still inherits a line box in some clients and the caret would
+   * otherwise sit a few pixels lower than the text it marks. */
+  const caret = `<div style="width:6px;height:6px;border-left:2px solid ${FERN};border-top:2px solid ${FERN};transform:rotate(45deg);margin-top:8px;"></div>`;
+
   const rows = items
-    .map(
-      (item, i) => `
+    .map((item, i) => {
+      const pad = i === 0 ? 0 : 10;
+      const cell =
+        marker === "number"
+          ? `<td width="28" valign="top" style="padding:${pad}px 0 0;font-family:${MONO};font-size:13px;line-height:1.97;color:${INK_MUTED};">${i + 1}.</td>`
+          : `<td width="20" valign="top" style="padding:${pad}px 0 0;font-size:0;line-height:0;">${caret}</td>`;
+
+      return `
         <tr>
-          <td width="28" valign="top" style="padding:${i === 0 ? 0 : 10}px 0 0;font-family:${MONO};font-size:13px;line-height:1.97;color:${INK_MUTED};">${i + 1}.</td>
-          <td valign="top" style="padding:${i === 0 ? 0 : 10}px 0 0;font-family:${BODY};font-size:16px;line-height:1.6;color:${INK_BODY};">${inlineLinks(brandMark(escapeMultiline(item)))}</td>
-        </tr>`,
-    )
+          ${cell}
+          <td valign="top" style="padding:${pad}px 0 0;font-family:${BODY};font-size:16px;line-height:1.6;color:${INK_BODY};">${inlineLinks(brandMark(escapeMultiline(item)))}</td>
+        </tr>`;
+    })
     .join("");
 
   return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;margin-top:${top}px;">${rows}</table>`;
@@ -527,7 +567,7 @@ function htmlSection(section: EmailSection): string {
     // and read as belonging to that one instead of this.
     section.image ? htmlImage(section.image) : "",
     ...(section.paragraphs ?? []).map((text, i) => htmlParagraph(text, i === 0 && !section.image ? 14 : 18)),
-    section.list?.length ? htmlList(section.list) : "",
+    section.list?.length ? htmlList(section.list, 20, section.listMarker) : "",
     section.meta?.length ? htmlMeta(section.meta) : "",
   ]
     .filter(Boolean)
@@ -735,7 +775,7 @@ export function renderHtmlEmail(content: EmailContent): string {
       ? `<p style="margin:14px 0 0;font-family:${BODY};font-size:19px;line-height:1.5;color:${INK_BODY};">${brandMark(escapeMultiline(content.lede))}</p>`
       : "",
     ...content.intro.map((entry) =>
-      typeof entry === "string" ? htmlParagraph(entry, 24) : htmlList(entry.list, 24),
+      typeof entry === "string" ? htmlParagraph(entry, 24) : htmlList(entry.list, 24, entry.marker),
     ),
     content.meta?.length ? htmlMeta(content.meta) : "",
     content.quote ? htmlQuote(content.quote) : "",
@@ -862,7 +902,9 @@ export function renderTextEmail(content: EmailContent): string {
   const blocks: string[] = [
     wrap(content.heading),
     ...(content.lede ? [wrap(content.lede)] : []),
-    ...content.intro.map((entry) => (typeof entry === "string" ? wrap(entry) : textList(entry.list))),
+    ...content.intro.map((entry) =>
+      typeof entry === "string" ? wrap(entry) : textList(entry.list, entry.marker),
+    ),
   ];
 
   if (content.meta?.length) {
@@ -893,7 +935,7 @@ export function renderTextEmail(content: EmailContent): string {
       blocks.push(wrap(`[${section.image.alt}${credit}]`));
     }
     for (const paragraph of section.paragraphs ?? []) blocks.push(wrap(paragraph));
-    if (section.list?.length) blocks.push(textList(section.list));
+    if (section.list?.length) blocks.push(textList(section.list, section.listMarker));
     if (section.meta?.length) {
       blocks.push(section.meta.map((item) => `${item.label}: ${item.value}`).join("\n"));
     }

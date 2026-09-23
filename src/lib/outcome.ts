@@ -327,7 +327,9 @@ export function communityDecline(replyTo: string): Message {
          * score, which is not a conversation this letter can finish.
          *
          * "SUCH AS" MEANS THESE ARE EXAMPLES, so nothing above may call them
-         * the heaviest or the top three. If a weight is ever put back, that
+         * the heaviest or the top three, and they take the caret marker rather
+         * than numbers: a numbered list implies a ranking, which is the one
+         * thing "such as" is there to avoid. If a weight is ever put back, that
          * framing has to come back with it. */
         {
           list: [

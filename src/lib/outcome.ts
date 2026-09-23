@@ -208,17 +208,21 @@ export function juniorInternOffer(
  * three builds; sixteen organisations applied. That arithmetic comes first
  * because it reflects nothing about the applicant.
  *
- * Then the three heaviest criteria are named: need 25%, reuse 20%,
- * deliverability 20%, which is 65% of the score between them. Naming the
- * CRITERIA rather than the winners is the whole design of this paragraph. It
- * explains the decision without asking thirteen organisations to measure
- * themselves against three named others, which is what "we chose X because it
- * was more Y than yours" does however carefully it is phrased. These three
- * weightings were already published on /organisations and in the programme
- * terms before anyone applied, so this tells nobody anything they were not
- * told upfront.
+ * Then three of the six criteria are named, as examples rather than as a
+ * ranking. Naming the CRITERIA rather than the winners is the whole design of
+ * this paragraph. It explains the decision without asking thirteen
+ * organisations to measure themselves against three named others, which is
+ * what "we chose X because it was more Y than yours" does however carefully it
+ * is phrased.
  *
- * It still does not say where any individual application scored. That is a
+ * NO WEIGHTS AND NO TOTAL. Both were here and both came out. The percentages
+ * live on /organisations and in the programme terms, which is the right place
+ * for someone who wants to audit the process; inside a decline they invite the
+ * reader to score their own application, and the letter cannot finish that
+ * conversation. Totalling them was worse again, being arithmetic the reader
+ * can do unaided.
+ *
+ * It does not say where any individual application scored. That is a
  * conversation, and the letter offers one.
  *
  * THE ALTERNATIVES ARE THE POINT OF THE LETTER, NOT A CONSOLATION. A scan of
@@ -279,7 +283,7 @@ export function communityDecline(replyTo: string): Message {
        * verdict, and a preheader that stopped at "not this round" would get it
        * deleted before the useful half was seen. */
       preheader:
-        "Not this round, and we are sorry. We did find something that may solve your problem anyway.",
+        "Not this round. We did find something that may solve your problem anyway, and it is often free.",
       eyebrow: "Application outcome",
       heading: "Your application",
       intro: [
@@ -287,13 +291,16 @@ export function communityDecline(replyTo: string): Message {
         "Thank you for applying to Community Tech Lab, and for the time your organisation put into the application. It is a long form and we know what an hour of an evening is worth in a small team.",
         // The answer. One sentence, no "unfortunately we regret to inform".
         "We are not able to take your problem forward this round.",
-        /* The arithmetic, as one thought.
+        /* The arithmetic, as one thought, and the Chair's wording.
          *
-         * This was two sentences that did not follow from each other: the fund
-         * covering three builds and a panel reading every application are both
-         * true and only the first explains the outcome. The reading is now
-         * where it belongs, attached to the criteria that came out of it. */
-        "Our funding from the QLDC Economic Diversification Fund covered three builds, and sixteen organisations applied.",
+         * "Unfortunately" earns its place here and nowhere else in the letter:
+         * it attaches to the funding rather than to the reader, which is the
+         * one place regret is about a constraint instead of about them.
+         *
+         * "Challenging decisions" is the Chair's and it does something the
+         * earlier draft did not: it says the panel found this hard, which is
+         * both true and the difference between a close call and a filter. */
+        "Unfortunately, our funding from the QLDC Economic Diversification Fund covers but three builds. With 16 applications, the assessment panel had to make some challenging decisions.",
         /* The criteria, introduced and then enumerated.
          *
          * A LIST BECAUSE IT IS A LIST. Three weighted criteria read as three
@@ -301,28 +308,43 @@ export function communityDecline(replyTo: string): Message {
          * not, and the reader deciding whether the process was fair is
          * counting them.
          *
-         * NO TOTAL. This said the three carry 65 percent between them, which
-         * is arithmetic the reader can do and does not need done for them.
-         * Naming the weights and stopping is the version that respects them. */
-        "A local panel read every application in full and scored each against six criteria, published before applications opened. Three of them carry the most weight:",
-        /* The three, in weight order, immediately under the colon that
-         * introduces them.
+         * The weights came out too; see the note beside the list itself. */
+        "They read every application in full and scored each against six criteria, such as:",
+        /* Three of the six, immediately under the colon that introduces them.
          *
          * Worded as the questions the panel was actually asking rather than as
          * the scoring matrix's own labels ("genuine need", "reuse and wider
          * application"), which are the internal names for these and read as
-         * jargon to the person being told no. The weights are kept because they
-         * are what makes this a fact rather than a claim, and they are not
-         * totalled: the reader can add three numbers. */
+         * jargon to the person being told no.
+         *
+         * "THEY", because the Chair's sentence above has just introduced the
+         * assessment panel and naming it again two lines later reads as two
+         * different panels.
+         *
+         * NO WEIGHTS. They are published on /organisations and in the terms,
+         * which is where someone who wants to audit the process should find
+         * them; in a decline they invite the reader to work out their own
+         * score, which is not a conversation this letter can finish.
+         *
+         * "SUCH AS" MEANS THESE ARE EXAMPLES, so nothing above may call them
+         * the heaviest or the top three. If a weight is ever put back, that
+         * framing has to come back with it. */
         {
           list: [
-            "How much difference it would make. 25 percent.",
-            "How many other organisations in the district share the same problem. 20 percent.",
-            "Whether five weeks was honestly enough to finish something useful. 20 percent.",
+            "How much difference it would make",
+            "How many other organisations in the district share the same problem",
+            "Whether five weeks was honestly enough to finish something useful",
           ],
         },
-        // The reassurance, after the list rather than inside it.
-        "It is not a reflection on your organisation or on the problem you brought us.",
+        /* The reassurance, after the list rather than inside it.
+         *
+         * "A very close field" rather than a bare denial. "It is not a
+         * reflection on you" is the sentence every decline contains and every
+         * reader discounts; pairing it with the thing that makes it true, which
+         * is that the decisions were hard, is what gives it something to stand
+         * on. The Chair's "challenging decisions" two paragraphs above is the
+         * same fact, so this reads as a continuation rather than a new claim. */
+        "It was a very close field, and this is not a reflection on your organisation or on the problem you brought us.",
         // "Today", not "tomorrow": this sends on the same day as the
         // announcement.
         "The three that were chosen are announced publicly later today, and you will most likely see that email as well.",
@@ -342,16 +364,29 @@ export function communityDecline(replyTo: string): Message {
          * more than once, across groups that look nothing like each other.
          *
          * No prices; see the note at the top of this function. */
-        "Some of the shapes we saw, as examples. Tracking what a grant commits you to, and what is left, is usually a chart of accounts change in Xero rather than anything new. Volunteer hours collected for funder reporting is what Zelos does, and it has a free community plan. Club membership, subscriptions and equipment records are covered by Sporty, which is free and built in New Zealand. Lending gear or tools out and getting them back is what myTurn is for.",
-        /* The offer, in the third person.
+        "A few examples, from the problems we saw more than once. Tracking what a grant commits you to, and what is left of it, is usually a chart of accounts change in Xero rather than anything new. Volunteer hours collected for funder reporting is what Zelos does, and it has a free community plan. Club membership, subscriptions and equipment records are covered by Sporty, which is free and built in New Zealand. Lending gear or tools out and getting them back is what myTurn is for.",
+        /* First person, because the Chair signs the letter.
          *
-         * Names the Chair and the role rather than saying "I", because the
-         * reply address is a personal one and a reader who has never met him
-         * should know who is going to answer and in what capacity before they
-         * write. */
-        "Yours may well have an answer like that, and we have notes on every application. Reply to this email and the Community Tech Lab chair, Giovanni Stephens, will walk you through what we found for your problem and whether it is worth pursuing. Plans and prices move, so anything we point you at is a starting point to check rather than a recommendation to buy.",
-        "If you would rather talk about how your application was read, he is happy to do that too.",
-        "If we run the programme again, I would be glad to see your application come back.",
+         * This named him in the third person for a while, on the reasoning that
+         * a reader who has never met him should know who was going to answer.
+         * The signature already does that, four lines below, and a letter that
+         * refers to its own author by name and title reads as though it was
+         * written by somebody else on his behalf. Which, for a decline offering
+         * a personal conversation, is the wrong impression entirely. */
+        "Yours may well have one, and we kept notes on every application. Reply to this email and I will tell you what we found for your problem and whether it looks worth pursuing. Plans and prices move, so treat anything we point you at as a starting point to check rather than a recommendation to buy.",
+        /* NOTHING ABOUT A SECOND ROUND, AND THAT IS THE POINT.
+         *
+         * This closed on "if we run the programme again, I would be glad to see
+         * your application come back". Removed at the Chair's direction: whether
+         * there is another round is not decided, and this is exactly the
+         * audience that would remember being invited back. Even hedged with
+         * "if", a closing line about next time sets an expectation the
+         * programme may not be able to meet, and these thirteen have already
+         * had one disappointment from us.
+         *
+         * Do not reinstate it, in any hedged form, until a second round is
+         * actually funded. The letter ends on the offer above instead, which is
+         * a thing that exists now. */
       ],
       signoff: "Ngā mihi nui\nGiovanni Stephens\nChair, Community Tech Lab",
       /* Bulk, because it is a broadcast. See the note above on the trade.

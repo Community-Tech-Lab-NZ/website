@@ -5,6 +5,7 @@ import { ClosingCta } from "@/components/ClosingCta";
 import { ExternalLink } from "@/components/ExternalLink";
 import { Pairing } from "@/components/Pairing";
 import { PartnerRow } from "@/components/PartnerRow";
+import { PROFILE_LABEL, ProfileIcon, type ProfileKind } from "@/components/ProfileIcon";
 import { Reveal } from "@/components/Reveal";
 import { Section } from "@/components/Section";
 import { SectionRule } from "@/components/SectionRule";
@@ -21,7 +22,15 @@ export const metadata: Metadata = {
   alternates: { canonical: "/about" },
 };
 
-const PEOPLE = [
+type Person = {
+  name: string;
+  role: string;
+  accent: boolean;
+  paragraphs: string[];
+  links: { kind: ProfileKind; href: string }[];
+};
+
+const PEOPLE: Person[] = [
   {
     name: "Dr Pradeesh Parameswaran",
     role: "Delivery lead",
@@ -32,9 +41,9 @@ const PEOPLE = [
       "His research background is in how people actually write and speak, rather than how software wishes they would, which is a useful instinct in a programme where most of the work is understanding a problem before building anything. He also sits closest to the developers coming through Queenstown Resort College, so he sees which of them are ready for real client work.",
     ],
     links: [
-      { label: "Website", href: "https://www.prasys.info/" },
-      { label: "GitHub", href: "https://github.com/prasys" },
-      { label: "LinkedIn", href: "https://www.linkedin.com/in/prasys/" },
+      { kind: "website", href: "https://www.prasys.info/" },
+      { kind: "github", href: "https://github.com/prasys" },
+      { kind: "linkedin", href: "https://www.linkedin.com/in/prasys/" },
     ],
   },
   {
@@ -47,9 +56,9 @@ const PEOPLE = [
       "He also advised Queenstown Resort College on its data and machine learning programmes, which is part of why QRC students have a guaranteed place in this cohort.",
     ],
     links: [
-      { label: "Website", href: "https://www.giovanni-stephens.com/" },
-      { label: "GitHub", href: "https://github.com/GiovanniStephens" },
-      { label: "LinkedIn", href: "https://www.linkedin.com/in/giovanni-stephens/" },
+      { kind: "website", href: "https://www.giovanni-stephens.com/" },
+      { kind: "github", href: "https://github.com/GiovanniStephens" },
+      { kind: "linkedin", href: "https://www.linkedin.com/in/giovanni-stephens/" },
     ],
   },
 ];
@@ -184,14 +193,15 @@ export default function AboutPage() {
                     {para}
                   </Note>
                 ))}
-                <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2">
+                <div className="mt-5 flex gap-x-5">
                   {person.links.map((link) => (
-                    <ExternalLink
-                      key={link.href}
-                      href={link.href}
-                      className="ctl-hit ctl-link-grow font-sans text-body-sm text-ink underline decoration-kowhai underline-offset-[var(--link-underline-offset)] hover:decoration-fern"
-                    >
-                      {link.label}
+                    <ExternalLink key={link.href} href={link.href} className="ctl-hit ctl-link-grow text-ink">
+                      <ProfileIcon kind={link.kind} />
+                      {/* Named for the person: a screen reader's links list
+                          otherwise has two identical "GitHub" entries. */}
+                      <span className="sr-only">
+                        {PROFILE_LABEL[link.kind]}, {person.name}
+                      </span>
                     </ExternalLink>
                   ))}
                 </div>

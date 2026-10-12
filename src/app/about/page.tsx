@@ -31,6 +31,11 @@ const PEOPLE = [
       "He is responsible for delivery: recruitment, the build schedule, technical standards across the three teams, and getting everything handed over properly.",
       "His research background is in how people actually write and speak, rather than how software wishes they would, which is a useful instinct in a programme where most of the work is understanding a problem before building anything. He also sits closest to the developers coming through Queenstown Resort College, so he sees which of them are ready for real client work.",
     ],
+    links: [
+      { label: "Website", href: "https://www.prasys.info/" },
+      { label: "GitHub", href: "https://github.com/prasys" },
+      { label: "LinkedIn", href: "https://www.linkedin.com/in/prasys/" },
+    ],
   },
   {
     name: "Giovanni Stephens",
@@ -40,6 +45,11 @@ const PEOPLE = [
       "Giovanni founded Queenstown Coders Connect, the district's regular meet-up for local developers, and chairs FLINT Queenstown, the local branch of TUANZ. He works as a software engineer building AI systems.",
       "From 2024 to 2026 he was community investment adviser at Queenstown Lakes District Council, managing the community fund and designing The Funding Series, a capability programme helping community groups become more financially sustainable. That work meant sitting across the table from a lot of local organisations and hearing the same thing repeatedly: the problem was not always money, it was that the tools they needed did not exist at a price they could pay.",
       "He also advised Queenstown Resort College on its data and machine learning programmes, which is part of why QRC students have a guaranteed place in this cohort.",
+    ],
+    links: [
+      { label: "Website", href: "https://www.giovanni-stephens.com/" },
+      { label: "GitHub", href: "https://github.com/GiovanniStephens" },
+      { label: "LinkedIn", href: "https://www.linkedin.com/in/giovanni-stephens/" },
     ],
   },
 ];
@@ -174,6 +184,17 @@ export default function AboutPage() {
                     {para}
                   </Note>
                 ))}
+                <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2">
+                  {person.links.map((link) => (
+                    <ExternalLink
+                      key={link.href}
+                      href={link.href}
+                      className="ctl-hit ctl-link-grow font-sans text-body-sm text-ink underline decoration-kowhai underline-offset-[var(--link-underline-offset)] hover:decoration-fern"
+                    >
+                      {link.label}
+                    </ExternalLink>
+                  ))}
+                </div>
               </Card>
             ))}
           </div>

@@ -142,6 +142,7 @@ There is no icon set in the supplied material, and none has been invented. The o
 
 - Emoji: never.
 - Unicode symbols as decoration: never. The caret replaces bullets and arrows.
+- Profile links on the About page are the one exception, added October 2026: a globe for a personal site (Lucide `globe`, 2px stroke) and the GitHub and LinkedIn logos, solid, as their owners draw them. Ink only, because both owners allow their logo in black but not recoloured. All three live in `ProfileIcon`.
 - No icon font, no sprite sheet, no CDN icon library is part of the brand. If a future surface genuinely needs a functional icon set (e.g. an admin tool), pick one restrained outline set at 1.5px to 2px stroke, use it in Ink or Fern only, flag the addition, and add it here rather than mixing sets.
 
 ## Logo handling

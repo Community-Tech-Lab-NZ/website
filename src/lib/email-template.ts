@@ -65,9 +65,16 @@ export type EmailMeta = {
   /** What the HTML part shows in place of `value`, for when the value is a
    *  40-character Google Docs URL that would wrap across three lines. */
   display?: string;
+  /** A 20px mark before the value, as a 40px PNG on white. Decorative: the value names it. */
+  icon?: string;
 };
 
-export type EmailCta = { label: string; href: string };
+export type EmailCta = {
+  label: string;
+  href: string;
+  /** Kōwhai with an Ink label instead of Ink with Oat. Full-width section buttons always are. */
+  gold?: boolean;
+};
 
 /* One mark in the credit wall.
  *
@@ -202,6 +209,10 @@ export type EmailSection = {
   list?: EmailList;
   /** Caret by default; "number" where the order carries meaning. */
   listMarker?: EmailListMarker;
+  /** A full-width Kōwhai button closing the section, for the one action the message is for. */
+  cta?: EmailCta;
+  /** Labels above values, for short labels like When and Where that are read first. */
+  metaLabelsFirst?: boolean;
 };
 
 /* What bulk mail has to carry and transactional mail must not.
@@ -492,21 +503,25 @@ function htmlLink(href: string, label: string): string {
  * VALUE FIRST, because it is what the reader is scanning for, and because it is
  * the shorter of the two. The label under it in muted ink reads as a caption on
  * the date rather than as a second fact. */
-function htmlMeta(meta: EmailMeta[]): string {
+function htmlMeta(meta: EmailMeta[], labelsFirst = false): string {
   const rows = meta
-    .map(
-      (item) => `
+    .map((item) => {
+      const icon = item.icon
+        ? `<img src="${escapeHtml(item.icon)}" width="20" height="20" alt="" style="display:inline-block;border:0;width:20px;height:20px;vertical-align:-4px;margin-right:8px;">`
+        : "";
+      const value = `<p style="margin:${labelsFirst ? "2px 0 0" : "0"};font-family:${BODY};font-size:15px;line-height:1.5;color:${INK};word-break:break-word;">${icon}${
+        item.href
+          ? htmlLink(item.href, item.display ?? item.value)
+          : escapeHtml(item.display ?? item.value)
+      }</p>`;
+      const label = `<p style="margin:${labelsFirst ? "0" : "2px 0 0"};font-family:${BODY};font-size:14px;line-height:1.5;color:${INK_MUTED};">${escapeHtml(item.label)}</p>`;
+      return `
         <tr>
           <td style="padding:12px 0;border-top:1px solid ${HAIRLINE};" valign="top">
-            <p style="margin:0;font-family:${BODY};font-size:15px;line-height:1.5;color:${INK};word-break:break-word;">${
-              item.href
-                ? htmlLink(item.href, item.display ?? item.value)
-                : escapeHtml(item.display ?? item.value)
-            }</p>
-            <p style="margin:2px 0 0;font-family:${BODY};font-size:14px;line-height:1.5;color:${INK_MUTED};">${escapeHtml(item.label)}</p>
+            ${labelsFirst ? label + value : value + label}
           </td>
-        </tr>`,
-    )
+        </tr>`;
+    })
     .join("");
 
   return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;margin-top:28px;">${rows}</table>`;
@@ -607,7 +622,8 @@ function htmlSection(section: EmailSection): string {
     section.image ? htmlImage(section.image) : "",
     ...(section.paragraphs ?? []).map((text, i) => htmlParagraph(text, i === 0 && !section.image ? 14 : 18)),
     section.list?.length ? htmlList(section.list, 20, section.listMarker) : "",
-    section.meta?.length ? htmlMeta(section.meta) : "",
+    section.meta?.length ? htmlMeta(section.meta, section.metaLabelsFirst) : "",
+    section.cta ? htmlCta(section.cta, true) : "",
   ]
     .filter(Boolean)
     .join("\n");
@@ -622,15 +638,21 @@ function htmlSection(section: EmailSection): string {
     </table>`;
 }
 
-function htmlCta(cta: EmailCta): string {
+function htmlCta(cta: EmailCta, full = false): string {
   // A table cell with a background colour, not a styled <a>. Outlook ignores
   // padding on inline elements, so a padded link collapses to bare underlined
   // text on the one client where the button matters most. Flat Ink, Oat label,
   // near-square corners, no shadow, exactly as the site draws it.
-  return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:32px;">
+  // Gold buttons carry an Ink label (8.2:1). Keep to one per screen, as the brand asks.
+  const width = full ? ` width="100%" style="width:100%;margin-top:28px;"` : ` style="margin-top:32px;"`;
+  const gold = full || cta.gold;
+  const link = full
+    ? "display:block;padding:20px 24px;font-size:19px;text-align:center;"
+    : "display:inline-block;padding:15px 30px;font-size:16px;";
+  return `<table role="presentation" cellpadding="0" cellspacing="0" border="0"${width}>
       <tr>
-        <td style="background-color:${INK};border-radius:2px;">
-          <a href="${escapeHtml(cta.href)}" style="display:inline-block;padding:15px 30px;font-family:${DISPLAY};font-size:16px;font-weight:700;line-height:1.2;color:${OAT};text-decoration:none;">${escapeHtml(cta.label)}</a>
+        <td align="center" style="background-color:${gold ? KOWHAI : INK};border-radius:2px;">
+          <a href="${escapeHtml(cta.href)}" style="${link}font-family:${DISPLAY};font-weight:700;line-height:1.2;color:${gold ? INK : OAT};text-decoration:none;">${escapeHtml(cta.label)}</a>
         </td>
       </tr>
     </table>`;
@@ -811,7 +833,7 @@ export function renderHtmlEmail(content: EmailContent): string {
     htmlEyebrow(content.eyebrow),
     `<h1 class="ctl-heading" style="margin:18px 0 0;font-family:${DISPLAY};font-size:34px;line-height:1.1;font-weight:800;color:${INK};">${escapeHtml(content.heading)}</h1>`,
     content.lede
-      ? `<p style="margin:14px 0 0;font-family:${BODY};font-size:19px;line-height:1.5;color:${INK_BODY};">${brandMark(escapeMultiline(content.lede))}</p>`
+      ? `<p style="margin:14px 0 0;font-family:${BODY};font-size:19px;line-height:1.5;color:${INK_BODY};">${inlineLinks(brandMark(escapeMultiline(content.lede)))}</p>`
       : "",
     ...content.intro.map((entry) =>
       typeof entry === "string" ? htmlParagraph(entry, 24) : htmlList(entry.list, 24, entry.marker),
@@ -975,6 +997,7 @@ export function renderTextEmail(content: EmailContent): string {
     if (section.meta?.length) {
       blocks.push(section.meta.map((item) => `${item.label}: ${item.value}`).join("\n"));
     }
+    if (section.cta) blocks.push(`${section.cta.label}:\n${section.cta.href}`);
   }
   if (content.summary) {
     // The same rendering the panel's Doc gets, so the applicant's copy and the

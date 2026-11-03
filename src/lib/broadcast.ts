@@ -104,6 +104,9 @@ export const LIST_REASON = {
   /** Prior correspondence, from the inherited contact records. */
   personalContacts:
     "You are receiving this because you have previously corresponded with someone involved in community work in the Queenstown Lakes district, and your address is in the contact records Community Tech Lab now holds.",
+  /** The Showcase Hui list, which mixes applicants, Community Connect, council and funders. */
+  showcase:
+    "You are receiving this because you applied to Community Tech Lab, your organisation is listed with a Community Connect group, or you fund or work alongside community organisations in the Queenstown Lakes district.",
 } as const;
 
 /* The partner and funder marks, closing the message.
@@ -168,9 +171,9 @@ export const CREDIT_WALL = {
      * the exact wording is ever a condition of the grant, put the sentence
      * back and let it repeat.
      *
-     * The date is theirs and unverified by us. If this line outlives the
-     * 2026/27 round it becomes wrong, so it comes out when that round closes. */
-    note: `The Economic Diversification Fund backs groups working together to diversify the local economy. [Applications for 2026/27 are open now](${FUNDER_URL}).`,
+     * The "applications are open" sentence came out when the 2026/27 round
+     * closed. Put a dated one back only while a round is actually open. */
+    note: `The Economic Diversification Fund backs groups working together to diversify the local economy. [See how the fund works](${FUNDER_URL}).`,
   },
 } satisfies EmailLogoWall;
 

@@ -31,6 +31,7 @@ import {
   LIST_REASON,
 } from "../src/lib/broadcast";
 import { renderHtmlEmail, renderTextEmail } from "../src/lib/email-template";
+import { showcaseInviteBroadcast } from "../src/lib/showcase-invite";
 import {
   applicationCopy,
   communityConfirmation,
@@ -225,6 +226,7 @@ const messages: { name: string; message: Message }[] = [
       "practice",
     ),
   },
+  { name: "18-showcase-invite", message: showcaseInviteBroadcast() },
 ];
 
 mkdirSync(OUT, { recursive: true });

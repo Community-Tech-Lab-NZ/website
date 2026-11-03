@@ -59,3 +59,6 @@ next-env.d.ts
 # Drive alongside the permissions for them, which is also where the next person
 # has to go for the ones we were not given.
 /assets/photos/
+
+# people's addresses for the broadcast scripts; the repo is public
+/scripts/private/

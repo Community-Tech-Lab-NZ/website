@@ -34,6 +34,7 @@
 import { Resend } from "resend";
 import { renderHtmlEmail, renderTextEmail } from "../src/lib/email-template";
 import { communityDecline } from "../src/lib/outcome";
+import { APPLICANTS } from "./lib/applicants";
 import { loadEnv, reportAndExit } from "./lib/draft-to-lists";
 
 /** Where replies go. The letter offers to talk someone through how their
@@ -43,101 +44,6 @@ const REPLY_TO = "stephens.giovanni@gmail.com";
 
 const SEGMENT = "Community applicants, unsuccessful";
 const BROADCAST = "Application outcome, unsuccessful community applicants";
-
-/* Every organisation that applied, as supplied on 23 September.
- *
- * ALL SIXTEEN ARE HERE, including the three that were chosen. They carry
- * `chosen: true` and are filtered out below rather than being absent, so that
- * the guard at the end can assert they are not in the segment. A roster with
- * them already removed cannot prove anything about them.
- *
- * `firstName` is what Resend substitutes into the greeting. It is the contact's
- * first name as given, except where noted.
- *
- * NAMES ARE AS THE ORGANISATION WROTE THEM, with two corrections that are
- * typography rather than fact: "Whakatipu Reforestation TRust" and the double
- * space in the Dark Sky row. Both are chosen rows and neither is mailed, so the
- * corrections only affect what gets printed to the console.
- */
-type Applicant = {
-  org: string;
-  firstName: string;
-  email: string;
-  chosen?: true;
-  note?: string;
-};
-
-const APPLICANTS: Applicant[] = [
-  { org: "Grow Wānaka Community Garden", firstName: "Emberly", email: "applicant01@example.org" },
-  {
-    org: "Tāhuna Glenorchy Dark Sky Sanctuary, under the Glenorchy Heritage and Museum Group",
-    firstName: "Leslie",
-    email: "applicant02@example.org",
-    chosen: true,
-  },
-  { org: "Te Atamira Whakatipu Community Trust", firstName: "Ruth", email: "applicant03@example.org" },
-  { org: "The Lightfoot Initiative", firstName: "Paul", email: "applicant04@example.org" },
-  { org: "Headlight Trust", firstName: "Niamh", email: "applicant05@example.org" },
-  {
-    org: "Wao Aotearoa, Better Events Collective Working Group",
-    firstName: "Kelcey",
-    email: "applicant06@example.org",
-  },
-  {
-    org: "Arrowtown Primary School",
-    firstName: "Hannah",
-    email: "applicant07@example.org",
-  },
-  {
-    org: "Japanese Family Society of Queenstown",
-    firstName: "Keiko",
-    email: "applicant08@example.org",
-  },
-  { org: "Queenstown Ice Hockey Club", firstName: "JC", email: "applicant09@example.org" },
-  {
-    org: "Whakatipu Reforestation Trust",
-    firstName: "Sararose",
-    email: "applicant10@example.org",
-    chosen: true,
-  },
-  {
-    org: "Upper Clutha Children's Medical Trust",
-    firstName: "Diana",
-    email: "applicant11@example.org",
-  },
-  {
-    org: "WAI Wanaka",
-    firstName: "Prue",
-    email: "applicant12@example.org",
-    /* The supplied row had "Prue" in the contact column and "Kane" in the role
-     * column, which is a column shift rather than a person called Prue with the
-     * role "Kane". Read as Prue Kane, with no role recorded. Only the first
-     * name is used, so the reading is safe either way: "Kia ora Prue" is
-     * correct whether or not Kane is the surname. */
-    note: "Surname read from a shifted column, first name only is used",
-  },
-  {
-    org: "Women's Shed Aotearoa",
-    firstName: "Alex",
-    email: "applicant13@example.org",
-  },
-  {
-    org: "Queenstown Lakes Community Housing Trust",
-    firstName: "Julie",
-    email: "applicant14@example.org",
-  },
-  {
-    org: "Wanaka Community Hub",
-    firstName: "Alicia",
-    email: "applicant15@example.org",
-  },
-  {
-    org: "Queenstown Mountain Bike Club",
-    firstName: "Natalie",
-    email: "applicant16@example.org",
-    chosen: true,
-  },
-];
 
 async function main() {
   const recipients = APPLICANTS.filter((a) => !a.chosen);

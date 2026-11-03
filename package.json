@@ -20,6 +20,7 @@
     "broadcast:final": "tsx scripts/create-final-call-broadcast.ts",
     "broadcast:announce": "tsx scripts/create-announcement-broadcast.ts",
     "broadcast:decline": "tsx scripts/create-community-decline-broadcast.ts",
+    "broadcast:showcase": "tsx scripts/create-showcase-broadcast.ts",
     "outcome:draft": "tsx scripts/create-outcome-broadcast.ts",
     "check:mobile": "node scripts/mobile-check.mjs",
     "build:photos": "node scripts/build-email-photos.mjs"

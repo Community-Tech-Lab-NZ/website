@@ -30,6 +30,8 @@ const WORK: Record<string, { paragraphs: string[]; image: EmailImage }> = {
     image: photo(
       "reminder-dark-sky",
       "A volunteer holding two sky meters up under the Milky Way, mountains dark on the horizon",
+      // Giovanni's best guess, 13 November: the sanctuary's photographer, not confirmed.
+      "Corrine Davis",
     ),
   },
   "reforestation-volunteers": {

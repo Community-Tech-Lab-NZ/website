@@ -168,6 +168,7 @@ const PHOTOS = [
     out: "reminder-dark-sky",
     src: "dark-sky-readings-milky-way.jpeg",
     alt: "A volunteer holding two sky meters up under the Milky Way, mountains dark on the horizon",
+    credit: "Corrine Davis", // best guess, not confirmed
     use: "reminder",
   },
   {

@@ -160,6 +160,35 @@ const PHOTOS = [
     src: "786030674_18351567439217583_7742938609854745050_n.jpg",
     alt: "A newly cut trail climbing through pines, with the range visible through the trees",
   },
+
+  /* THE SHOWCASE HUI REMINDER. The work itself rather than scenery, from the
+   * teams' own folders, 13 November. The berm beats the app screenshot, which
+   * crops badly from portrait and shows a volunteer's name. */
+  {
+    out: "reminder-dark-sky",
+    src: "dark-sky-readings-milky-way.jpeg",
+    alt: "A volunteer holding two sky meters up under the Milky Way, mountains dark on the horizon",
+    use: "reminder",
+  },
+  {
+    out: "reminder-reforestation",
+    src: "wrt-dashboard-overview.png",
+    alt: "The trust's new planting history, showing 140,068 recorded plants across 38 sites and 95 species",
+    gravity: "west", // keeps the headline figure and the sidebar
+    use: "reminder",
+  },
+  {
+    out: "reminder-mtb",
+    src: "mtb-berm-check.jpg",
+    alt: "A club member in a pink helmet checking a berm on a forest trail with a phone",
+    use: "reminder",
+  },
+  {
+    out: "reminder-team",
+    src: "team-at-the-screens.jpeg",
+    alt: "A developer talking through the work with two people from the organisation, at a desk of screens",
+    use: "reminder",
+  },
 ];
 
 /* Only the three that ship, unless asked for all of them.
@@ -173,7 +202,7 @@ const PHOTOS = [
  *
  * Run: node scripts/build-email-photos.mjs --all */
 const ALL = process.argv.includes("--all");
-const SELECTED = ALL ? PHOTOS : PHOTOS.filter((p) => p.use === true);
+const SELECTED = ALL ? PHOTOS : PHOTOS.filter((p) => p.use);
 
 const built = [];
 
@@ -220,7 +249,8 @@ for (const photo of SELECTED) {
 
   built.push({
     name: photo.out,
-    use: photo.use === true,
+    // true is the announcement; a string names another email.
+    use: photo.use === true ? "announcement" : photo.use,
     w: email.info.width,
     h: email.info.height,
     emailKb: email.data.length / 1024,
@@ -228,22 +258,16 @@ for (const photo of SELECTED) {
   });
 }
 
-const shipping = built.filter((b) => b.use);
-const total = shipping.reduce((sum, b) => sum + b.emailKb, 0);
-
 console.log(`Wrote ${built.length} photograph(s)${ALL ? ", including the spares" : ""} to:`);
 console.log(`  ${OUT_EMAIL}   (${EMAIL_W}px JPEG)`);
 console.log(`  ${OUT_SITE}   (${SITE_W}px JPEG and WebP)\n`);
-console.log("For the EmailImage entries in src/lib/announcement.ts:\n");
+console.log("For the EmailImage entries:\n");
 for (const b of built) {
   console.log(
-    `  ${b.use ? "*" : " "} ${b.name.padEnd(28)} w: ${b.w}, h: ${b.h}   email ${b.emailKb.toFixed(0)}KB, site ${b.siteKb.toFixed(0)}KB`,
+    `  ${(b.use ?? "").padEnd(13)} ${b.name.padEnd(28)} w: ${b.w}, h: ${b.h}   email ${b.emailKb.toFixed(0)}KB, site ${b.siteKb.toFixed(0)}KB`,
   );
 }
-console.log(
-  `\n* ships in the announcement. ${shipping.length} photographs, ${total.toFixed(0)}KB of email.` +
-    (ALL ? "" : "  Pass --all to build the spares as well."),
-);
+if (!ALL) console.log("\nPass --all to build the spares as well.");
 
 /* A ceiling, not a guideline. Gmail clips a message at 102KB of HTML, which
  * this cannot breach because images are fetched rather than embedded, but a
@@ -251,8 +275,11 @@ console.log(
  * photographs are the whole weight of this email. 300KB is about two seconds on
  * a bad 4G connection, which is the point at which images start arriving after
  * the reader has finished reading. */
-if (total > 300) {
-  throw new Error(
-    `The three shipping photographs come to ${total.toFixed(0)}KB, over the 300KB ceiling. Drop the quality or crop tighter.`,
-  );
+for (const use of new Set(built.map((b) => b.use).filter(Boolean))) {
+  const total = built.filter((b) => b.use === use).reduce((sum, b) => sum + b.emailKb, 0);
+  if (total > 300) {
+    throw new Error(
+      `The ${use} photographs come to ${total.toFixed(0)}KB, over the 300KB ceiling. Drop the quality or crop tighter.`,
+    );
+  }
 }

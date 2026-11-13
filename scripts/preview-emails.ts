@@ -32,6 +32,7 @@ import {
 } from "../src/lib/broadcast";
 import { renderHtmlEmail, renderTextEmail } from "../src/lib/email-template";
 import { showcaseInviteBroadcast } from "../src/lib/showcase-invite";
+import { showcaseReminderBroadcast } from "../src/lib/showcase-reminder";
 import {
   applicationCopy,
   communityConfirmation,
@@ -227,6 +228,7 @@ const messages: { name: string; message: Message }[] = [
     ),
   },
   { name: "18-showcase-invite", message: showcaseInviteBroadcast() },
+  { name: "19-showcase-reminder", message: showcaseReminderBroadcast() },
 ];
 
 mkdirSync(OUT, { recursive: true });

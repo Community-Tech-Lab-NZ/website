@@ -107,6 +107,9 @@ export const LIST_REASON = {
   /** The Showcase Hui list, which mixes applicants, Community Connect, council and funders. */
   showcase:
     "You are receiving this because you applied to Community Tech Lab, your organisation is listed with a Community Connect group, or you fund or work alongside community organisations in the Queenstown Lakes district.",
+  /** The Showcase Hui reminder: every list, so the personal contacts' route is named too. */
+  showcaseReminder:
+    "You are receiving this because you applied to Community Tech Lab, your organisation is listed with a Community Connect group, you fund or work alongside community organisations in the Queenstown Lakes district, or you have corresponded with someone involved in community work here.",
 } as const;
 
 /* The partner and funder marks, closing the message.

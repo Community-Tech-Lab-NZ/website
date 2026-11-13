@@ -39,7 +39,7 @@ const BUILDS: EmailSection[] = CHOSEN.map((build) => {
   return { label: build.name, paragraphs, image: build.image };
 });
 
-const HUI: EmailMeta[] = [
+export const HUI: EmailMeta[] = [
   { label: "When", value: HUI_WHEN },
   { label: "Where", value: "Queenstown Resort College, 7 Coronation Drive, Queenstown" },
 ];

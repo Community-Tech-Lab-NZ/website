@@ -69,8 +69,8 @@ export function showcaseReminderBroadcast(listReason: string = LIST_REASON.showc
       lede: `Five weeks ago, three teams of local developers started building for three Queenstown Lakes community organisations. This week they're putting on the final touches, and on [Thursday 26 November](${RSVP_URL}) they show you what they made.`,
       intro: [
         "Kia ora koutou,",
-        "That went fast. Right now the teams are putting the last pieces in place, switching everything on, and working side by side with the organisations they made it for. It's the first time the district has done anything like this, and there's a lot to celebrate.",
-        "New to us? Community Tech Lab brings local developers and community organisations together to build software the organisations couldn't otherwise afford. Everything we build is open source, for anyone to pick up.",
+        "That went fast! Right now the teams are putting the last pieces in place, switching everything on, and working side by side with the organisations they made it for. It's the first time the district has done anything like this, and there's a lot to celebrate.",
+        "New to us? Community Tech Lab brings local developers and community organisations together to build software the organisations couldn't otherwise afford.",
       ],
       sections: [
         {

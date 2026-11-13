@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
 import { ExternalLink } from "@/components/ExternalLink";
 import { Reveal } from "@/components/Reveal";
@@ -8,6 +9,7 @@ import { SectionRule } from "@/components/SectionRule";
 import { Timeline } from "@/components/Timeline";
 import { Body, Eyebrow, Heading, Lede } from "@/components/Typography";
 import { CHOSEN } from "@/lib/announcement";
+import { HUI_ADDRESS, HUI_VENUE, HUI_WHEN, isShowcaseAhead, RSVP_URL } from "@/lib/showcase";
 import { breadcrumbSchema, JsonLd, showcaseEventSchema } from "@/lib/structured-data";
 
 const LINK =
@@ -193,6 +195,16 @@ export default function BuildsPage() {
                 All three are demonstrated in public at the Showcase Hui, which FLINT
                 Queenstown is running as its Q4 event. It is free to come along.
               </Body>
+              {isShowcaseAhead() ? (
+                <>
+                  <Body className="mt-4">
+                    {HUI_WHEN}, at {HUI_VENUE}, {HUI_ADDRESS}.
+                  </Body>
+                  <Button variant="primary" size="md" href={RSVP_URL} className="mt-6">
+                    RSVP on Humanitix
+                  </Button>
+                </>
+              ) : null}
             </div>
             <div>
               <Eyebrow className="mb-4">Open source</Eyebrow>

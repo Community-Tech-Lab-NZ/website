@@ -1,6 +1,7 @@
 import { applyHref } from "./apply-path";
 import { escapeHtml } from "./html";
 import { ROLES } from "./roles";
+import { HUI_VENUE, RSVP_URL, SHOWCASE_END, SHOWCASE_START } from "./showcase";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "./site";
 
 /* JSON-LD structured data.
@@ -192,20 +193,24 @@ export function showcaseEventSchema() {
     name: "Community Tech Lab Showcase Hui",
     description:
       "The three tools built during the programme are demonstrated publicly, hosted by FLINT Queenstown.",
-    startDate: "2026-11-26",
+    startDate: SHOWCASE_START,
+    endDate: SHOWCASE_END,
     eventStatus: "https://schema.org/EventScheduled",
     eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
     location: {
       "@type": "Place",
-      name: "Queenstown Lakes district",
+      name: HUI_VENUE,
       address: {
         "@type": "PostalAddress",
+        streetAddress: "7 Coronation Drive",
+        addressLocality: "Queenstown",
         addressRegion: "Otago",
         addressCountry: "NZ",
       },
     },
     organizer: { "@id": `${SITE_URL}/#organization` },
     isAccessibleForFree: true,
+    url: RSVP_URL,
   };
 }
 

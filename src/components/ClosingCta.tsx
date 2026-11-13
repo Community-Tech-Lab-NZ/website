@@ -1,6 +1,7 @@
 import { CalloutBanner } from "./CalloutBanner";
 import { Section } from "./Section";
 import { getSiteCopy, getWindowState, isAnnounced } from "@/lib/application-window";
+import { HUI_VENUE, isShowcaseAhead, RSVP_URL } from "@/lib/showcase";
 
 /* The Ink band that closes every content page: same window eyebrow, same
  * action, only the title and note vary per page. Extracted so the window
@@ -31,6 +32,22 @@ export function ClosingCta({
 }) {
   const copy = getSiteCopy();
   const closed = getWindowState() === "closed";
+
+  // Until the night, every page closes on the RSVP.
+  if (isAnnounced() && isShowcaseAhead()) {
+    return (
+      <Section tone="ink" tight>
+        <CalloutBanner
+          bare
+          eyebrow="Showcase Hui, Thursday 26 November"
+          title="Come see what the teams made"
+          note={`5:30pm to 9pm at ${HUI_VENUE}. All three tools shown live, then food and drinks with the district's tech and community crowd.`}
+          actionLabel="RSVP on Humanitix"
+          actionHref={RSVP_URL}
+        />
+      </Section>
+    );
+  }
 
   if (isAnnounced()) {
     return (

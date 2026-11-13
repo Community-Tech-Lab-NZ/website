@@ -2,6 +2,7 @@ import type { Message } from "./email";
 import type { EmailMeta, EmailSection } from "./email-template";
 import { CHOSEN } from "./announcement";
 import { CREDIT_SENTENCE, CREDIT_WALL, LIST_REASON } from "./broadcast";
+import { HUI_ADDRESS, HUI_VENUE, HUI_WHEN, RSVP_URL } from "./showcase";
 import { PRODUCTION_URL } from "./site";
 
 /* The Showcase Hui invitation, with a short progress update on each build.
@@ -10,11 +11,8 @@ import { PRODUCTION_URL } from "./site";
  * ratings, budget, staffing and anything still being negotiated stay out.
  * Energy comes from the wording: the brand bans exclamation marks. */
 
-export const RSVP_URL = "https://events.humanitix.com/community-tech-lab-showcase-hui";
+export { HUI_WHEN, RSVP_URL } from "./showcase";
 export const LINKEDIN_URL = "https://www.linkedin.com/company/community-tech-lab-qt/";
-
-// Asserted by the draft script, because a wrong date or time cannot be recalled.
-export const HUI_WHEN = "Thursday 26 November, 5:30pm to 9pm";
 
 // Two short paragraphs per build: the problem, then what the team made.
 const PROGRESS: Record<string, string[]> = {
@@ -41,7 +39,7 @@ const BUILDS: EmailSection[] = CHOSEN.map((build) => {
 
 export const HUI: EmailMeta[] = [
   { label: "When", value: HUI_WHEN },
-  { label: "Where", value: "Queenstown Resort College, 7 Coronation Drive, Queenstown" },
+  { label: "Where", value: `${HUI_VENUE}, ${HUI_ADDRESS}` },
 ];
 
 export function showcaseInviteBroadcast(listReason: string = LIST_REASON.showcase): Message {

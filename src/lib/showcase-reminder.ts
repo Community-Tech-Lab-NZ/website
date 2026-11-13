@@ -71,8 +71,11 @@ export function showcaseReminderBroadcast(listReason: string = LIST_REASON.showc
         "Kia ora koutou,",
         "That went fast! Right now the teams are switching everything on and working side by side with the organisations they built for. It's the first time we've run this, and we're proud of what's come out of it.",
         "Community Tech Lab is a funded local programme that pairs experienced software engineers with early-career ones to build practical tech solutions for community organisations across the Queenstown Lakes, at no cost.",
+        "Here's a first look at the three new tools.",
       ],
+      // The work before the ask: a full-width button high up read as the end of the email.
       sections: [
+        ...ORGANISATIONS,
         {
           label: "The handover",
           image: photo(
@@ -94,7 +97,6 @@ export function showcaseReminderBroadcast(listReason: string = LIST_REASON.showc
           metaLabelsFirst: true,
           cta: { label: "RSVP on Humanitix", href: RSVP_URL },
         },
-        ...ORGANISATIONS,
         {
           label: "Follow along",
           paragraphs: ["Follow us on LinkedIn for the stories behind each one and photos from the night."],
@@ -112,7 +114,6 @@ export function showcaseReminderBroadcast(listReason: string = LIST_REASON.showc
       outro: [CREDIT_SENTENCE],
       signoff: "Ngā mihi nui\nGiovanni Stephens\nChair, Community Tech Lab",
       logos: CREDIT_WALL,
-      cta: { label: "RSVP now", href: RSVP_URL, gold: true },
       bulk: {
         reason: listReason,
         unsubscribeUrl: "{{{RESEND_UNSUBSCRIBE_URL}}}",

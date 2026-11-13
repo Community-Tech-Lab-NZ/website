@@ -187,7 +187,7 @@ const PHOTOS = [
   {
     out: "reminder-team",
     src: "team-at-the-screens.jpeg",
-    alt: "A developer talking through the work with two people from the organisation, at a desk of screens",
+    alt: "A software engineer talking it through with two people from the organisation, at a desk of screens",
     use: "reminder",
   },
 ];

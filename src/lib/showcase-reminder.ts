@@ -37,7 +37,7 @@ const WORK: Record<string, { paragraphs: string[]; image: EmailImage }> = {
   "reforestation-volunteers": {
     paragraphs: [
       // Figures from the trust's own dashboard, cleared with the trust on 13 November.
-      "For the first time, the trust can see its whole planting history in one place: more than 140,000 recorded plants across 38 sites and 95 species, from autumn 2015 to now. Funder reports come straight out of it.",
+      "Now the trust can see its whole planting history in one place: more than 140,000 recorded plants across 38 sites and 95 species, from autumn 2015 to now. Funder reports come straight out of it.",
     ],
     image: photo(
       "reminder-reforestation",
@@ -46,7 +46,7 @@ const WORK: Record<string, { paragraphs: string[]; image: EmailImage }> = {
   },
   "mtb-ridgeline": {
     paragraphs: [
-      "More than 100 km of trail, and every jump and drop has to be audited against national guidelines. Members now log each feature on their phone, right there on the trail, with before and after photos, and send fixes off for sign-off.",
+      "The club looks after more than 100 km of trail, and every jump and drop has to be audited against national guidelines. Members now log each one on their phone as they go, with before and after photos, and send fixes off for sign-off.",
     ],
     image: photo("reminder-mtb", "A club member in a pink helmet checking a berm on a forest trail with a phone"),
   },
@@ -66,32 +66,33 @@ export function showcaseReminderBroadcast(listReason: string = LIST_REASON.showc
       preheader: "Thursday 26 November at QRC. Three new tools for local community organisations, shown live.",
       eyebrow: "Showcase Hui, Thursday 26 November",
       heading: "Five weeks of work. One night to see it.",
-      lede: `Five weeks ago, three teams of local developers started building for three Queenstown Lakes community organisations. This week they're putting on the final touches, and on [Thursday 26 November](${RSVP_URL}) they show you what they made.`,
+      lede: `Since 12 October, three teams of local software engineers have been building for three Queenstown Lakes community organisations. This week they're putting on the final touches, and on [Thursday 26 November](${RSVP_URL}) they show you what they made.`,
       intro: [
         "Kia ora koutou,",
-        "That went fast! Right now the teams are putting the last pieces in place, switching everything on, and working side by side with the organisations they made it for. It's the first time the district has done anything like this, and there's a lot to celebrate.",
-        "New to us? Community Tech Lab brings local developers and community organisations together to build software the organisations couldn't otherwise afford.",
+        "That went fast! Right now the teams are switching everything on and working side by side with the organisations they built for. It's the first time we've run this, and we're proud of what's come out of it.",
+        "Community Tech Lab is a funded local programme that pairs experienced software engineers with early-career ones to build practical tech solutions for community organisations across the Queenstown Lakes, at no cost.",
       ],
       sections: [
         {
-          label: "Final week",
+          label: "The handover",
           image: photo(
             "reminder-team",
-            "A developer talking through the work with two people from the organisation, at a desk of screens",
+            "A software engineer talking it through with two people from the organisation, at a desk of screens",
           ),
           paragraphs: [
-            "Next comes the handover. Each organisation takes over what was made for it, with training for the people who'll use it every day and six weeks of bug fixes after that. The Showcase Hui lands just as the work goes into real use.",
+            "Each organisation now takes over its new tool, with training for the people who'll use it every day and six weeks of support after that. The Showcase Hui lands just as the work goes into real use.",
           ],
         },
         {
           label: "Come and celebrate with us",
           paragraphs: [
-            "This is where it all comes together. Each team demonstrates what it built, alongside the organisation it built it for. Then we celebrate: good chats, food, beers and wines with the district's tech and community crowd. FLINT Queenstown is hosting it as its Q4 event.",
-            "There's still room, so bring a colleague, or someone from an organisation that could use one of these tools next. Grab your place so we get the food and drinks right. Already have your ticket? Thank you, see you there.",
+            "Each team shows what it made, alongside the organisation it's for. Then it's good chats, food, beers and wines with the district's tech and community crowd. FLINT Queenstown is hosting it as its Q4 event.",
+            "There's still room, so bring a colleague, or someone from a group that could use one of these tools next. RSVP so we get the numbers right.",
+            "Already have your ticket? Thank you, see you there.",
           ],
           meta: HUI,
           metaLabelsFirst: true,
-          cta: { label: "Save your place on Humanitix", href: RSVP_URL },
+          cta: { label: "RSVP on Humanitix", href: RSVP_URL },
         },
         ...ORGANISATIONS,
         {
@@ -109,9 +110,9 @@ export function showcaseReminderBroadcast(listReason: string = LIST_REASON.showc
         },
       ],
       outro: [CREDIT_SENTENCE],
-      signoff: "Ngā mihi\nGiovanni Stephens\nChair, Community Tech Lab",
+      signoff: "Ngā mihi nui\nGiovanni Stephens\nChair, Community Tech Lab",
       logos: CREDIT_WALL,
-      cta: { label: "Save my place", href: RSVP_URL, gold: true },
+      cta: { label: "RSVP now", href: RSVP_URL, gold: true },
       bulk: {
         reason: listReason,
         unsubscribeUrl: "{{{RESEND_UNSUBSCRIBE_URL}}}",

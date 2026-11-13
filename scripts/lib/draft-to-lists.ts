@@ -115,7 +115,8 @@ export async function draftToLists(
   const { message, html, text } = built[0];
   console.log(`${statuses.length} images resolve`);
   console.log(`Subject: ${message.subject}`);
-  console.log(`Call to action: "${message.content.cta?.label}" to ${message.content.cta?.href}`);
+  const cta = message.content.cta ?? message.content.sections?.findLast((s) => s.cta)?.cta;
+  if (cta) console.log(`Call to action: "${cta.label}" to ${cta.href}`);
   console.log(`Body: ${((html.length + text.length) / 1024).toFixed(1)}KB, Gmail clips over ~102KB\n`);
 
   const resend = new Resend(apiKey);
